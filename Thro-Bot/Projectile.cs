@@ -70,9 +70,8 @@ namespace Thro_Bot
         {
             //The Rectangle to render the texture
             Rectangle sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
-            Vector2 origin = m_ProjectileOrigin;
 
-            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle, Color.White, m_fProjectileRotation, origin, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle, Color.White, m_fProjectileRotation, Vector2.Zero, 1f, SpriteEffects.None, 0f);
 
         }
     }

@@ -114,7 +114,7 @@ namespace Thro_Bot
             UpdatePlayer(gameTime);
 
             //Add the projectile
-            //OrbitProjectile();
+            OrbitProjectile();
 
             base.Update(gameTime);
         }
