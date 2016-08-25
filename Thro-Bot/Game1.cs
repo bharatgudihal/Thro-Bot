@@ -76,7 +76,7 @@ namespace Thro_Bot
 
             //Load the projectile texture
             projectileTexture = Content.Load<Texture2D>("Graphics/Discv2");
-            projectile.Initialize(projectileTexture, playerPosition, playerPosition, player.m_fRotation);
+            projectile.Initialize(projectileTexture, playerPosition, playerPosition,player.m_fRotation);
             //Adjust the position of the projectile
             //projectile.m_Position.X = playerPosition.X + 100f;
         }
@@ -123,7 +123,7 @@ namespace Thro_Bot
         private void UpdatePlayer(GameTime gameTime)
         {
 
-            player.m_fRotation -= 0.05f;
+            player.Update();
 
             //Check the case where the space bar is pressed
             if (currentKeyboardState.IsKeyDown(Keys.Space))

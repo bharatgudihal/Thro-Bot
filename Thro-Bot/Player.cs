@@ -21,7 +21,7 @@ namespace Thro_Bot
 
         //The rotation angle of the player
         public float m_fRotation;
-
+        private float rotationSpeed;
 
         //The origin of the player
         public Vector2 m_PlayerOrigin;
@@ -59,13 +59,14 @@ namespace Thro_Bot
             //Set the Player origin
             m_PlayerOrigin = new Vector2(m_PlayerTexture.Width * 0.5f, m_PlayerTexture.Height * 0.5f);
 
+            // Set rotation speed
+            rotationSpeed = 0.05f;
+
         }
 
         public void Update()
         {
-           
-
-
+            m_fRotation -= rotationSpeed;                       
         }
 
         public void Draw(SpriteBatch spriteBatch)
