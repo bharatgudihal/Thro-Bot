@@ -36,8 +36,8 @@ namespace Thro_Bot
             Content.RootDirectory = "Content";
 
             //Change the size of the window
-            graphics.PreferredBackBufferWidth = 480; //set the value to the desired width
-            graphics.PreferredBackBufferHeight = 640; //set the value to the desired height
+            graphics.PreferredBackBufferWidth = 600; //set the value to the desired width
+            graphics.PreferredBackBufferHeight = 800; //set the value to the desired height
             graphics.ApplyChanges();
         }
 
@@ -75,10 +75,9 @@ namespace Thro_Bot
             
 
             //Load the projectile texture
+            Vector2 projectilePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f)+10f, GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.8f));
             projectileTexture = Content.Load<Texture2D>("Graphics/Discv2");
-            projectile.Initialize(projectileTexture, playerPosition, playerPosition,player.m_fRotation);
-            //Adjust the position of the projectile
-            //projectile.m_Position.X = playerPosition.X + 100f;
+            projectile.Initialize(projectileTexture, projectilePosition, playerPosition);            
         }
 
         /// <summary>

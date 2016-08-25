@@ -21,6 +21,7 @@ namespace Thro_Bot
 
         //The rotation of the projectile
         public float m_fProjectileRotation;
+        private float rotationSpeed;
 
         //The origin of the projectile
         public Vector2 m_ProjectileOrigin;
@@ -37,7 +38,7 @@ namespace Thro_Bot
         }
 
 
-        public void Initialize(Texture2D texture, Vector2 position,Vector2 origin, float rotation)
+        public void Initialize(Texture2D texture, Vector2 position,Vector2 origin)
         {
             m_ProjectileTexture = texture;
 
@@ -48,7 +49,7 @@ namespace Thro_Bot
             m_ProjectileOrigin = origin;
 
             //Set the projectile's rotation
-            m_fProjectileRotation = rotation;
+            m_fProjectileRotation = 0f;
 
             //Set the player to be active
             m_bActive = true;
@@ -57,12 +58,14 @@ namespace Thro_Bot
             //Set the angle to 0
             m_fProjectileRotation = 0f;
 
+            rotationSpeed = 0.05f;
+
         }
 
         public void Update()
         {
 
-
+            m_fProjectileRotation -= rotationSpeed;
 
         }
 
@@ -70,8 +73,7 @@ namespace Thro_Bot
         {
             //The Rectangle to render the texture
             Rectangle sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
-
-            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle, Color.White, m_fProjectileRotation, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin/4, 0.5f, SpriteEffects.None, 0f);
 
         }
     }
