@@ -78,7 +78,7 @@ namespace Thro_Bot
             projectileTexture = Content.Load<Texture2D>("Graphics/Discv2");
             projectile.Initialize(projectileTexture, playerPosition, playerPosition,player.m_fRotation);
             //Adjust the position of the projectile
-            //projectile.m_Position.X = playerPosition.X + 100f;
+            projectile.m_Position.X = playerPosition.X + 100f;
         }
 
         /// <summary>
