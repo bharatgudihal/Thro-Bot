@@ -13,10 +13,32 @@ namespace Thro_Bot
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        //Represents the player
+        Player player;
+
+        //represents the projectile
+        Projectile projectile;
+
+
+        //texture of the projectile
+        Texture2D projectileTexture;
+
+        //Keyboard sates used to determine key presses
+        KeyboardState currentKeyboardState;
+        KeyboardState previousKeyboardState;
+
+
+
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            //Change the size of the window
+            graphics.PreferredBackBufferWidth = 480; //set the value to the desired width
+            graphics.PreferredBackBufferHeight = 640; //set the value to the desired height
+            graphics.ApplyChanges();
         }
 
         /// <summary>
@@ -27,6 +49,11 @@ namespace Thro_Bot
         /// </summary>
         protected override void Initialize()
         {
+
+            player = new Player();
+
+            projectile = new Projectile();
+
             // TODO: Add your initialization logic here
 
             base.Initialize();
@@ -41,7 +68,17 @@ namespace Thro_Bot
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            //Load the player resources
+            Vector2 playerPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.8f));
+            player.Initialize(Content.Load<Texture2D>("Graphics/PlayerTestv2"), playerPosition);
+
+            
+
+            //Load the projectile texture
+            projectileTexture = Content.Load<Texture2D>("Graphics/Discv2");
+            projectile.Initialize(projectileTexture, playerPosition, playerPosition, player.m_fRotation);
+            //Adjust the position of the projectile
+            //projectile.m_Position.X = playerPosition.X + 100f;
         }
 
         /// <summary>
@@ -63,10 +100,50 @@ namespace Thro_Bot
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            //The space bar releases the projectile
+
+
+
+            // Save the previous state of the keyboard 
+            previousKeyboardState = currentKeyboardState;
+
+            //Read the current state
+            currentKeyboardState = Keyboard.GetState();
+
+            //Update the player
+            UpdatePlayer(gameTime);
+
+            //Add the projectile
+            //OrbitProjectile();
 
             base.Update(gameTime);
         }
+
+
+        private void UpdatePlayer(GameTime gameTime)
+        {
+
+            player.m_fRotation -= 0.05f;
+
+            //Check the case where the space bar is pressed
+            if (currentKeyboardState.IsKeyDown(Keys.Space))
+            {
+                //Launch the projectile
+
+            }
+
+
+
+
+        }
+
+        protected void OrbitProjectile() {
+
+            projectile.m_fProjectileRotation = player.m_fRotation;
+           
+        }
+
+
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -74,7 +151,20 @@ namespace Thro_Bot
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
+
+            //Start drawing
+            spriteBatch.Begin();
+
+            //Draw the Player
+            player.Draw(spriteBatch);
+
+            //Draw the projectile
+            projectile.Draw(spriteBatch);
+
+            //Stop drawing
+            spriteBatch.End();
+
 
             // TODO: Add your drawing code here
 
