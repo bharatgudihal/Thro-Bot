@@ -113,7 +113,7 @@ namespace Thro_Bot
             UpdatePlayer(gameTime);
 
             //Add the projectile
-            OrbitProjectile();
+            UpdateProjectile();
 
             base.Update(gameTime);
         }
@@ -128,7 +128,7 @@ namespace Thro_Bot
             if (currentKeyboardState.IsKeyDown(Keys.Space))
             {
                 //Launch the projectile
-
+                projectile.m_bInOrbitToPlayer = false;
             }
 
 
@@ -136,10 +136,19 @@ namespace Thro_Bot
 
         }
 
-        protected void OrbitProjectile() {
+        protected void UpdateProjectile() {
 
-            projectile.m_fProjectileRotation = player.m_fRotation;
-           
+            if (projectile.m_Position.X <= 0 || projectile.m_Position.X >= GraphicsDevice.Viewport.Width - projectile.m_iSpriteWidth)
+            {
+                projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+            }
+
+            if (projectile.m_Position.Y <= 0 || projectile.m_Position.Y >= GraphicsDevice.Viewport.Height - projectile.m_iSpriteHeight)
+            {
+                projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
+            }
+
+            projectile.Update();
         }
 
 

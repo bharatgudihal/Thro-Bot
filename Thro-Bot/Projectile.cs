@@ -23,6 +23,12 @@ namespace Thro_Bot
         public float m_fProjectileRotation;
         private float rotationSpeed;
 
+        public float m_fProjectileSpeedX;
+        public float m_fProjectileSpeedY;
+
+        public bool m_bInOrbitToPlayer;
+
+
         //The origin of the projectile
         public Vector2 m_ProjectileOrigin;
 
@@ -46,7 +52,7 @@ namespace Thro_Bot
             m_Position = position;
 
             //Set the origin of the projectile
-            m_ProjectileOrigin = origin;
+            m_ProjectileOrigin = origin/4;
 
             //Set the projectile's rotation
             m_fProjectileRotation = 0f;
@@ -54,9 +60,14 @@ namespace Thro_Bot
             //Set the player to be active
             m_bActive = true;
 
+            //Start with the projectile in orbit with the player
+            m_bInOrbitToPlayer = true;
 
             //Set the angle to 0
             m_fProjectileRotation = 0f;
+
+            m_fProjectileSpeedX = 5f;
+            m_fProjectileSpeedY = 5f;
 
             rotationSpeed = 0.05f;
 
@@ -65,7 +76,18 @@ namespace Thro_Bot
         public void Update()
         {
 
-            m_fProjectileRotation -= rotationSpeed;
+
+
+            if (m_bInOrbitToPlayer)
+            {
+                m_fProjectileRotation -= rotationSpeed;
+            }
+            else {
+
+                m_Position.X -= (float)(m_fProjectileSpeedX * Math.Cos((double)m_fProjectileRotation));
+                m_Position.Y -= (float)(m_fProjectileSpeedY * Math.Sin((double)m_fProjectileRotation));
+            }
+
 
         }
 
@@ -73,7 +95,7 @@ namespace Thro_Bot
         {
             //The Rectangle to render the texture
             Rectangle sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
-            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin/4, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, 1f, SpriteEffects.None, 0f);
 
         }
     }
