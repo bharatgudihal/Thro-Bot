@@ -15,23 +15,16 @@ namespace Thro_Bot
 
         //Position of the projectile relative to the upper left side of the screen
         public Vector2 m_Position;
-
-        //The dummy object that will always be rotating around the player avatar
-        public Vector2 m_DummyPosition;
-        //the dummy object's rotation
-        public float m_fDummyRotation;
-        //The dummy object's rotation speed
-        private float m_fDummyRotationSpeed;
-
-        //The origin of the dummy obkect around which ot rotates
-        private Vector2 m_DummyOrigin;
-
+        
         //state of the projectile
         public bool m_bActive;
 
         //The rotation of the projectile
         public float m_fProjectileRotation;
+        public float m_fProjectileRotation_fixed;
         private float rotationSpeed;
+
+        public bool selfRotate;
 
         public float m_fProjectileSpeedX;
         public float m_fProjectileSpeedY;
@@ -41,6 +34,7 @@ namespace Thro_Bot
         //The amount of times the projectile has hit the screen sides to return to the player
         public int m_iBounces;
 
+        public Vector2 selfOrigin;
 
         //The origin of the projectile
         public Vector2 m_ProjectileOrigin;
@@ -69,19 +63,7 @@ namespace Thro_Bot
 
             //Set the projectile's rotation
             m_fProjectileRotation = 0f;
-
-            //Set the dummy Position 
-            m_DummyPosition = position;
-
-            //Set the dummy Rotation
-            m_fDummyRotation = 0f;
-
-            //Set the dummy rotation speed
-            m_fDummyRotationSpeed = 0f;
-
-            //Set the dummy origin
-            m_DummyOrigin = dummyOrigin;
-
+            
             //Set the player to be active
             m_bActive = true;
 
@@ -90,6 +72,7 @@ namespace Thro_Bot
 
             //Set the angle to 0
             m_fProjectileRotation = 0f;
+            m_fProjectileRotation_fixed = 0f;
 
             m_fProjectileSpeedX = 10f;
             m_fProjectileSpeedY = 10f;
@@ -98,33 +81,40 @@ namespace Thro_Bot
 
             //Set the number of bounces to 4
             m_iBounces = 4;
-            
+
+            selfRotate = false;
+
+            selfOrigin.X = m_ProjectileTexture.Width / 2;
+            selfOrigin.Y = m_ProjectileTexture.Height / 2;
+
         }
 
         public void Update()
         {
-
-
-
             if (m_bInOrbitToPlayer)
             {
                 m_fProjectileRotation -= rotationSpeed;
-                m_Position = m_DummyPosition;
+                m_fProjectileRotation_fixed = m_fProjectileRotation;
             }
-            else {
-
-                m_Position.X += (float)(m_fProjectileSpeedX * Math.Cos((double)m_fProjectileRotation));
-                m_Position.Y += (float)(m_fProjectileSpeedY * Math.Sin((double)m_fProjectileRotation));
+            else {                
+                m_Position.X += (float)(m_fProjectileSpeedX * Math.Cos((double)m_fProjectileRotation_fixed));
+                m_Position.Y += (float)(m_fProjectileSpeedY * Math.Sin((double)m_fProjectileRotation_fixed));
+                if (selfRotate)
+                {
+                    m_fProjectileRotation -= rotationSpeed;
+                }
+                else
+                {
+                    m_ProjectileOrigin = Vector2.Zero;                   
+                }
             }
-
-
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             //The Rectangle to render the texture
             Rectangle sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
-            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, .5f, SpriteEffects.None, 0f);
 
         }
     }

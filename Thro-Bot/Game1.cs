@@ -129,7 +129,7 @@ namespace Thro_Bot
             if (currentKeyboardState.IsKeyDown(Keys.Space))
             {
                 //Launch the projectile
-                projectile.m_bInOrbitToPlayer = false;
+                projectile.m_bInOrbitToPlayer = false;                
             }
 
 
@@ -148,6 +148,14 @@ namespace Thro_Bot
             {
                 projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
             }
+            if (currentKeyboardState.IsKeyDown(Keys.R)){
+                projectile.m_ProjectileOrigin = projectile.selfOrigin;
+                projectile.selfRotate = true;
+            }else
+            {
+                projectile.m_ProjectileOrigin = Vector2.Zero;
+                projectile.selfRotate = false;
+            }            
 
             projectile.Update();
         }
