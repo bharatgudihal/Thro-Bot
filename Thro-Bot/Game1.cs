@@ -77,7 +77,8 @@ namespace Thro_Bot
             //Load the projectile texture
             Vector2 projectilePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f)+10f, GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.8f));
             projectileTexture = Content.Load<Texture2D>("Graphics/Discv2");
-            projectile.Initialize(projectileTexture, projectilePosition, playerPosition);            
+            projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero,playerPosition);
+            //projectile.m_DummyPosition.X += 10f;            
         }
 
         /// <summary>
@@ -138,7 +139,7 @@ namespace Thro_Bot
 
         protected void UpdateProjectile() {
 
-            if (projectile.m_Position.X <= 0 || projectile.m_Position.X >= GraphicsDevice.Viewport.Width - projectile.m_iSpriteWidth)
+            if (projectile.m_Position.X <= 0 || projectile.m_Position.X >= GraphicsDevice.Viewport.Width - projectile.m_iSpriteWidth/2)
             {
                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
             }

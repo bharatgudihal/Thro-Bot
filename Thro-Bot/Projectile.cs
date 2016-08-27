@@ -16,6 +16,16 @@ namespace Thro_Bot
         //Position of the projectile relative to the upper left side of the screen
         public Vector2 m_Position;
 
+        //The dummy object that will always be rotating around the player avatar
+        public Vector2 m_DummyPosition;
+        //the dummy object's rotation
+        public float m_fDummyRotation;
+        //The dummy object's rotation speed
+        private float m_fDummyRotationSpeed;
+
+        //The origin of the dummy obkect around which ot rotates
+        private Vector2 m_DummyOrigin;
+
         //state of the projectile
         public bool m_bActive;
 
@@ -27,6 +37,9 @@ namespace Thro_Bot
         public float m_fProjectileSpeedY;
 
         public bool m_bInOrbitToPlayer;
+
+        //The amount of times the projectile has hit the screen sides to return to the player
+        public int m_iBounces;
 
 
         //The origin of the projectile
@@ -44,7 +57,7 @@ namespace Thro_Bot
         }
 
 
-        public void Initialize(Texture2D texture, Vector2 position,Vector2 origin)
+        public void Initialize(Texture2D texture, Vector2 position,Vector2 origin,Vector2 dummyOrigin)
         {
             m_ProjectileTexture = texture;
 
@@ -52,10 +65,22 @@ namespace Thro_Bot
             m_Position = position;
 
             //Set the origin of the projectile
-            m_ProjectileOrigin = origin/4;
+            m_ProjectileOrigin = origin;
 
             //Set the projectile's rotation
             m_fProjectileRotation = 0f;
+
+            //Set the dummy Position 
+            m_DummyPosition = position;
+
+            //Set the dummy Rotation
+            m_fDummyRotation = 0f;
+
+            //Set the dummy rotation speed
+            m_fDummyRotationSpeed = 0f;
+
+            //Set the dummy origin
+            m_DummyOrigin = dummyOrigin;
 
             //Set the player to be active
             m_bActive = true;
@@ -66,11 +91,14 @@ namespace Thro_Bot
             //Set the angle to 0
             m_fProjectileRotation = 0f;
 
-            m_fProjectileSpeedX = 5f;
-            m_fProjectileSpeedY = 5f;
+            m_fProjectileSpeedX = 10f;
+            m_fProjectileSpeedY = 10f;
 
             rotationSpeed = 0.05f;
 
+            //Set the number of bounces to 4
+            m_iBounces = 4;
+            
         }
 
         public void Update()
@@ -81,11 +109,12 @@ namespace Thro_Bot
             if (m_bInOrbitToPlayer)
             {
                 m_fProjectileRotation -= rotationSpeed;
+                m_Position = m_DummyPosition;
             }
             else {
 
-                m_Position.X -= (float)(m_fProjectileSpeedX * Math.Cos((double)m_fProjectileRotation));
-                m_Position.Y -= (float)(m_fProjectileSpeedY * Math.Sin((double)m_fProjectileRotation));
+                m_Position.X += (float)(m_fProjectileSpeedX * Math.Cos((double)m_fProjectileRotation));
+                m_Position.Y += (float)(m_fProjectileSpeedY * Math.Sin((double)m_fProjectileRotation));
             }
 
 
