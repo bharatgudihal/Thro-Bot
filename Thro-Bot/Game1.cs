@@ -77,7 +77,8 @@ namespace Thro_Bot
             //Load the projectile texture
             Vector2 projectilePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f)+10f, GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.8f));
             projectileTexture = Content.Load<Texture2D>("Graphics/Discv2");
-            projectile.Initialize(projectileTexture, projectilePosition, playerPosition);            
+            projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero,playerPosition);
+            //projectile.m_DummyPosition.X += 10f;            
         }
 
         /// <summary>
@@ -113,7 +114,7 @@ namespace Thro_Bot
             UpdatePlayer(gameTime);
 
             //Add the projectile
-            OrbitProjectile();
+            UpdateProjectile();
 
             base.Update(gameTime);
         }
@@ -128,7 +129,7 @@ namespace Thro_Bot
             if (currentKeyboardState.IsKeyDown(Keys.Space))
             {
                 //Launch the projectile
-
+                projectile.m_bInOrbitToPlayer = false;
             }
 
 
@@ -136,10 +137,19 @@ namespace Thro_Bot
 
         }
 
-        protected void OrbitProjectile() {
+        protected void UpdateProjectile() {
 
-            projectile.m_fProjectileRotation = player.m_fRotation;
-           
+            if (projectile.m_Position.X <= 0 || projectile.m_Position.X >= GraphicsDevice.Viewport.Width - projectile.m_iSpriteWidth/2)
+            {
+                projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+            }
+
+            if (projectile.m_Position.Y <= 0 || projectile.m_Position.Y >= GraphicsDevice.Viewport.Height - projectile.m_iSpriteHeight)
+            {
+                projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
+            }
+
+            projectile.Update();
         }
 
 
