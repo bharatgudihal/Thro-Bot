@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+using System.Collections.Generic;
+
 // Testing commit sync
 namespace Thro_Bot
 {
@@ -18,6 +20,8 @@ namespace Thro_Bot
 
         //represents the projectile
         Projectile projectile;
+
+		List<BasicEnemy> enemies;
 
 
         //texture of the projectile
@@ -39,6 +43,7 @@ namespace Thro_Bot
             graphics.PreferredBackBufferWidth = 600; //set the value to the desired width
             graphics.PreferredBackBufferHeight = 800; //set the value to the desired height
             graphics.ApplyChanges();
+
         }
 
         /// <summary>
@@ -53,6 +58,10 @@ namespace Thro_Bot
             player = new Player();
 
             projectile = new Projectile();
+
+			enemies = new List<BasicEnemy>() {
+				new BasicEnemy()
+			};
 
             // TODO: Add your initialization logic here
 
@@ -78,7 +87,16 @@ namespace Thro_Bot
             Vector2 projectilePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f)+10f, GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.8f));
             projectileTexture = Content.Load<Texture2D>("Graphics/Discv2");
             projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero,playerPosition);
-            //projectile.m_DummyPosition.X += 10f;            
+            //projectile.m_DummyPosition.X += 10f;   
+			
+			// Load the basic enemy resources
+			BasicEnemy.Texture = Content.Load<Texture2D>("Graphics/enemy1");
+			foreach (BasicEnemy enemy in enemies) {
+				enemy.Initialize (BasicEnemy.Texture, new Vector2 (
+					GraphicsDevice.Viewport.TitleSafeArea.X + GraphicsDevice.Viewport.Width/2, 
+					GraphicsDevice.Viewport.TitleSafeArea.Y + GraphicsDevice.Viewport.Height/2)
+				);
+			}
         }
 
         /// <summary>
@@ -115,6 +133,10 @@ namespace Thro_Bot
 
             //Add the projectile
             UpdateProjectile();
+
+			foreach (BasicEnemy enemy in enemies) {
+				enemy.Update(gameTime);
+			}
 
             base.Update(gameTime);
         }
@@ -178,6 +200,9 @@ namespace Thro_Bot
 
             //Draw the projectile
             projectile.Draw(spriteBatch);
+
+			foreach (BasicEnemy enemy in enemies)
+				enemy.Draw (spriteBatch);
 
             //Stop drawing
             spriteBatch.End();
