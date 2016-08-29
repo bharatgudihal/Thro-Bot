@@ -148,15 +148,12 @@ namespace Thro_Bot
             {
                 projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
             }
-            if (currentKeyboardState.IsKeyDown(Keys.R)){
-                projectile.m_ProjectileOrigin = projectile.selfOrigin;
+            if (currentKeyboardState.IsKeyDown(Keys.R)){             
                 projectile.selfRotate = true;
             }else
             {
-                projectile.m_ProjectileOrigin = Vector2.Zero;
                 projectile.selfRotate = false;
-            }            
-
+            }
             projectile.Update();
         }
 

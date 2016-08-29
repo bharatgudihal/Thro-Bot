@@ -24,6 +24,8 @@ namespace Thro_Bot
         public float m_fProjectileRotation_fixed;
         private float rotationSpeed;
 
+        private int frameCount = 0;
+
         public bool selfRotate;
 
         public float m_fProjectileSpeedX;
@@ -96,17 +98,14 @@ namespace Thro_Bot
                 m_fProjectileRotation -= rotationSpeed;
                 m_fProjectileRotation_fixed = m_fProjectileRotation;
             }
-            else {                
+            else {
                 m_Position.X += (float)(m_fProjectileSpeedX * Math.Cos((double)m_fProjectileRotation_fixed));
                 m_Position.Y += (float)(m_fProjectileSpeedY * Math.Sin((double)m_fProjectileRotation_fixed));
                 if (selfRotate)
                 {
-                    m_fProjectileRotation -= rotationSpeed;
-                }
-                else
-                {
-                    m_ProjectileOrigin = Vector2.Zero;                   
-                }
+                    m_ProjectileOrigin = selfOrigin;
+                    m_fProjectileRotation -= rotationSpeed*5;
+                }                
             }
         }
 
@@ -114,7 +113,7 @@ namespace Thro_Bot
         {
             //The Rectangle to render the texture
             Rectangle sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
-            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, .5f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, 1f, SpriteEffects.None, 0f);
 
         }
     }
