@@ -40,7 +40,7 @@ namespace Thro_Bot
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(Texture, Position, rectangle, Color.White, 0f, origin, 0.5f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(Texture, Position, rectangle, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
         }
     }
         

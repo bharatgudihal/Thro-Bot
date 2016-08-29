@@ -111,7 +111,7 @@ namespace Thro_Bot
 
         public void Draw(SpriteBatch spriteBatch)
         {                        
-            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, .5f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, 1f, SpriteEffects.None, 0f);
         }
     }
 }

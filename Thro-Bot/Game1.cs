@@ -185,11 +185,10 @@ namespace Thro_Bot
         }
 
         private bool CheckCollision(Enemy1 enemy)
-        {
-            Rectangle enemyRectangle = new Rectangle((int)enemy.Position.X, (int)enemy.Position.Y, enemy.Texture.Width/4, enemy.Texture.Height/4);
-            Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X, (int)projectile.m_Position.Y, projectile.m_ProjectileTexture.Width/2, projectile.m_ProjectileTexture.Height/2);
-            bool sillyFlag = enemyRectangle.Intersects(projectileRectangle);        
-            return sillyFlag;
+        {            
+            Rectangle enemyRectangle = new Rectangle((int)enemy.Position.X, (int)enemy.Position.Y, enemy.Texture.Width-35, enemy.Texture.Height-50);
+            Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X-projectile.m_ProjectileTexture.Width/2, (int)projectile.m_Position.Y-projectile.m_ProjectileTexture.Height/2, projectile.m_ProjectileTexture.Width, projectile.m_ProjectileTexture.Height);
+            return enemyRectangle.Intersects(projectileRectangle);
         }
 
         private void SpawnEnemies(GameTime gameTime)
