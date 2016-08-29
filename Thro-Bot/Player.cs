@@ -57,6 +57,7 @@ namespace Thro_Bot
             m_fRotation = 0f;
 
             //Set the Player origin
+            //m_PlayerOrigin = Vector2.Zero;
             m_PlayerOrigin = new Vector2(m_PlayerTexture.Width * 0.5f, m_PlayerTexture.Height * 0.5f);
 
             // Set rotation speed

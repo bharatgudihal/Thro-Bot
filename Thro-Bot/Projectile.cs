@@ -24,8 +24,6 @@ namespace Thro_Bot
         public float m_fProjectileRotation_fixed;
         private float rotationSpeed;
 
-        private int frameCount = 0;
-
         public bool selfRotate;
 
         public float m_fProjectileSpeedX;
@@ -36,7 +34,6 @@ namespace Thro_Bot
         //The amount of times the projectile has hit the screen sides to return to the player
         public int m_iBounces;
 
-        public Vector2 selfOrigin;
 
         //The origin of the projectile
         public Vector2 m_ProjectileOrigin;
@@ -53,7 +50,7 @@ namespace Thro_Bot
         }
 
 
-        public void Initialize(Texture2D texture, Vector2 position,Vector2 origin,Vector2 dummyOrigin)
+        public void Initialize(Texture2D texture, Vector2 position,Vector2 origin)
         {
             m_ProjectileTexture = texture;
 
@@ -61,7 +58,7 @@ namespace Thro_Bot
             m_Position = position;
 
             //Set the origin of the projectile
-            m_ProjectileOrigin = origin;
+            m_ProjectileOrigin = new Vector2(texture.Width/2,texture.Height/2);
 
             //Set the projectile's rotation
             m_fProjectileRotation = 0f;
@@ -82,30 +79,36 @@ namespace Thro_Bot
             rotationSpeed = 0.05f;
 
             //Set the number of bounces to 4
-            m_iBounces = 4;
+            m_iBounces = 0;
 
             selfRotate = false;
 
-            selfOrigin.X = m_ProjectileTexture.Width / 2;
-            selfOrigin.Y = m_ProjectileTexture.Height / 2;
-
         }
 
-        public void Update()
+        public void Update(Vector2 origin)
         {
             if (m_bInOrbitToPlayer)
             {
-                m_fProjectileRotation -= rotationSpeed;
+                m_fProjectileRotation -= rotationSpeed * 4f;
+
+                
+
+                //The equation of a circle
+                m_Position.X = origin.X + (float)(40f * Math.Cos((double)m_fProjectileRotation / 2));
+                m_Position.Y = origin.Y + (float)(40f * Math.Sin((double)m_fProjectileRotation/ 2));
+
                 m_fProjectileRotation_fixed = m_fProjectileRotation;
             }
             else {
+
                 m_Position.X += (float)(m_fProjectileSpeedX * Math.Cos((double)m_fProjectileRotation_fixed));
                 m_Position.Y += (float)(m_fProjectileSpeedY * Math.Sin((double)m_fProjectileRotation_fixed));
+
                 if (selfRotate)
                 {
-                    m_ProjectileOrigin = selfOrigin;
-                    m_fProjectileRotation -= rotationSpeed*5;
-                }                
+                    m_fProjectileRotation -= rotationSpeed * 8f;
+                }
+               
             }
         }
 
@@ -113,7 +116,7 @@ namespace Thro_Bot
         {
             //The Rectangle to render the texture
             Rectangle sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
-            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, .5f, SpriteEffects.None, 0f);
 
         }
     }

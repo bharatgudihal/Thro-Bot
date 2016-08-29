@@ -28,7 +28,8 @@ namespace Thro_Bot
         KeyboardState previousKeyboardState;
 
 
-
+        //The texture of the background
+        Texture2D backgroundTexture;
 
         public Game1()
         {
@@ -69,16 +70,19 @@ namespace Thro_Bot
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             //Load the player resources
-            Vector2 playerPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.8f));
-            player.Initialize(Content.Load<Texture2D>("Graphics/PlayerTestv2"), playerPosition);
-
-            
+            //Vector2 playerPosition = Vector2.Zero;
+            Vector2 playerPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.81f));
+            player.Initialize(Content.Load<Texture2D>("Graphics/PlayerTestv2"), playerPosition);          
 
             //Load the projectile texture
-            Vector2 projectilePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f)+10f, GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.8f));
+            Vector2 projectilePosition = new Vector2(playerPosition.X + 10f, playerPosition.Y);
             projectileTexture = Content.Load<Texture2D>("Graphics/Discv2");
-            projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero,playerPosition);
-            //projectile.m_DummyPosition.X += 10f;            
+            projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
+
+
+            //Load the background 
+            backgroundTexture = Content.Load<Texture2D>("Graphics/Background");
+
         }
 
         /// <summary>
@@ -99,9 +103,6 @@ namespace Thro_Bot
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            //The space bar releases the projectile
-
 
 
             // Save the previous state of the keyboard 
@@ -139,22 +140,36 @@ namespace Thro_Bot
 
         protected void UpdateProjectile() {
 
-            if (projectile.m_Position.X <= 0 || projectile.m_Position.X >= GraphicsDevice.Viewport.Width - projectile.m_iSpriteWidth/2)
+            if (projectile.m_Position.X <= 10f || projectile.m_Position.X >= GraphicsDevice.Viewport.TitleSafeArea.Width - 10f)
             {
                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+                projectile.m_iBounces++;
             }
 
-            if (projectile.m_Position.Y <= 0 || projectile.m_Position.Y >= GraphicsDevice.Viewport.Height - projectile.m_iSpriteHeight)
+            if (projectile.m_Position.Y <= 10f || projectile.m_Position.Y >= GraphicsDevice.Viewport.TitleSafeArea.Height - 10f)
             {
                 projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
+                projectile.m_iBounces++;
             }
-            if (currentKeyboardState.IsKeyDown(Keys.R)){             
+
+            if (projectile.m_iBounces > 4) {
+
+                projectile.m_bInOrbitToPlayer = true;
+
+                //Reset the bounces
+                projectile.m_iBounces = 0;
+            }
+
+
+            //Check is projectile has been launched, rotate it around its center
+            if (currentKeyboardState.IsKeyDown(Keys.Space)){                
                 projectile.selfRotate = true;
             }else
             {
                 projectile.selfRotate = false;
-            }
-            projectile.Update();
+            }            
+
+            projectile.Update(player.m_Position);
         }
 
 
@@ -167,14 +182,23 @@ namespace Thro_Bot
         {
             GraphicsDevice.Clear(Color.Black);
 
+
+
             //Start drawing
             spriteBatch.Begin();
+
+
+            //Draw the background
+            Rectangle sourceRectangle = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            spriteBatch.Draw(backgroundTexture, sourceRectangle,Color.White);
 
             //Draw the Player
             player.Draw(spriteBatch);
 
             //Draw the projectile
             projectile.Draw(spriteBatch);
+
+            
 
             //Stop drawing
             spriteBatch.End();
