@@ -75,7 +75,7 @@ namespace Thro_Bot
             //The Rectangle to render the texture
             Rectangle sourceRectangle = new Rectangle(0, 0, m_PlayerTexture.Width, m_PlayerTexture.Height);
             
-            spriteBatch.Draw(m_PlayerTexture,m_Position,sourceRectangle,Color.White,m_fRotation, m_PlayerOrigin, 1f,SpriteEffects.None,0f);
+            spriteBatch.Draw(m_PlayerTexture,m_Position,sourceRectangle,Color.White,m_fRotation, m_PlayerOrigin, .1f,SpriteEffects.None,0f);
 
         }
 

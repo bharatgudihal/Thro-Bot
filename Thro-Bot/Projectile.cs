@@ -6,10 +6,6 @@ namespace Thro_Bot
 {
     class Projectile
     {
-        //The player the projectile is parented to
-
-
-
         //The texture that represents the projectile
         public Texture2D m_ProjectileTexture;
 
@@ -38,6 +34,9 @@ namespace Thro_Bot
         //The origin of the projectile
         public Vector2 m_ProjectileOrigin;
 
+        // Projectile rotation radius
+        private float rotationRadius = 55f;
+
         //Get the width of the player ship sprite
         public int m_iSpriteWidth
         {
@@ -49,6 +48,8 @@ namespace Thro_Bot
             get { return m_ProjectileTexture.Height; }
         }
 
+        // Projectile Rectangle
+        public Rectangle sourceRectangle;
 
         public void Initialize(Texture2D texture, Vector2 position,Vector2 origin)
         {
@@ -83,27 +84,23 @@ namespace Thro_Bot
 
             selfRotate = false;
 
+            //The Rectangle to render the texture
+            sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
+
         }
 
         public void Update(Vector2 origin)
         {
             if (m_bInOrbitToPlayer)
             {
-                m_fProjectileRotation -= rotationSpeed * 4f;
-
-                
-
+                m_fProjectileRotation -= rotationSpeed*2f;
                 //The equation of a circle
-                m_Position.X = origin.X + (float)(40f * Math.Cos((double)m_fProjectileRotation / 2));
-                m_Position.Y = origin.Y + (float)(40f * Math.Sin((double)m_fProjectileRotation/ 2));
-
-                m_fProjectileRotation_fixed = m_fProjectileRotation;
-            }
-            else {
-
-                m_Position.X += (float)(m_fProjectileSpeedX * Math.Cos((double)m_fProjectileRotation_fixed));
-                m_Position.Y += (float)(m_fProjectileSpeedY * Math.Sin((double)m_fProjectileRotation_fixed));
-
+                m_Position.X = origin.X + (float)(rotationRadius * Math.Cos((double)m_fProjectileRotation / 2));
+                m_Position.Y = origin.Y + (float)(rotationRadius * Math.Sin((double)m_fProjectileRotation / 2));
+                m_fProjectileRotation_fixed = m_fProjectileRotation / 2;
+            }else {
+                m_Position.X += (float)(m_fProjectileSpeedX * Math.Sin(m_fProjectileRotation_fixed));
+                m_Position.Y -= (float)(m_fProjectileSpeedY * Math.Cos(m_fProjectileRotation_fixed));
                 if (selfRotate)
                 {
                     m_fProjectileRotation -= rotationSpeed * 8f;
@@ -113,11 +110,8 @@ namespace Thro_Bot
         }
 
         public void Draw(SpriteBatch spriteBatch)
-        {
-            //The Rectangle to render the texture
-            Rectangle sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
+        {                        
             spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, .5f, SpriteEffects.None, 0f);
-
         }
     }
 }
