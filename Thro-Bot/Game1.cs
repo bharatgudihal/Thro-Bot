@@ -96,9 +96,9 @@ namespace Thro_Bot
             ringLinePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.92f));
             enemiesList = new List<EnemyBase>();
 
-			enemyDeathPS = new ParticleSystemBase (0f, 1f, 1f, 
+			enemyDeathPS = new ParticleSystemBase (0f, 1f, 0.5f, 1.5f,
 				0.1f, 0.25f, 
-				new Vector2 (-2f, -2f), new Vector2 (2f, 2f),
+				new Vector2 (-4f, -4f), new Vector2 (4f, 4f),
 				0.02f, 0.1f);
 			
 			activeParticleSystems = new List<ParticleSystemBase>() {
@@ -420,9 +420,13 @@ namespace Thro_Bot
 			if (enemyDeathPS.m_Sprites == null)
 				enemyDeathPS.m_Sprites = enemyPiecesList;
 
+			enemyDeathPS.SetWind (new Vector2 (
+				(float)(projectile.m_fProjectileSpeedX * Math.Sin(projectile.m_fProjectileRotation_fixed)), 
+				-(float)(projectile.m_fProjectileSpeedY * Math.Cos(projectile.m_fProjectileRotation_fixed))
+			) * 0.6f);
 			enemyDeathPS.m_Position = enemy.m_Position + enemy.m_Center;
 			enemyDeathPS.SetTint (enemy.m_Color);
-			enemyDeathPS.Emit (4);
+			enemyDeathPS.Emit (8);
 		}
     }
 

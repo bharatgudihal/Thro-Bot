@@ -51,7 +51,9 @@ namespace Thro_Bot {
 		/// <summary>
 		/// Color tint to apply to this particle.
 		/// </summary>
-		public Color m_Color;
+		public Color m_InitialColor;
+
+		protected Color m_Color;
 
 		protected float m_MaxLifetime;
 
@@ -86,6 +88,7 @@ namespace Thro_Bot {
 			m_Rect = new Rectangle (0, 0, m_Texture.Width, m_Texture.Height);
 			m_Origin = new Vector2 (m_Texture.Width/2, m_Texture.Height/2);
 			m_Scale = scale;
+			m_InitialColor = color;
 			m_Color = color;
 			m_MaxLifetime = lifetime;
 			m_Lifetime = lifetime;
@@ -101,7 +104,7 @@ namespace Thro_Bot {
 				m_Position += m_Velocity;
 				m_Rotation += m_AngularVelocity;
 
-				m_Color.A = (byte)(m_Lifetime / m_MaxLifetime);
+				m_Color = Color.Lerp (m_InitialColor, Color.Transparent, 1f-(m_Lifetime/m_MaxLifetime));
 			}
 		}
 
