@@ -129,10 +129,11 @@ namespace Thro_Bot
             edge = edge_normal;
 
             // Load enemy texture
-            enemyTextures = new Texture2D[3];
+            enemyTextures = new Texture2D[4];
             enemyTextures[0] = Content.Load<Texture2D>("Graphics/E1");
             enemyTextures[1] = Content.Load<Texture2D>("Graphics/E2");
             enemyTextures[2] = Content.Load<Texture2D>("Graphics/E3");
+            enemyTextures[3] = Content.Load<Texture2D>("Graphics/E3_Shield");
 
             //Load the score texture
             Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.45f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.067f));
@@ -193,6 +194,10 @@ namespace Thro_Bot
                     if (enemy.m_Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy))
                     {
                         enemy.m_Active = false;
+                        if(enemy.GetType() == typeof(HexagonEnemy))
+                        {
+                            ((HexagonEnemy)enemy).shield.m_Active = false;
+                        }
 
                         //Cause damage to the player
                         if (!CheckCollision(enemy))
@@ -258,15 +263,32 @@ namespace Thro_Bot
             if (gameTime.TotalGameTime - currentTime > spawnTimeSpan)
             {
                 currentTime = gameTime.TotalGameTime;
-                EnemyBase enemy = random.Next(0,2) == 0 ? (EnemyBase)new LinearTriangleEnemy() : new SquigglyTriangleEnemy();
-                if (enemy.GetType() == typeof(LinearTriangleEnemy))
-                {
-                    enemy.Initialize(enemyTextures[0], new Vector2(random.Next(enemyTextures[0].Width, WIDTH - enemyTextures[0].Width), 0));
-                }else if(enemy.GetType() == typeof(SquigglyTriangleEnemy))
-                {
-                    enemy.Initialize(enemyTextures[1], new Vector2(random.Next(enemyTextures[1].Width, WIDTH - enemyTextures[1].Width), 0));
-                }
-                enemiesList.Add(enemy);
+                int spawn = random.Next(0, 3);
+                EnemyBase enemy = null;
+                EnemyBase shield = null;
+                switch (spawn){
+                    case 0:
+                        enemy = new LinearTriangleEnemy();
+                        enemy.Initialize(enemyTextures[0], new Vector2(random.Next(enemyTextures[0].Width, WIDTH - enemyTextures[0].Width), 0));
+                        break;
+                    case 1:
+                        enemy = new SquigglyTriangleEnemy();
+                        enemy.Initialize(enemyTextures[1], new Vector2(random.Next(enemyTextures[1].Width, WIDTH - enemyTextures[1].Width), 0));
+                        break;
+                    case 2:
+                        enemy = new HexagonEnemy();
+                        enemy.Initialize(enemyTextures[2], new Vector2(random.Next(enemyTextures[2].Width, WIDTH - enemyTextures[2].Width), 0));
+                        shield = new Shield(ref enemy);
+                        shield.Initialize(enemyTextures[3], Vector2.Zero);
+                        ((HexagonEnemy)enemy).shield = (Shield)shield;
+                        break;
+                    default:                        
+                        break;
+                } 
+                if(null != enemy)               
+                    enemiesList.Add(enemy);
+                if (null != shield)
+                    enemiesList.Add(shield);
             }
         }
 
