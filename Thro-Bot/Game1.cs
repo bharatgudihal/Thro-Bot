@@ -99,9 +99,9 @@ namespace Thro_Bot
             ringLinePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.92f));
             enemiesList = new List<EnemyBase>();
 
-			enemyDeathPS = new ParticleSystemBase (0f, 1f, 1f, 
+			enemyDeathPS = new ParticleSystemBase (0f, 1f, 0.5f, 1.5f,
 				0.1f, 0.25f, 
-				new Vector2 (-2f, -2f), new Vector2 (2f, 2f),
+				new Vector2 (-4f, -4f), new Vector2 (4f, 4f),
 				0.02f, 0.1f);
 			
 			activeParticleSystems = new List<ParticleSystemBase>() {
@@ -165,11 +165,18 @@ namespace Thro_Bot
 			};
 
             //Load the score texture
-            Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.45f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.067f));
-            ui.Initialize(Content.Load<Texture2D>("Graphics/ScoreUI"),scorePosition, Vector2.Zero);
+            Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.22f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.040f));
+            ui.InitializeScore(Content.Load<Texture2D>("Graphics/ScoreUI"),scorePosition, Vector2.Zero);
+
+            Vector2 healthPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.73f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.030f));
+            Vector2 healthBarPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.58f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.030f));
+            ui.InitializeHealth(Content.Load<Texture2D>("Graphics/HealthUI"), healthPosition, Content.Load<Texture2D>("Graphics/HealthBarUI"), healthBarPosition);
 
             //Load the score font
             ui.scoreFont = Content.Load<SpriteFont>("Fonts/Score");
+
+            //Load the health font
+            ui.healthFont = Content.Load<SpriteFont>("Fonts/Health");
         }
 
         /// <summary>
@@ -209,8 +216,11 @@ namespace Thro_Bot
             // Update enemy
             UpdateEnemies(gameTime);
 
-			// Update all particle systems
-			UpdateParticleSystems();
+            //Update the UI
+            ui.Update();
+
+            // Update all particle systems
+            UpdateParticleSystems();
 
             base.Update(gameTime);
         }
@@ -267,11 +277,20 @@ namespace Thro_Bot
                         if (!CheckCollision(enemy))
                         {
                             player.m_iHealth -= 10;
-                            ui.playerHealth = player.m_iHealth;
+
+                            //Cap the maximum health to lose
+                            if (ui.playerHealth > 0f)
+                            ui.playerHealth = (float)player.m_iHealth;
                         }
-                        //Add points to the player score
+                        
+                        //Initiate the combo system
                         else
                         {
+                            //Check the enemy type
+                           // if(enemy.)
+
+
+                            //Add points to the player score
                             ui.score += 100;
                         }
                     }
@@ -282,6 +301,8 @@ namespace Thro_Bot
                 }            
             }
         }
+
+
 
         private bool CheckCollision(EnemyBase enemy)
         {
@@ -453,10 +474,10 @@ namespace Thro_Bot
             ui.Draw(spriteBatch);
 
             //Draw the score
-            spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(150,80), Color.White);
+            spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(78,40), Color.White);
 
             //Draw the player health
-            spriteBatch.DrawString(ui.scoreFont, "Health: " + ui.playerHealth.ToString(), new Vector2(300, 80), Color.White);
+            spriteBatch.DrawString(ui.healthFont, ui.playerHealth.ToString() + "%", new Vector2(680, 35), Color.White);
 
             //Stop drawing
             spriteBatch.End();
@@ -482,9 +503,13 @@ namespace Thro_Bot
 			if (enemyDeathPS.m_Sprites == null)
 				enemyDeathPS.m_Sprites = enemyPiecesList;
 
+			enemyDeathPS.SetWind (new Vector2 (
+				(float)(projectile.m_fProjectileSpeedX * Math.Sin(projectile.m_fProjectileRotation_fixed)), 
+				-(float)(projectile.m_fProjectileSpeedY * Math.Cos(projectile.m_fProjectileRotation_fixed))
+			) * 0.6f);
 			enemyDeathPS.m_Position = enemy.m_Position + enemy.m_Center;
 			enemyDeathPS.SetTint (enemy.m_Color);
-			enemyDeathPS.Emit (4);
+			enemyDeathPS.Emit (8);
 		}
     }
 
