@@ -240,10 +240,7 @@ namespace Thro_Bot
                             ui.score += 100;
                         }
                     }
-                }
-
-                
-                else
+                }else
                 {
 					enemy.Kill();
                     enemiesList.RemoveAt(i);
@@ -314,9 +311,12 @@ namespace Thro_Bot
                         break;
                     default:                        
                         break;
-                } 
-                if(null != enemy)               
+                }
+                if (null != enemy)
+                {
+                    enemy.onDeath += new EnemyBase.EnemyEventHandler(ShowEnemyDeath);
                     enemiesList.Add(enemy);
+                }
                 if (null != shield)
                     enemiesList.Add(shield);
             }

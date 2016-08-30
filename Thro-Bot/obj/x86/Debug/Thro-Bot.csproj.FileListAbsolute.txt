@@ -125,3 +125,7 @@ C:\Users\u1088224\Dropbox\Throwbot\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Conte
 C:\Users\u1088224\Dropbox\Throwbot\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Graphics\Piece_02.xnb
 C:\Users\u1088224\Dropbox\Throwbot\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Graphics\Piece_03.xnb
 C:\Users\u1088224\Dropbox\Throwbot\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Graphics\Piece_04.xnb
+C:\Users\u1070597\Documents\GitHub\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Graphics\Piece_01.xnb
+C:\Users\u1070597\Documents\GitHub\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Graphics\Piece_02.xnb
+C:\Users\u1070597\Documents\GitHub\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Graphics\Piece_03.xnb
+C:\Users\u1070597\Documents\GitHub\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Graphics\Piece_04.xnb
