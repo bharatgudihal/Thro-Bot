@@ -50,7 +50,7 @@ namespace Thro_Bot
         Random random;
 
         // Screen resolution
-        const int WIDTH = 600;
+        const int WIDTH = 750;
         const int HEIGHT = 1000;
 
         // Spawn interval
@@ -68,6 +68,7 @@ namespace Thro_Bot
             //Change the size of the window
             graphics.PreferredBackBufferWidth = WIDTH; //set the value to the desired width
             graphics.PreferredBackBufferHeight = HEIGHT; //set the value to the desired height
+            //graphics.IsFullScreen = true;
             graphics.ApplyChanges();
         }
 
@@ -185,10 +186,40 @@ namespace Thro_Bot
         }
 
         private bool CheckCollision(Enemy1 enemy)
-        {            
+        {
+            bool collision = false;            
             Rectangle enemyRectangle = new Rectangle((int)enemy.Position.X, (int)enemy.Position.Y, enemy.Texture.Width-35, enemy.Texture.Height-50);
             Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X-projectile.m_ProjectileTexture.Width/2, (int)projectile.m_Position.Y-projectile.m_ProjectileTexture.Height/2, projectile.m_ProjectileTexture.Width, projectile.m_ProjectileTexture.Height);
-            return enemyRectangle.Intersects(projectileRectangle);
+            if (enemyRectangle.Intersects(projectileRectangle)){                
+                collision = pixelCollision(enemy, projectile, Rectangle.Intersect(projectileRectangle,enemyRectangle));
+            }
+            return collision;
+        }
+
+        private bool pixelCollision(Enemy1 enemy, Projectile projectile, Rectangle rectangle)
+        {            
+            Color[] color1 = new Color[enemy.Texture.Width * enemy.Texture.Height];
+            Color[] color2 = new Color[projectile.m_ProjectileTexture.Width * projectile.m_ProjectileTexture.Height];
+            enemy.Texture.GetData(color1);
+            projectile.m_ProjectileTexture.GetData(color2);
+            projectile.m_ProjectileTexture.GetData(color2);
+            int x1 = rectangle.X;
+            int x2 = rectangle.X+rectangle.Width;
+            int y1 = rectangle.Y;
+            int y2 = rectangle.Y+rectangle.Height;
+            for (int y= y1;y< y2; y++)
+            {
+                for(int x=x1; x < x2; x++)
+                {
+                    Color a = color1[Math.Abs((x-(int)enemy.Position.X)) + Math.Abs((y-(int)enemy.Position.Y)) * enemy.Texture.Width];
+                    Color b = color2[Math.Abs((x - (int)projectile.m_Position.X)) + Math.Abs((y - (int)projectile.m_Position.Y)) * projectile.m_ProjectileTexture.Width];
+                    if(a.A !=0 && b.A != 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         private void SpawnEnemies(GameTime gameTime)
