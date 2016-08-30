@@ -1,10 +1,8 @@
 ﻿// MovementBehaviorBase.cs
 
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -132,7 +130,12 @@ namespace Thro_Bot
 		/// <summary>
 		/// Origin (pivot point) of this enemy.
 		/// </summary>
-		protected Vector2 m_Origin;
+		public Vector2 m_Origin;
+
+		/// <summary>
+		/// Center offset of this enemy.
+		/// </summary>
+		public Vector2 m_Center;
 
 		/// <summary>
 		/// Movement speed of this enemy (units per step).
@@ -182,6 +185,9 @@ namespace Thro_Bot
 		/// Rotation behavior to use for this enemy type.
 		/// </summary>
 		protected RotationBehaviorBase _rotationBehavior;
+
+		public delegate void EnemyEventHandler (EnemyBase sender);
+		public event EnemyEventHandler onDeath;
 		
 		/// <summary>
 		/// Initializes this instance's movement and rotation behaviors.
@@ -195,6 +201,7 @@ namespace Thro_Bot
 			m_Texture = texture;
 			m_Rect = new Rectangle (0, 0, m_Texture.Width, m_Texture.Height);
 			m_Origin = Vector2.Zero;
+			m_Center = new Vector2 (m_Texture.Width/2, m_Texture.Height/2);
 
 			// Init movement/rotation behaviors
 			InitializeBehaviors();
@@ -213,6 +220,9 @@ namespace Thro_Bot
 		}
 
 		public void Kill () {
+			if (onDeath != null)
+				onDeath (this);
+
 			m_Active = false;
 		}
     }
