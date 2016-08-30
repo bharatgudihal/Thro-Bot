@@ -125,7 +125,8 @@ namespace Thro_Bot
 			LinearTriangle,
 			SquigglyTriangle,
 			Moonface,
-			Hexagon
+			Hexagon,
+            Shield
 		}
 
 		/// <summary>
@@ -141,7 +142,7 @@ namespace Thro_Bot
 		/// <summary>
 		/// Current rotation of this enemy (radians).
 		/// </summary>
-		protected float m_Rotation = 0f;
+		public float m_Rotation = 0f;
 
 		/// <summary>
 		/// Scale of this enemy;
@@ -237,6 +238,10 @@ namespace Thro_Bot
             if (_rotationBehavior != null)
             {
                 m_Rotation = _rotationBehavior.Rotate(m_Rotation);
+                if(Math.PI*2 < Math.Abs(m_Rotation))
+                {
+                    m_Rotation += (float)Math.PI * 2;
+                }
                 m_Position = _rotationBehavior.Move(m_Position, m_Rotation);
             }
 		}

@@ -60,6 +60,9 @@ namespace Thro_Bot
         // Random
         Random random;
 
+        TimeSpan collisionTime = TimeSpan.FromSeconds(1);
+        TimeSpan previousCollisionTime = TimeSpan.Zero;
+
         // Screen resolution
         const int WIDTH = 750;
         const int HEIGHT = 1000;
@@ -204,7 +207,7 @@ namespace Thro_Bot
             UpdateProjectile(gameTime);
 
             // Update enemy
-            UpdateEnemies();
+            UpdateEnemies(gameTime);
 
 			// Update all particle systems
 			UpdateParticleSystems();
@@ -212,7 +215,7 @@ namespace Thro_Bot
             base.Update(gameTime);
         }
 
-        private void UpdateEnemies()
+        private void UpdateEnemies(GameTime gameTime)
         {
             for (int i=0;i<enemiesList.Count;i++)
             {
@@ -222,12 +225,44 @@ namespace Thro_Bot
                     enemy.Update();
                     if (enemy.m_Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy))
                     {
-                        enemy.m_Active = false;
-                        if(enemy.GetType() == typeof(HexagonEnemy))
+                        if (enemy.GetType() != typeof(Shield))
                         {
-                            ((HexagonEnemy)enemy).shield.m_Active = false;
+                            // Destroy enemy
+                            enemy.m_Active = false;
+                            if (enemy.GetType() == typeof(HexagonEnemy))
+                            {
+                                ((HexagonEnemy)enemy).shield.m_Active = false;
+                            }
                         }
-
+                        else if (CheckCollision(enemy) && gameTime.TotalGameTime - previousCollisionTime > collisionTime)
+                        {
+                            previousCollisionTime = gameTime.TotalGameTime;
+                            // Bounce off the shield
+                            if (0 < Math.Abs(enemy.m_Rotation) && Math.Abs(enemy.m_Rotation) <= Math.PI / 3)
+                            {
+                                projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+                            }
+                            else if (Math.PI / 3 < Math.Abs(enemy.m_Rotation) && Math.Abs(enemy.m_Rotation) <= 2 * Math.PI / 3)
+                            {
+                                projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
+                            }
+                            else if (2 * Math.PI / 3 < Math.Abs(enemy.m_Rotation) && Math.Abs(enemy.m_Rotation) <= Math.PI)
+                            {
+                                projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+                            }
+                            else if (Math.PI < Math.Abs(enemy.m_Rotation) && Math.Abs(enemy.m_Rotation) <= 4 * Math.PI / 3)
+                            {
+                                projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+                            }
+                            else if (4 * Math.PI / 3 < Math.Abs(enemy.m_Rotation) && Math.Abs(enemy.m_Rotation) <= 5 * Math.PI / 3)
+                            {
+                                projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
+                            }
+                            else
+                            {
+                                projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+                            }
+                        }
                         //Cause damage to the player
                         if (!CheckCollision(enemy))
                         {
@@ -250,8 +285,15 @@ namespace Thro_Bot
 
         private bool CheckCollision(EnemyBase enemy)
         {
-            bool collision = false;            
-            Rectangle enemyRectangle = new Rectangle((int)enemy.m_Position.X, (int)enemy.m_Position.Y, enemy.Texture.Width-35, enemy.Texture.Height-50);
+            bool collision = false;
+            Rectangle enemyRectangle;
+            if (enemy.GetType() != typeof(Shield))
+            {
+                enemyRectangle = new Rectangle((int)enemy.m_Position.X, (int)enemy.m_Position.Y, enemy.Texture.Width * 7 / 10, enemy.Texture.Height * 6 / 10);
+            }else
+            {
+                enemyRectangle = new Rectangle((int)enemy.m_Position.X-enemy.Texture.Width/2, (int)enemy.m_Position.Y-enemy.Texture.Height/2, enemy.Texture.Width, enemy.Texture.Height);
+            }
             Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X-projectile.m_ProjectileTexture.Width/2, (int)projectile.m_Position.Y-projectile.m_ProjectileTexture.Height/2, projectile.m_ProjectileTexture.Width, projectile.m_ProjectileTexture.Height);
             if (enemyRectangle.Intersects(projectileRectangle)){                
                 collision = pixelCollision(enemy, projectile, Rectangle.Intersect(projectileRectangle,enemyRectangle));
@@ -264,8 +306,7 @@ namespace Thro_Bot
             Color[] color1 = new Color[enemy.Texture.Width * enemy.Texture.Height];
             Color[] color2 = new Color[projectile.m_ProjectileTexture.Width * projectile.m_ProjectileTexture.Height];
             enemy.Texture.GetData(color1);
-            projectile.m_ProjectileTexture.GetData(color2);
-            projectile.m_ProjectileTexture.GetData(color2);
+            projectile.m_ProjectileTexture.GetData(color2);            
             int x1 = rectangle.X;
             int x2 = rectangle.X+rectangle.Width;
             int y1 = rectangle.Y;
@@ -307,7 +348,7 @@ namespace Thro_Bot
                         enemy.Initialize(enemyTextures[2], new Vector2(random.Next(enemyTextures[2].Width, WIDTH - enemyTextures[2].Width), 0));
                         shield = new Shield(ref enemy);
                         shield.Initialize(enemyTextures[3], Vector2.Zero);
-                        ((HexagonEnemy)enemy).shield = (Shield)shield;
+                        ((HexagonEnemy)enemy).setShield(ref shield);
                         break;
                     default:                        
                         break;
@@ -339,12 +380,12 @@ namespace Thro_Bot
             if (projectile.m_Position.X <= 10f || projectile.m_Position.X >= GraphicsDevice.Viewport.TitleSafeArea.Width - 10f)
             {
                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
-                projectile.m_iBounces++;
+                //projectile.m_iBounces++;
                 edge = edge_hit;
             }else if (projectile.m_Position.Y <= 10f || projectile.m_Position.Y >= GraphicsDevice.Viewport.TitleSafeArea.Height - 10f)
             {
                 projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
-                projectile.m_iBounces++;
+                //projectile.m_iBounces++;
                 edge = edge_hit;
             }else
             {
