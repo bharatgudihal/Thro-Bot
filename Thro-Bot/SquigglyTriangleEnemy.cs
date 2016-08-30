@@ -13,9 +13,9 @@ namespace Thro_Bot {
 
 		protected override float m_MovementSpeed { get { return 1f; } }
 
-		protected override string m_TexturePath { get { return "Graphics/E1"; } }
+		protected override string m_TexturePath { get { return "Graphics/E2"; } }
 
-		public override Color m_Color { get { return Color.MediumPurple; } }
+		public override Color m_Color { get { return Color.White; } }
 
 		public override int m_HurtValue { get { return 5; } }
 

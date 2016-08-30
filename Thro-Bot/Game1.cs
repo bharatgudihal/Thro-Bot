@@ -44,7 +44,7 @@ namespace Thro_Bot
 
         // Enemy list
         List<EnemyBase> enemiesList;
-        Texture2D enemyTexture;
+        Texture2D[] enemyTextures;
 
         // Random
         Random random;
@@ -123,7 +123,10 @@ namespace Thro_Bot
             edge = edge_normal;
 
             // Load enemy texture
-            enemyTexture = Content.Load<Texture2D>("Graphics/E1");
+            enemyTextures = new Texture2D[3];
+            enemyTextures[0] = Content.Load<Texture2D>("Graphics/E1");
+            enemyTextures[1] = Content.Load<Texture2D>("Graphics/E2");
+            enemyTextures[2] = Content.Load<Texture2D>("Graphics/E3");
         }
 
         /// <summary>
@@ -228,7 +231,13 @@ namespace Thro_Bot
             {
                 currentTime = gameTime.TotalGameTime;
                 EnemyBase enemy = random.Next(0,2) == 0 ? (EnemyBase)new LinearTriangleEnemy() : new SquigglyTriangleEnemy();
-                enemy.Initialize(enemyTexture, new Vector2(random.Next(enemyTexture.Width, WIDTH - enemyTexture.Width),0));
+                if (enemy.GetType() == typeof(LinearTriangleEnemy))
+                {
+                    enemy.Initialize(enemyTextures[0], new Vector2(random.Next(enemyTextures[0].Width, WIDTH - enemyTextures[0].Width), 0));
+                }else if(enemy.GetType() == typeof(SquigglyTriangleEnemy))
+                {
+                    enemy.Initialize(enemyTextures[1], new Vector2(random.Next(enemyTextures[1].Width, WIDTH - enemyTextures[1].Width), 0));
+                }
                 enemiesList.Add(enemy);
             }
         }
@@ -299,13 +308,13 @@ namespace Thro_Bot
             Rectangle sourceRectangle = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             spriteBatch.Draw(backgroundTexture, sourceRectangle,Color.White);
 
-            // Draw edge
-            Rectangle edgeRectangle = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            spriteBatch.Draw(edge, edgeRectangle, Color.White);
-
             // Draw ring line
             Rectangle ringLineRectangle = new Rectangle(0, 0, ringLineTexture.Width, ringLineTexture.Height);
             spriteBatch.Draw(ringLineTexture, ringLinePosition, ringLineRectangle, Color.White, 0f, ringLineOrigin, 0.5f, SpriteEffects.None, 0f);
+
+            // Draw edge
+            Rectangle edgeRectangle = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            spriteBatch.Draw(edge, edgeRectangle, Color.White);           
 
             //Draw the Player
             player.Draw(spriteBatch);

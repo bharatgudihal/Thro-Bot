@@ -170,7 +170,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>anal3q7VxIJ1U6FfUgRd4WLyyQEZJQiS4h8xWBWqTBk=</dsig:DigestValue>
+        <dsig:DigestValue>gbB7LMlLB5ILTF+TtFxmReYKdvU13pE89wIT4gd+YCg=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -199,6 +199,33 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
       <dsig:DigestValue>enx9UmwKx1ZRNc+bD46znviVlNLVbU4FRgNMI+7x4hI=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Graphics\E2.xnb" size="65621">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>9ITeBfoP037EuC4irUN0k3eryqORlJI/8iVxYkvUiiw=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Graphics\E3.xnb" size="65621">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>TsGou5kV6OePdLuoa5EVOHzUjynQkkzAhKXjbLcbfMo=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Graphics\E3_Shield.xnb" size="65621">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>d77KM7xyTkIYD1WUFve6nC9hIJ4CzLGVdQ4ZtI72RIE=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Graphics\Edge_Hit.xnb" size="5760085">
@@ -237,13 +264,13 @@
       <dsig:DigestValue>I+IDIFsQMmWM1CtojOXoNSHjE/Q6gQEohuc2B5B7Jyg=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="Content\Graphics\Ring_Line.xnb" size="1098085">
+  <file name="Content\Graphics\Ring_Line.xnb" size="2498645">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>/6HRyQlBuAXJjozVOW8JHXIy1O2z3IzMrZzg0zmG1Z4=</dsig:DigestValue>
+      <dsig:DigestValue>eUIj68HgUP1fCj3H4oaT9Y4VIY78oSPpJtqncGdB1l8=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Icon.ico" size="147541">
