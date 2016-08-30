@@ -9,7 +9,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Thro_Bot {
 	public class SquigglyTriangleEnemy : EnemyBase {
-		protected override float m_Scale { get { return 1f; } }
+		public override EnemyBase.Type m_Type { get { return Type.SquigglyTriangle; } }
+
+		protected override float m_Scale { get { return 0.3f; } }
 
 		protected override float m_MovementSpeed { get { return 1f; } }
 
@@ -26,7 +28,7 @@ namespace Thro_Bot {
 		}
 
 		public override void InitializeBehaviors() {
-			_movementBehavior = new SquigglyMovementBehavior(0.15f, 5f);
+			_movementBehavior = new SquigglyMovementBehavior(0.15f, 2f);
 			_rotationBehavior = null;
 		}
 	}
