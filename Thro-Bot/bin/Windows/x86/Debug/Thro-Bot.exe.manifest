@@ -163,17 +163,26 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thro-Bot.exe" size="160680">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thro-Bot.exe" size="162728">
       <assemblyIdentity name="Thro-Bot" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>/5/EEBiNkhJCYtgRjRHooegMqe6YzKL52oM0EilgdG4=</dsig:DigestValue>
+        <dsig:DigestValue>fuprosxXE+KYh6C5cvU9egirVAx+0xXtOrPRO+4vP4c=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
+  <file name="Content\Fonts\Score.xnb" size="37908">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>h3LOOKOtmG0ZSXo3nLley2NKIfFSqSfIilRXNatzBfA=</dsig:DigestValue>
+    </hash>
+  </file>
   <file name="Content\Graphics\Background.xnb" size="5760085">
     <hash>
       <dsig:Transforms>
@@ -244,6 +253,15 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
       <dsig:DigestValue>/6HRyQlBuAXJjozVOW8JHXIy1O2z3IzMrZzg0zmG1Z4=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Graphics\ScoreUI.xnb" size="1137685">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>F/P32JT84ZVynrGvqyLUcOTb4hOE+Cg+pVvz+dR40V8=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Icon.ico" size="147541">

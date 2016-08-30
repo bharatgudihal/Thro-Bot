@@ -26,6 +26,10 @@ namespace Thro_Bot
         //texture of the projectile
         Texture2D projectileTexture;
 
+        //Represents the UI score board
+        UI ui;
+
+
         //Keyboard sates used to determine key presses
         KeyboardState currentKeyboardState;
         KeyboardState previousKeyboardState;
@@ -50,11 +54,11 @@ namespace Thro_Bot
         Random random;
 
         // Screen resolution
-        const int WIDTH = 600;
+        const int WIDTH = 750;
         const int HEIGHT = 1000;
 
         // Spawn interval
-        const float SPAWN_INTERVAL = 5f;
+        const float SPAWN_INTERVAL = 2f;
         TimeSpan spawnTimeSpan;
 
         // Current game time
@@ -86,6 +90,8 @@ namespace Thro_Bot
             random = new Random();
             currentTime = TimeSpan.Zero;
             spawnTimeSpan = TimeSpan.FromSeconds(SPAWN_INTERVAL);
+            ui = new UI();
+
             base.Initialize();
         }
 
@@ -123,6 +129,13 @@ namespace Thro_Bot
 
             // Load enemy texture
             enemyTexture = Content.Load<Texture2D>("Graphics/E1");
+
+            //Load the score texture
+            Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.45f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.067f));
+            ui.Initialize(Content.Load<Texture2D>("Graphics/ScoreUI"),scorePosition, Vector2.Zero);
+
+            //Load the score font
+            ui.scoreFont = Content.Load<SpriteFont>("Fonts/Score");
         }
 
         /// <summary>
@@ -157,7 +170,7 @@ namespace Thro_Bot
             UpdatePlayer(gameTime);
 
             //Update the projectile
-            UpdateProjectile();
+            UpdateProjectile(gameTime);
 
             // Update enemy
             UpdateEnemies();
@@ -176,8 +189,23 @@ namespace Thro_Bot
                     if (enemy.Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy))
                     {
                         enemy.Active = false;
+
+                        //Cause damage to the player
+                        if (!CheckCollision(enemy))
+                        {
+                            player.m_iHealth -= 10;
+                            ui.playerHealth = player.m_iHealth;
+                        }
+                        //Add points to the player score
+                        else
+                        {
+                            ui.score += 100;
+                        }
                     }
-                }else
+                }
+
+                
+                else
                 {
                     enemiesList.RemoveAt(i);
                 }            
@@ -208,14 +236,14 @@ namespace Thro_Bot
             player.Update();
 
             //Check the case where the space bar is pressed
-            if (currentKeyboardState.IsKeyDown(Keys.Space))
+            if (previousKeyboardState.IsKeyUp(Keys.Space) && currentKeyboardState.IsKeyDown(Keys.Space))
             {
                 //Launch the projectile
                 projectile.m_bInOrbitToPlayer = false;                
             }
         }
 
-        protected void UpdateProjectile() {
+        protected void UpdateProjectile(GameTime gameTime) {
 
             if (projectile.m_Position.X <= 10f || projectile.m_Position.X >= GraphicsDevice.Viewport.TitleSafeArea.Width - 10f)
             {
@@ -246,7 +274,7 @@ namespace Thro_Bot
                 projectile.selfRotate = false;
             }            
 
-            projectile.Update(player.m_Position);
+            projectile.Update(player.m_Position, gameTime);
         }
 
 
@@ -258,8 +286,6 @@ namespace Thro_Bot
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-
-
 
             //Start drawing
             spriteBatch.Begin();
@@ -285,6 +311,15 @@ namespace Thro_Bot
 
             //Draw enemies
             DrawEnemies(spriteBatch);
+
+            //Draw ui
+            ui.Draw(spriteBatch);
+
+            //Draw the score
+            spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(150,80), Color.White);
+
+            //Draw the player health
+            spriteBatch.DrawString(ui.scoreFont, "Health: " + ui.playerHealth.ToString(), new Vector2(300, 80), Color.White);
 
             //Stop drawing
             spriteBatch.End();

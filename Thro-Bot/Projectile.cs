@@ -30,6 +30,28 @@ namespace Thro_Bot
         //The amount of times the projectile has hit the screen sides to return to the player
         public int m_iBounces;
 
+        //The scale of the projectile 
+        public float m_fProjectileScale;
+
+        //The max scale of the projectile
+        private const float MAX_PROJECTILE_SCALE = 0.65f;
+
+        //The min scale of the projectile
+        private const float MIN_PROJECTILE_SCALE = 0.45f;
+
+        //The direction of scaling the projectile
+        private bool m_bScaleUp;
+
+        //The elapsed time
+        private TimeSpan elapsedTime = TimeSpan.Zero;
+
+        //The time until max scale
+        private TimeSpan scaleTime = TimeSpan.FromSeconds(0.1);
+
+        //The duration of time
+        private const int duration = 5000;
+
+        
 
         //The origin of the projectile
         public Vector2 m_ProjectileOrigin;
@@ -84,12 +106,18 @@ namespace Thro_Bot
 
             selfRotate = false;
 
+            //Set the initial scale of the projectile
+            m_fProjectileScale = 0.5f;
+
+            //Set the value to scale up every time
+            m_bScaleUp = true;
+
             //The Rectangle to render the texture
             sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
 
         }
 
-        public void Update(Vector2 origin)
+        public void Update(Vector2 origin, GameTime gameTime)
         {
             if (m_bInOrbitToPlayer)
             {
@@ -101,17 +129,70 @@ namespace Thro_Bot
             }else {
                 m_Position.X += (float)(m_fProjectileSpeedX * Math.Sin(m_fProjectileRotation_fixed));
                 m_Position.Y -= (float)(m_fProjectileSpeedY * Math.Cos(m_fProjectileRotation_fixed));
+
+
+                //Spin the projectile
                 if (selfRotate)
                 {
-                    m_fProjectileRotation -= rotationSpeed * 8f;
+                    m_fProjectileRotation -= rotationSpeed * 10f;
+                    AlterProjectileScale(gameTime);
+                }
+
+                //Return the projectile to its original scale
+                else {
+                    m_fProjectileScale = 0.5f;
                 }
                
             }
         }
 
+
+        private void AlterProjectileScale(GameTime gameTime) {
+
+            if (m_bScaleUp)
+            {
+                m_fProjectileScale = ScaleProjectile(m_fProjectileScale, MAX_PROJECTILE_SCALE, gameTime);
+
+                if (m_fProjectileScale == MAX_PROJECTILE_SCALE)
+                {
+                    m_bScaleUp = false;
+                    elapsedTime = TimeSpan.Zero;
+                }
+
+            }
+            else {
+                m_fProjectileScale = ScaleProjectile(m_fProjectileScale, MIN_PROJECTILE_SCALE, gameTime);
+
+                if (m_fProjectileScale == MIN_PROJECTILE_SCALE)
+                {
+                    m_bScaleUp = true;
+                    elapsedTime = TimeSpan.Zero;
+                }
+            }
+        }
+
+
+        private float ScaleProjectile(float initialScale, float targetScale, GameTime gameTime) {
+
+            elapsedTime += gameTime.ElapsedGameTime;
+
+            if (elapsedTime >= scaleTime)
+                elapsedTime = scaleTime;
+
+            float amount = (float)elapsedTime.Ticks / scaleTime.Ticks;
+            initialScale = MathHelper.Lerp(initialScale, targetScale, amount);
+
+
+            return initialScale;
+        }
+
+
+
+
+
         public void Draw(SpriteBatch spriteBatch)
         {                        
-            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, .5f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, m_fProjectileScale, SpriteEffects.None, 0f);
         }
     }
 }
