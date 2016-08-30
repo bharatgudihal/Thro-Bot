@@ -147,10 +147,11 @@ namespace Thro_Bot
             edge = edge_normal;
 
             // Load enemy texture
-            enemyTextures = new Texture2D[3];
+            enemyTextures = new Texture2D[4];
             enemyTextures[0] = Content.Load<Texture2D>("Graphics/E1");
             enemyTextures[1] = Content.Load<Texture2D>("Graphics/E2");
             enemyTextures[2] = Content.Load<Texture2D>("Graphics/E3");
+            enemyTextures[3] = Content.Load<Texture2D>("Graphics/E3_Shield");
 
 			// Load enemy piece textures
 			enemyPiecesList = new List<Texture2D>() {
@@ -161,11 +162,18 @@ namespace Thro_Bot
 			};
 
             //Load the score texture
-            Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.45f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.067f));
-            ui.Initialize(Content.Load<Texture2D>("Graphics/ScoreUI"),scorePosition, Vector2.Zero);
+            Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.22f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.040f));
+            ui.InitializeScore(Content.Load<Texture2D>("Graphics/ScoreUI"),scorePosition, Vector2.Zero);
+
+            Vector2 healthPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.73f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.030f));
+            Vector2 healthBarPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.58f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.030f));
+            ui.InitializeHealth(Content.Load<Texture2D>("Graphics/HealthUI"), healthPosition, Content.Load<Texture2D>("Graphics/HealthBarUI"), healthBarPosition);
 
             //Load the score font
             ui.scoreFont = Content.Load<SpriteFont>("Fonts/Score");
+
+            //Load the health font
+            ui.healthFont = Content.Load<SpriteFont>("Fonts/Health");
         }
 
         /// <summary>
@@ -205,8 +213,11 @@ namespace Thro_Bot
             // Update enemy
             UpdateEnemies();
 
-			// Update all particle systems
-			UpdateParticleSystems();
+            //Update the UI
+            ui.Update();
+
+            // Update all particle systems
+            UpdateParticleSystems();
 
             base.Update(gameTime);
         }
@@ -222,29 +233,41 @@ namespace Thro_Bot
                     if (enemy.m_Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy))
                     {
                         enemy.m_Active = false;
+                        if(enemy.GetType() == typeof(HexagonEnemy))
+                        {
+                            ((HexagonEnemy)enemy).shield.m_Active = false;
+                        }
 
                         //Cause damage to the player
                         if (!CheckCollision(enemy))
                         {
                             player.m_iHealth -= 10;
-                            ui.playerHealth = player.m_iHealth;
+
+                            //Cap the maximum health to lose
+                            if (ui.playerHealth > 0f)
+                            ui.playerHealth = (float)player.m_iHealth;
                         }
-                        //Add points to the player score
+                        
+                        //Initiate the combo system
                         else
                         {
+                            //Check the enemy type
+                           // if(enemy.)
+
+
+                            //Add points to the player score
                             ui.score += 100;
                         }
                     }
-                }
-
-                
-                else
+                }else
                 {
 					enemy.Kill();
                     enemiesList.RemoveAt(i);
                 }            
             }
         }
+
+
 
         private bool CheckCollision(EnemyBase enemy)
         {
@@ -288,16 +311,35 @@ namespace Thro_Bot
             if (gameTime.TotalGameTime - currentTime > spawnTimeSpan)
             {
                 currentTime = gameTime.TotalGameTime;
-                EnemyBase enemy = random.Next(0,2) == 0 ? (EnemyBase)new LinearTriangleEnemy() : new SquigglyTriangleEnemy();
-				enemy.onDeath += new EnemyBase.EnemyEventHandler (ShowEnemyDeath);
-                if (enemy.GetType() == typeof(LinearTriangleEnemy))
-                {
-                    enemy.Initialize(enemyTextures[0], new Vector2(random.Next(enemyTextures[0].Width, WIDTH - enemyTextures[0].Width), 0));
-                }else if(enemy.GetType() == typeof(SquigglyTriangleEnemy))
-                {
-                    enemy.Initialize(enemyTextures[1], new Vector2(random.Next(enemyTextures[1].Width, WIDTH - enemyTextures[1].Width), 0));
+                int spawn = random.Next(0, 3);
+                EnemyBase enemy = null;
+                EnemyBase shield = null;
+                switch (spawn){
+                    case 0:
+                        enemy = new LinearTriangleEnemy();
+                        enemy.Initialize(enemyTextures[0], new Vector2(random.Next(enemyTextures[0].Width, WIDTH - enemyTextures[0].Width), 0));
+                        break;
+                    case 1:
+                        enemy = new SquigglyTriangleEnemy();
+                        enemy.Initialize(enemyTextures[1], new Vector2(random.Next(enemyTextures[1].Width, WIDTH - enemyTextures[1].Width), 0));
+                        break;
+                    case 2:
+                        enemy = new HexagonEnemy();
+                        enemy.Initialize(enemyTextures[2], new Vector2(random.Next(enemyTextures[2].Width, WIDTH - enemyTextures[2].Width), 0));
+                        shield = new Shield(ref enemy);
+                        shield.Initialize(enemyTextures[3], Vector2.Zero);
+                        ((HexagonEnemy)enemy).shield = (Shield)shield;
+                        break;
+                    default:                        
+                        break;
                 }
-                enemiesList.Add(enemy);
+                if (null != enemy)
+                {
+                    enemy.onDeath += new EnemyBase.EnemyEventHandler(ShowEnemyDeath);
+                    enemiesList.Add(enemy);
+                }
+                if (null != shield)
+                    enemiesList.Add(shield);
             }
         }
 
@@ -391,10 +433,10 @@ namespace Thro_Bot
             ui.Draw(spriteBatch);
 
             //Draw the score
-            spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(150,80), Color.White);
+            spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(78,40), Color.White);
 
             //Draw the player health
-            spriteBatch.DrawString(ui.scoreFont, "Health: " + ui.playerHealth.ToString(), new Vector2(300, 80), Color.White);
+            spriteBatch.DrawString(ui.healthFont, ui.playerHealth.ToString() + "%", new Vector2(680, 35), Color.White);
 
             //Stop drawing
             spriteBatch.End();
