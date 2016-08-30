@@ -163,17 +163,26 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thro-Bot.exe" size="163752">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thro-Bot.exe" size="165800">
       <assemblyIdentity name="Thro-Bot" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>anal3q7VxIJ1U6FfUgRd4WLyyQEZJQiS4h8xWBWqTBk=</dsig:DigestValue>
+        <dsig:DigestValue>JgG2KjaPoNRwPd6mReEb3vFd4jW1F0X1xJI0K2E6FTY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
+  <file name="Content\Fonts\Score.xnb" size="37908">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>h3LOOKOtmG0ZSXo3nLley2NKIfFSqSfIilRXNatzBfA=</dsig:DigestValue>
+    </hash>
+  </file>
   <file name="Content\Graphics\Background.xnb" size="5760085">
     <hash>
       <dsig:Transforms>
@@ -219,6 +228,15 @@
       <dsig:DigestValue>NTvLdC8VBoetjCvY8MTf2VqKL67o19kwJ9HTZXL4gvA=</dsig:DigestValue>
     </hash>
   </file>
+  <file name="Content\Graphics\HealthUI.xnb" size="1046133">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>l15H0JF4QXP2puMavt0G7+i47fxpBUjMdPkAQTanVP4=</dsig:DigestValue>
+    </hash>
+  </file>
   <file name="Content\Graphics\Player.xnb" size="4194389">
     <hash>
       <dsig:Transforms>
@@ -244,6 +262,15 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
       <dsig:DigestValue>/6HRyQlBuAXJjozVOW8JHXIy1O2z3IzMrZzg0zmG1Z4=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Graphics\ScoreUI.xnb" size="1137685">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>F/P32JT84ZVynrGvqyLUcOTb4hOE+Cg+pVvz+dR40V8=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Icon.ico" size="147541">

@@ -133,7 +133,8 @@ namespace Thro_Bot
 
             //Load the score texture
             Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.45f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.067f));
-            ui.Initialize(Content.Load<Texture2D>("Graphics/ScoreUI"),scorePosition, Vector2.Zero);
+            ui.InitializeScore(Content.Load<Texture2D>("Graphics/ScoreUI"),scorePosition, Vector2.Zero);
+            ui.InitializeHealth(Content.Load<Texture2D>("Graphics/HealthUI"), scorePosition, Vector2.Zero);
 
             //Load the score font
             ui.scoreFont = Content.Load<SpriteFont>("Fonts/Score");
@@ -197,9 +198,15 @@ namespace Thro_Bot
                             player.m_iHealth -= 10;
                             ui.playerHealth = player.m_iHealth;
                         }
-                        //Add points to the player score
+                        
+                        //Initiate the combo system
                         else
                         {
+                            //Check the enemy type
+                           // if(enemy.)
+
+
+                            //Add points to the player score
                             ui.score += 100;
                         }
                     }
@@ -212,6 +219,8 @@ namespace Thro_Bot
                 }            
             }
         }
+
+
 
         private bool CheckCollision(EnemyBase enemy)
         {
