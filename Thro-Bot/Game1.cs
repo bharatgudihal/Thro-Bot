@@ -50,6 +50,13 @@ namespace Thro_Bot
         List<EnemyBase> enemiesList;
         Texture2D[] enemyTextures;
 
+		// Enemy death particle list
+		List<Texture2D> enemyPiecesList;
+
+		// Particle system list
+		ParticleSystemBase enemyDeathPS;
+		List<ParticleSystemBase> activeParticleSystems;
+
         // Random
         Random random;
 
@@ -88,6 +95,17 @@ namespace Thro_Bot
             projectile = new Projectile();
             ringLinePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.92f));
             enemiesList = new List<EnemyBase>();
+
+			enemyDeathPS = new ParticleSystemBase (0f, 1f, 1f, 
+				0.1f, 0.25f, 
+				new Vector2 (-2f, -2f), new Vector2 (2f, 2f),
+				0.02f, 0.1f);
+			
+			activeParticleSystems = new List<ParticleSystemBase>() {
+				enemyDeathPS
+			};
+
+
             random = new Random();
             currentTime = TimeSpan.Zero;
             spawnTimeSpan = TimeSpan.FromSeconds(SPAWN_INTERVAL);
@@ -129,10 +147,19 @@ namespace Thro_Bot
             edge = edge_normal;
 
             // Load enemy texture
-            enemyTextures = new Texture2D[3];
+            enemyTextures = new Texture2D[4];
             enemyTextures[0] = Content.Load<Texture2D>("Graphics/E1");
             enemyTextures[1] = Content.Load<Texture2D>("Graphics/E2");
             enemyTextures[2] = Content.Load<Texture2D>("Graphics/E3");
+            enemyTextures[3] = Content.Load<Texture2D>("Graphics/E3_Shield");
+
+			// Load enemy piece textures
+			enemyPiecesList = new List<Texture2D>() {
+				Content.Load<Texture2D>("Graphics/Piece_01"),
+				Content.Load<Texture2D>("Graphics/Piece_02"),
+				Content.Load<Texture2D>("Graphics/Piece_03"),
+				Content.Load<Texture2D>("Graphics/Piece_04")
+			};
 
             //Load the score texture
             Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.22f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.040f));
@@ -189,6 +216,9 @@ namespace Thro_Bot
             //Update the UI
             ui.Update();
 
+            // Update all particle systems
+            UpdateParticleSystems();
+
             base.Update(gameTime);
         }
 
@@ -203,6 +233,10 @@ namespace Thro_Bot
                     if (enemy.m_Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy))
                     {
                         enemy.m_Active = false;
+                        if(enemy.GetType() == typeof(HexagonEnemy))
+                        {
+                            ((HexagonEnemy)enemy).shield.m_Active = false;
+                        }
 
                         //Cause damage to the player
                         if (!CheckCollision(enemy))
@@ -225,11 +259,9 @@ namespace Thro_Bot
                             ui.score += 100;
                         }
                     }
-                }
-
-                
-                else
+                }else
                 {
+					enemy.Kill();
                     enemiesList.RemoveAt(i);
                 }            
             }
@@ -279,15 +311,35 @@ namespace Thro_Bot
             if (gameTime.TotalGameTime - currentTime > spawnTimeSpan)
             {
                 currentTime = gameTime.TotalGameTime;
-                EnemyBase enemy = random.Next(0,2) == 0 ? (EnemyBase)new LinearTriangleEnemy() : new SquigglyTriangleEnemy();
-                if (enemy.GetType() == typeof(LinearTriangleEnemy))
-                {
-                    enemy.Initialize(enemyTextures[0], new Vector2(random.Next(enemyTextures[0].Width, WIDTH - enemyTextures[0].Width), 0));
-                }else if(enemy.GetType() == typeof(SquigglyTriangleEnemy))
-                {
-                    enemy.Initialize(enemyTextures[1], new Vector2(random.Next(enemyTextures[1].Width, WIDTH - enemyTextures[1].Width), 0));
+                int spawn = random.Next(0, 3);
+                EnemyBase enemy = null;
+                EnemyBase shield = null;
+                switch (spawn){
+                    case 0:
+                        enemy = new LinearTriangleEnemy();
+                        enemy.Initialize(enemyTextures[0], new Vector2(random.Next(enemyTextures[0].Width, WIDTH - enemyTextures[0].Width), 0));
+                        break;
+                    case 1:
+                        enemy = new SquigglyTriangleEnemy();
+                        enemy.Initialize(enemyTextures[1], new Vector2(random.Next(enemyTextures[1].Width, WIDTH - enemyTextures[1].Width), 0));
+                        break;
+                    case 2:
+                        enemy = new HexagonEnemy();
+                        enemy.Initialize(enemyTextures[2], new Vector2(random.Next(enemyTextures[2].Width, WIDTH - enemyTextures[2].Width), 0));
+                        shield = new Shield(ref enemy);
+                        shield.Initialize(enemyTextures[3], Vector2.Zero);
+                        ((HexagonEnemy)enemy).shield = (Shield)shield;
+                        break;
+                    default:                        
+                        break;
                 }
-                enemiesList.Add(enemy);
+                if (null != enemy)
+                {
+                    enemy.onDeath += new EnemyBase.EnemyEventHandler(ShowEnemyDeath);
+                    enemiesList.Add(enemy);
+                }
+                if (null != shield)
+                    enemiesList.Add(shield);
             }
         }
 
@@ -337,7 +389,10 @@ namespace Thro_Bot
             projectile.Update(player.m_Position, gameTime);
         }
 
-
+		void UpdateParticleSystems () {
+			foreach (ParticleSystemBase ps in activeParticleSystems)
+				ps.Update();
+		}
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -372,6 +427,8 @@ namespace Thro_Bot
             //Draw enemies
             DrawEnemies(spriteBatch);
 
+			DrawParticleSystems(spriteBatch);
+
             //Draw ui
             ui.Draw(spriteBatch);
 
@@ -395,5 +452,20 @@ namespace Thro_Bot
                 enemy.Draw(spriteBatch);
             }
         }
+
+		void DrawParticleSystems (SpriteBatch spriteBatch) {
+			foreach (ParticleSystemBase ps in activeParticleSystems)
+				ps.Draw(spriteBatch);
+		}
+
+		void ShowEnemyDeath (EnemyBase enemy) {
+			if (enemyDeathPS.m_Sprites == null)
+				enemyDeathPS.m_Sprites = enemyPiecesList;
+
+			enemyDeathPS.m_Position = enemy.m_Position + enemy.m_Center;
+			enemyDeathPS.SetTint (enemy.m_Color);
+			enemyDeathPS.Emit (4);
+		}
     }
+
 }

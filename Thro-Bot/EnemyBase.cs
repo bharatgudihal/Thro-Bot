@@ -1,10 +1,8 @@
 ﻿// MovementBehaviorBase.cs
 
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -30,12 +28,9 @@ namespace Thro_Bot
 	/// </summary>
 	public class LinearMovementBehavior : MovementBehaviorBase
 	{
-		public override Vector2 Move(Vector2 position, float rotation, float speed)
+		public override Vector2 Move(Vector2 position, float rotation,float speed)
 		{
-			return position + new Vector2 (
-				(float)Math.Cos ((double)rotation),
-				(float)Math.Sin ((double)rotation)
-			) * speed;
+			return position + new Vector2 (0,speed);
 		}
 	}
 
@@ -72,13 +67,12 @@ namespace Thro_Bot
 			_theta = (_theta + dTheta) % (2f * (float)Math.PI);
 
 			// Add sine offset
-			Vector2 offset = new Vector2 (
-				speed,
-				_amplitude * (float)Math.Sin (_theta)
-			);
+			Vector2 offset = new Vector2 (				
+				_amplitude * (float)Math.Sin (_theta), speed
+            );
 
 			float sin = (float)Math.Sin (rotation);
-			float cos = (float)Math.Cos (rotation);
+			float cos = (float)Math.Cos (rotation);            
 
 			// Apply rotation
 			Vector2 rotatedOffset = new Vector2 (
@@ -93,9 +87,36 @@ namespace Thro_Bot
 	/// <summary>
 	/// Base class for all rotation behaviors.
 	/// </summary>
-	public abstract class RotationBehaviorBase {
+	public class RotationBehaviorBase {
 
-		public abstract float Rotate (float rotation);
+        // Enemy around which rotation should happen
+        private EnemyBase originEnemy;
+
+        // Radius of rotation
+        private float radius;
+
+        // Rotation speed
+        private float rotationSpeed = 0.0f;
+
+        public RotationBehaviorBase(ref EnemyBase originEnemy, float radius, float rotationSpeed)
+        {
+            this.originEnemy = originEnemy;
+            this.radius = radius;
+            this.rotationSpeed = rotationSpeed;
+        }
+
+        public Vector2 Move(Vector2 position,float rotation)
+        {
+            position.X = originEnemy.m_Position.X + originEnemy.Texture.Width/2 - (float)(radius * Math.Cos(rotation));
+            position.Y = originEnemy.m_Position.Y + originEnemy.Texture.Height/2 - (float)(radius * Math.Sin(rotation));
+            return position;
+        }
+
+        public float Rotate(float rotation)
+        {
+            return rotation - rotationSpeed;
+        }
+
 	}
 
     public abstract class EnemyBase
@@ -104,7 +125,7 @@ namespace Thro_Bot
 			LinearTriangle,
 			SquigglyTriangle,
 			Moonface,
-			Octagon
+			Hexagon
 		}
 
 		/// <summary>
@@ -120,19 +141,24 @@ namespace Thro_Bot
 		/// <summary>
 		/// Current rotation of this enemy (radians).
 		/// </summary>
-		protected float m_Rotation;
+		protected float m_Rotation = 0f;
 
 		/// <summary>
 		/// Scale of this enemy;
 		/// </summary>
 		protected abstract float m_Scale { get; }
 
-		public abstract EnemyBase.Type m_Type { get; }
+		public abstract Type m_Type { get; }
 
 		/// <summary>
 		/// Origin (pivot point) of this enemy.
 		/// </summary>
-		protected Vector2 m_Origin;
+		public Vector2 m_Origin;
+
+		/// <summary>
+		/// Center offset of this enemy.
+		/// </summary>
+		public Vector2 m_Center;
 
 		/// <summary>
 		/// Movement speed of this enemy (units per step).
@@ -182,6 +208,9 @@ namespace Thro_Bot
 		/// Rotation behavior to use for this enemy type.
 		/// </summary>
 		protected RotationBehaviorBase _rotationBehavior;
+
+		public delegate void EnemyEventHandler (EnemyBase sender);
+		public event EnemyEventHandler onDeath;
 		
 		/// <summary>
 		/// Initializes this instance's movement and rotation behaviors.
@@ -191,10 +220,11 @@ namespace Thro_Bot
 		public virtual void Initialize (Texture2D texture, Vector2 position) {
 			m_Active = true;
 			m_Position = position;
-			m_Rotation = (float)Math.PI / 2f;
+			m_Rotation = 0;
 			m_Texture = texture;
 			m_Rect = new Rectangle (0, 0, m_Texture.Width, m_Texture.Height);
 			m_Origin = Vector2.Zero;
+			m_Center = new Vector2 (m_Texture.Width/2, m_Texture.Height/2);
 
 			// Init movement/rotation behaviors
 			InitializeBehaviors();
@@ -204,15 +234,21 @@ namespace Thro_Bot
 			if (_movementBehavior != null)
 				m_Position = _movementBehavior.Move (m_Position, m_Rotation, m_MovementSpeed);
 
-			if (_rotationBehavior != null)
-				m_Rotation = _rotationBehavior.Rotate (m_Rotation);
+            if (_rotationBehavior != null)
+            {
+                m_Rotation = _rotationBehavior.Rotate(m_Rotation);
+                m_Position = _rotationBehavior.Move(m_Position, m_Rotation);
+            }
 		}
 
 		public virtual void Draw (SpriteBatch spriteBatch) {
-			spriteBatch.Draw (m_Texture, m_Position, m_Rect, m_Color, m_Rotation - ((float)Math.PI/2f), m_Origin, m_Scale, SpriteEffects.None, 0f);
+			spriteBatch.Draw (m_Texture, m_Position, m_Rect, m_Color, m_Rotation, m_Origin, m_Scale, SpriteEffects.None, 0f);
 		}
 
 		public void Kill () {
+			if (onDeath != null)
+				onDeath (this);
+
 			m_Active = false;
 		}
     }

@@ -9,7 +9,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Thro_Bot {
 	public class SquigglyTriangleEnemy : EnemyBase {
-		public override EnemyBase.Type m_Type { get { return Type.SquigglyTriangle; } }
+
+       public override EnemyBase.Type m_Type { get { return Type.SquigglyTriangle; } }
 
 		protected override float m_Scale { get { return 1f; } }
 
@@ -17,7 +18,7 @@ namespace Thro_Bot {
 
 		protected override string m_TexturePath { get { return "Graphics/E2"; } }
 
-		public override Color m_Color { get { return Color.White; } }
+		public override Color m_Color { get { return Color.Purple; } }
 
 		public override int m_HurtValue { get { return 5; } }
 
