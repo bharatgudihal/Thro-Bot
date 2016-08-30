@@ -100,6 +100,13 @@ namespace Thro_Bot
 
     public abstract class EnemyBase
     {
+		public enum Type {
+			LinearTriangle,
+			SquigglyTriangle,
+			Moonface,
+			Octagon
+		}
+
 		/// <summary>
 		/// True if this enemy is currently active.
 		/// </summary>
@@ -119,6 +126,8 @@ namespace Thro_Bot
 		/// Scale of this enemy;
 		/// </summary>
 		protected abstract float m_Scale { get; }
+
+		public abstract EnemyBase.Type m_Type { get; }
 
 		/// <summary>
 		/// Origin (pivot point) of this enemy.
@@ -185,8 +194,7 @@ namespace Thro_Bot
 			m_Rotation = (float)Math.PI / 2f;
 			m_Texture = texture;
 			m_Rect = new Rectangle (0, 0, m_Texture.Width, m_Texture.Height);
-            //m_Origin = new Vector2 (m_Texture.Width/2, m_Texture.Height/2);
-            m_Origin = Vector2.Zero;
+			m_Origin = Vector2.Zero;
 
 			// Init movement/rotation behaviors
 			InitializeBehaviors();

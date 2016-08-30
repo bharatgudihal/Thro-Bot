@@ -8,13 +8,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Thro_Bot {
 	public class LinearTriangleEnemy : EnemyBase {
+		public override EnemyBase.Type m_Type { get { return Type.LinearTriangle; } }
+
 		protected override float m_Scale { get { return 1f; } }
 
 		protected override float m_MovementSpeed { get { return 1f; } }
 
 		protected override string m_TexturePath { get { return "Graphics/E1"; } }
 
-		public override Color m_Color { get { return Color.YellowGreen; } }
+		public override Color m_Color { get { return Color.White; } }
 
 		public override int m_HurtValue { get { return 10; } }
 
