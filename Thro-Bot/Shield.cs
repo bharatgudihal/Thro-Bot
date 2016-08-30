@@ -40,7 +40,7 @@ namespace Thro_Bot
         {
             get
             {
-                return Type.Hexagon;
+                return Type.Shield;
             }
         }
 

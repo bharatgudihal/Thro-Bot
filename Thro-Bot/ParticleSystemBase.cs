@@ -63,7 +63,7 @@ namespace Thro_Bot {
 		/// <summary>
 		/// Lifetime for newly-created particles.
 		/// </summary>
-		protected float m_Lifetime;
+		protected float m_MinLifetime, m_MaxLifetime;
 
 		/// <summary>
 		/// Particle scale range.
@@ -74,6 +74,8 @@ namespace Thro_Bot {
 		/// Particle initial velocity range.
 		/// </summary>
 		protected Vector2 m_MinVelocity, m_MaxVelocity;
+
+		protected Vector2 m_Wind;
 
 		/// <summary>
 		/// Particle initial angular velocity range.
@@ -96,7 +98,7 @@ namespace Thro_Bot {
 		}
 
 		public ParticleSystemBase (float emissionRate, float emissionRadius,
-			float lifetime, float minScale, float maxScale, Vector2 minVelocity, Vector2 maxVelocity,
+			float minLifetime, float maxLifetime, float minScale, float maxScale, Vector2 minVelocity, Vector2 maxVelocity,
 			float minAngularVelocity, float maxAngularVelocity) : 
 			this() 
 		{
@@ -104,7 +106,8 @@ namespace Thro_Bot {
 			if (m_EmissionRate > 0f) m_EmissionTimer = m_EmissionRate;
 
 			m_EmissionRadius = emissionRadius;
-			m_Lifetime = lifetime;
+			m_MinLifetime = minLifetime;
+			m_MaxLifetime = maxLifetime;
 			m_MinScale = minScale;
 			m_MaxScale = maxScale;
 			m_MinVelocity = minVelocity;
@@ -157,6 +160,9 @@ namespace Thro_Bot {
 					particle.OnDeath += new Particle.ParticleDeathHandler (Deactivate);
 				}
 
+				// Randomize lifetime
+				float l = RNG.RandomFloat (m_MinLifetime, m_MaxLifetime);
+
 				// Calculate random position (polar)
 				float a = RNG.RandomFloat(0f, 2f * (float)Math.PI);
 				Vector2 pos = new Vector2 ((float)Math.Cos (a), (float)Math.Sin (a)) 
@@ -172,13 +178,13 @@ namespace Thro_Bot {
 				Vector2 v = new Vector2 (
 					RNG.RandomFloat (m_MinVelocity.X, m_MaxVelocity.X),
 					RNG.RandomFloat (m_MinVelocity.Y, m_MaxVelocity.Y)
-				);
+				) + m_Wind;
 
 				// Randomize starting angular velocity
 				float av = RNG.RandomFloat (m_MinAngularVelocity, m_MaxAngularVelocity);
 
 				// Init particle
-				particle.Initialize (sprite, pos, r, scale, m_ColorTint, m_Lifetime, v, av);
+				particle.Initialize (sprite, pos, r, scale, m_ColorTint, l, v, av);
 
 				_activeParticles.Add (particle);
 			}
@@ -195,6 +201,10 @@ namespace Thro_Bot {
 		/// <param name="color">New color to use.</param>
 		public void SetTint (Color color) {
 			m_ColorTint = color;
+		}
+
+		public void SetWind (Vector2 wind) {
+			m_Wind = wind;
 		}
 	}
 }
