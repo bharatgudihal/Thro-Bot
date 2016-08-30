@@ -70,11 +70,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Enemy1.cs" />
+    <Compile Include="EnemyBase.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="LinearTriangleEnemy.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SquigglyTriangleEnemy.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

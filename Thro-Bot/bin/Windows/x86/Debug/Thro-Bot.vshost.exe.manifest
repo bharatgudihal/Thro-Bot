@@ -163,14 +163,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thro-Bot.exe" size="160680">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Thro-Bot.exe" size="162728">
       <assemblyIdentity name="Thro-Bot" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>B0xkN60XOFvHIfnuw9NPzVU0vlVKVKNuXXOhxAZhcHU=</dsig:DigestValue>
+        <dsig:DigestValue>z8CSmRVUzK1R+3LO88Jq8mgkMyobSE92NqjN4AzwhAE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

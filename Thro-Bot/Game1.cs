@@ -43,7 +43,7 @@ namespace Thro_Bot
         Vector2 ringLineOrigin;
 
         // Enemy list
-        List<Enemy1> enemiesList;
+        List<EnemyBase> enemiesList;
         Texture2D enemyTexture;
 
         // Random
@@ -82,7 +82,7 @@ namespace Thro_Bot
             player = new Player();
             projectile = new Projectile();
             ringLinePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.92f));
-            enemiesList = new List<Enemy1>();
+            enemiesList = new List<EnemyBase>();
             random = new Random();
             currentTime = TimeSpan.Zero;
             spawnTimeSpan = TimeSpan.FromSeconds(SPAWN_INTERVAL);
@@ -169,13 +169,13 @@ namespace Thro_Bot
         {
             for (int i=0;i<enemiesList.Count;i++)
             {
-                Enemy1 enemy = enemiesList[i];
-                if (enemy.Active)
+                EnemyBase enemy = enemiesList[i];
+                if (enemy.m_Active)
                 {
                     enemy.Update();
-                    if (enemy.Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy))
+                    if (enemy.m_Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy))
                     {
-                        enemy.Active = false;
+                        enemy.Kill();
                     }
                 }else
                 {
@@ -184,9 +184,9 @@ namespace Thro_Bot
             }
         }
 
-        private bool CheckCollision(Enemy1 enemy)
+        private bool CheckCollision(EnemyBase enemy)
         {
-            Rectangle enemyRectangle = new Rectangle((int)enemy.Position.X, (int)enemy.Position.Y, enemy.Texture.Width/4, enemy.Texture.Height/4);
+            Rectangle enemyRectangle = new Rectangle((int)enemy.m_Position.X, (int)enemy.m_Position.Y, enemy.Texture.Width/4, enemy.Texture.Height/4);
             Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X, (int)projectile.m_Position.Y, projectile.m_ProjectileTexture.Width/2, projectile.m_ProjectileTexture.Height/2);
             bool sillyFlag = enemyRectangle.Intersects(projectileRectangle);        
             return sillyFlag;
@@ -197,7 +197,7 @@ namespace Thro_Bot
             if (gameTime.TotalGameTime - currentTime > spawnTimeSpan)
             {
                 currentTime = gameTime.TotalGameTime;
-                Enemy1 enemy = new Enemy1();
+                EnemyBase enemy = random.Next(0,2) == 0 ? (EnemyBase)new LinearTriangleEnemy() : new SquigglyTriangleEnemy();
                 enemy.Initialize(enemyTexture, new Vector2(random.Next(enemyTexture.Width, WIDTH - enemyTexture.Width),0));
                 enemiesList.Add(enemy);
             }
@@ -294,8 +294,9 @@ namespace Thro_Bot
 
         private void DrawEnemies(SpriteBatch spriteBatch)
         {
-            foreach (Enemy1 enemy in enemiesList)
+            foreach (EnemyBase enemy in enemiesList)
             {
+				if (!enemy.m_Active) continue;
                 enemy.Draw(spriteBatch);
             }
         }
