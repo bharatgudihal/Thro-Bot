@@ -135,12 +135,18 @@ namespace Thro_Bot
             enemyTextures[2] = Content.Load<Texture2D>("Graphics/E3");
 
             //Load the score texture
-            Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.45f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.067f));
+            Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.22f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.040f));
             ui.InitializeScore(Content.Load<Texture2D>("Graphics/ScoreUI"),scorePosition, Vector2.Zero);
-            ui.InitializeHealth(Content.Load<Texture2D>("Graphics/HealthUI"), scorePosition, Vector2.Zero);
+
+            Vector2 healthPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.73f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.030f));
+            Vector2 healthBarPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.58f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.030f));
+            ui.InitializeHealth(Content.Load<Texture2D>("Graphics/HealthUI"), healthPosition, Content.Load<Texture2D>("Graphics/HealthBarUI"), healthBarPosition);
 
             //Load the score font
             ui.scoreFont = Content.Load<SpriteFont>("Fonts/Score");
+
+            //Load the health font
+            ui.healthFont = Content.Load<SpriteFont>("Fonts/Health");
         }
 
         /// <summary>
@@ -180,6 +186,9 @@ namespace Thro_Bot
             // Update enemy
             UpdateEnemies();
 
+            //Update the UI
+            ui.Update();
+
             base.Update(gameTime);
         }
 
@@ -199,7 +208,10 @@ namespace Thro_Bot
                         if (!CheckCollision(enemy))
                         {
                             player.m_iHealth -= 10;
-                            ui.playerHealth = player.m_iHealth;
+
+                            //Cap the maximum health to lose
+                            if (ui.playerHealth > 0f)
+                            ui.playerHealth = (float)player.m_iHealth;
                         }
                         
                         //Initiate the combo system
@@ -364,10 +376,10 @@ namespace Thro_Bot
             ui.Draw(spriteBatch);
 
             //Draw the score
-            spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(150,80), Color.White);
+            spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(78,40), Color.White);
 
             //Draw the player health
-            spriteBatch.DrawString(ui.scoreFont, "Health: " + ui.playerHealth.ToString(), new Vector2(300, 80), Color.White);
+            spriteBatch.DrawString(ui.healthFont, ui.playerHealth.ToString() + "%", new Vector2(680, 35), Color.White);
 
             //Stop drawing
             spriteBatch.End();

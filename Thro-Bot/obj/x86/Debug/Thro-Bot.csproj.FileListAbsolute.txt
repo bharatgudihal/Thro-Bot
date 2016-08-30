@@ -112,3 +112,8 @@ C:\Users\u1070819\Documents\GitHub\Thro-Bot\Thro-Bot\obj\x86\Debug\Thro-Bot.appl
 C:\Users\u1070819\Documents\GitHub\Thro-Bot\Thro-Bot\obj\x86\Debug\Thro-Bot.exe
 C:\Users\u1070819\Documents\GitHub\Thro-Bot\Thro-Bot\obj\x86\Debug\Thro-Bot.pdb
 C:\Users\u1070819\Documents\GitHub\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Graphics\HealthUI.xnb
+C:\Users\u1070819\Documents\GitHub\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Graphics\E2.xnb
+C:\Users\u1070819\Documents\GitHub\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Graphics\E3.xnb
+C:\Users\u1070819\Documents\GitHub\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Graphics\E3_Shield.xnb
+C:\Users\u1070819\Documents\GitHub\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Fonts\Health.xnb
+C:\Users\u1070819\Documents\GitHub\Thro-Bot\Thro-Bot\bin\Windows\x86\Debug\Content\Graphics\HealthBarUI.xnb
