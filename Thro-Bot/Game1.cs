@@ -47,7 +47,7 @@ namespace Thro_Bot
         Vector2 ringLineOrigin;
 
         // Enemy list
-        List<Enemy1> enemiesList;
+        List<EnemyBase> enemiesList;
         Texture2D enemyTexture;
 
         // Random
@@ -72,6 +72,7 @@ namespace Thro_Bot
             //Change the size of the window
             graphics.PreferredBackBufferWidth = WIDTH; //set the value to the desired width
             graphics.PreferredBackBufferHeight = HEIGHT; //set the value to the desired height
+            //graphics.IsFullScreen = true;
             graphics.ApplyChanges();
         }
 
@@ -86,7 +87,7 @@ namespace Thro_Bot
             player = new Player();
             projectile = new Projectile();
             ringLinePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.92f));
-            enemiesList = new List<Enemy1>();
+            enemiesList = new List<EnemyBase>();
             random = new Random();
             currentTime = TimeSpan.Zero;
             spawnTimeSpan = TimeSpan.FromSeconds(SPAWN_INTERVAL);
@@ -182,11 +183,11 @@ namespace Thro_Bot
         {
             for (int i=0;i<enemiesList.Count;i++)
             {
-                Enemy1 enemy = enemiesList[i];
-                if (enemy.Active)
+                EnemyBase enemy = enemiesList[i];
+                if (enemy.m_Active)
                 {
                     enemy.Update();
-                    if (enemy.Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy))
+                    if (enemy.m_Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy))
                     {
                         enemy.Active = false;
 
@@ -214,10 +215,39 @@ namespace Thro_Bot
 
         private bool CheckCollision(Enemy1 enemy)
         {
-            Rectangle enemyRectangle = new Rectangle((int)enemy.Position.X, (int)enemy.Position.Y, enemy.Texture.Width/4, enemy.Texture.Height/4);
-            Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X, (int)projectile.m_Position.Y, projectile.m_ProjectileTexture.Width/2, projectile.m_ProjectileTexture.Height/2);
-            bool sillyFlag = enemyRectangle.Intersects(projectileRectangle);        
-            return sillyFlag;
+            bool collision = false;            
+            Rectangle enemyRectangle = new Rectangle((int)enemy.Position.X, (int)enemy.Position.Y, enemy.Texture.Width-35, enemy.Texture.Height-50);
+            Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X-projectile.m_ProjectileTexture.Width/2, (int)projectile.m_Position.Y-projectile.m_ProjectileTexture.Height/2, projectile.m_ProjectileTexture.Width, projectile.m_ProjectileTexture.Height);
+            if (enemyRectangle.Intersects(projectileRectangle)){                
+                collision = pixelCollision(enemy, projectile, Rectangle.Intersect(projectileRectangle,enemyRectangle));
+            }
+            return collision;
+        }
+
+        private bool pixelCollision(Enemy1 enemy, Projectile projectile, Rectangle rectangle)
+        {            
+            Color[] color1 = new Color[enemy.Texture.Width * enemy.Texture.Height];
+            Color[] color2 = new Color[projectile.m_ProjectileTexture.Width * projectile.m_ProjectileTexture.Height];
+            enemy.Texture.GetData(color1);
+            projectile.m_ProjectileTexture.GetData(color2);
+            projectile.m_ProjectileTexture.GetData(color2);
+            int x1 = rectangle.X;
+            int x2 = rectangle.X+rectangle.Width;
+            int y1 = rectangle.Y;
+            int y2 = rectangle.Y+rectangle.Height;
+            for (int y= y1;y< y2; y++)
+            {
+                for(int x=x1; x < x2; x++)
+                {
+                    Color a = color1[Math.Abs((x-(int)enemy.Position.X)) + Math.Abs((y-(int)enemy.Position.Y)) * enemy.Texture.Width];
+                    Color b = color2[Math.Abs((x - (int)projectile.m_Position.X)) + Math.Abs((y - (int)projectile.m_Position.Y)) * projectile.m_ProjectileTexture.Width];
+                    if(a.A !=0 && b.A != 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         private void SpawnEnemies(GameTime gameTime)
@@ -225,7 +255,7 @@ namespace Thro_Bot
             if (gameTime.TotalGameTime - currentTime > spawnTimeSpan)
             {
                 currentTime = gameTime.TotalGameTime;
-                Enemy1 enemy = new Enemy1();
+                EnemyBase enemy = random.Next(0,2) == 0 ? (EnemyBase)new LinearTriangleEnemy() : new SquigglyTriangleEnemy();
                 enemy.Initialize(enemyTexture, new Vector2(random.Next(enemyTexture.Width, WIDTH - enemyTexture.Width),0));
                 enemiesList.Add(enemy);
             }
@@ -329,8 +359,9 @@ namespace Thro_Bot
 
         private void DrawEnemies(SpriteBatch spriteBatch)
         {
-            foreach (Enemy1 enemy in enemiesList)
+            foreach (EnemyBase enemy in enemiesList)
             {
+				if (!enemy.m_Active) continue;
                 enemy.Draw(spriteBatch);
             }
         }
