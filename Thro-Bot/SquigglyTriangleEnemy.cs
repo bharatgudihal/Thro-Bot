@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Thro_Bot {
 	public class SquigglyTriangleEnemy : EnemyBase {
-		protected override float m_Scale { get { return 0.3f; } }
+		protected override float m_Scale { get { return 1f; } }
 
 		protected override float m_MovementSpeed { get { return 1f; } }
 

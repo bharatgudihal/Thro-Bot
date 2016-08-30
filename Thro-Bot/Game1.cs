@@ -189,7 +189,7 @@ namespace Thro_Bot
                     enemy.Update();
                     if (enemy.m_Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy))
                     {
-                        enemy.Active = false;
+                        enemy.m_Active = false;
 
                         //Cause damage to the player
                         if (!CheckCollision(enemy))
@@ -213,10 +213,10 @@ namespace Thro_Bot
             }
         }
 
-        private bool CheckCollision(Enemy1 enemy)
+        private bool CheckCollision(EnemyBase enemy)
         {
             bool collision = false;            
-            Rectangle enemyRectangle = new Rectangle((int)enemy.Position.X, (int)enemy.Position.Y, enemy.Texture.Width-35, enemy.Texture.Height-50);
+            Rectangle enemyRectangle = new Rectangle((int)enemy.m_Position.X, (int)enemy.m_Position.Y, enemy.Texture.Width-35, enemy.Texture.Height-50);
             Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X-projectile.m_ProjectileTexture.Width/2, (int)projectile.m_Position.Y-projectile.m_ProjectileTexture.Height/2, projectile.m_ProjectileTexture.Width, projectile.m_ProjectileTexture.Height);
             if (enemyRectangle.Intersects(projectileRectangle)){                
                 collision = pixelCollision(enemy, projectile, Rectangle.Intersect(projectileRectangle,enemyRectangle));
@@ -224,7 +224,7 @@ namespace Thro_Bot
             return collision;
         }
 
-        private bool pixelCollision(Enemy1 enemy, Projectile projectile, Rectangle rectangle)
+        private bool pixelCollision(EnemyBase enemy, Projectile projectile, Rectangle rectangle)
         {            
             Color[] color1 = new Color[enemy.Texture.Width * enemy.Texture.Height];
             Color[] color2 = new Color[projectile.m_ProjectileTexture.Width * projectile.m_ProjectileTexture.Height];
@@ -239,7 +239,7 @@ namespace Thro_Bot
             {
                 for(int x=x1; x < x2; x++)
                 {
-                    Color a = color1[Math.Abs((x-(int)enemy.Position.X)) + Math.Abs((y-(int)enemy.Position.Y)) * enemy.Texture.Width];
+                    Color a = color1[Math.Abs((x-(int)enemy.m_Position.X)) + Math.Abs((y-(int)enemy.m_Position.Y)) * enemy.Texture.Width];
                     Color b = color2[Math.Abs((x - (int)projectile.m_Position.X)) + Math.Abs((y - (int)projectile.m_Position.Y)) * projectile.m_ProjectileTexture.Width];
                     if(a.A !=0 && b.A != 0)
                     {
