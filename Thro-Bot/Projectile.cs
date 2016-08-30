@@ -34,10 +34,10 @@ namespace Thro_Bot
         public float m_fProjectileScale;
 
         //The max scale of the projectile
-        private const float MAX_PROJECTILE_SCALE = 0.65f;
+        private const float MAX_PROJECTILE_SCALE = 1.15f;
 
         //The min scale of the projectile
-        private const float MIN_PROJECTILE_SCALE = 0.45f;
+        private const float MIN_PROJECTILE_SCALE = 0.95f;
 
         //The direction of scaling the projectile
         private bool m_bScaleUp;
@@ -107,7 +107,7 @@ namespace Thro_Bot
             selfRotate = false;
 
             //Set the initial scale of the projectile
-            m_fProjectileScale = 0.5f;
+            m_fProjectileScale = 1f;
 
             //Set the value to scale up every time
             m_bScaleUp = true;
@@ -140,7 +140,7 @@ namespace Thro_Bot
 
                 //Return the projectile to its original scale
                 else {
-                    m_fProjectileScale = 0.5f;
+                    m_fProjectileScale = 1f;
                 }
                
             }

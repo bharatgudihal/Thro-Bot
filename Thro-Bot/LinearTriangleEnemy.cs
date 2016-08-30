@@ -10,7 +10,7 @@ namespace Thro_Bot {
 	public class LinearTriangleEnemy : EnemyBase {
 		public override EnemyBase.Type m_Type { get { return Type.LinearTriangle; } }
 
-		protected override float m_Scale { get { return 0.4f; } }
+		protected override float m_Scale { get { return 1f; } }
 
 		protected override float m_MovementSpeed { get { return 1f; } }
 

@@ -11,7 +11,7 @@ namespace Thro_Bot {
 	public class SquigglyTriangleEnemy : EnemyBase {
 		public override EnemyBase.Type m_Type { get { return Type.SquigglyTriangle; } }
 
-		protected override float m_Scale { get { return 0.3f; } }
+		protected override float m_Scale { get { return 1f; } }
 
 		protected override float m_MovementSpeed { get { return 1f; } }
 

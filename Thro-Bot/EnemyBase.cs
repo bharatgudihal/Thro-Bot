@@ -194,7 +194,7 @@ namespace Thro_Bot
 			m_Rotation = (float)Math.PI / 2f;
 			m_Texture = texture;
 			m_Rect = new Rectangle (0, 0, m_Texture.Width, m_Texture.Height);
-			m_Origin = new Vector2 (m_Texture.Width/2, m_Texture.Height/2);
+			m_Origin = Vector2.Zero;
 
 			// Init movement/rotation behaviors
 			InitializeBehaviors();
