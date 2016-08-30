@@ -26,6 +26,19 @@ namespace Thro_Bot
         //The origin of the player
         public Vector2 m_PlayerOrigin;
 
+        //The combo multiplier
+        public int m_iComboMultiplier;
+
+        //If a combo is active
+        public bool m_bComboActive;
+
+        //The time the combo started
+        public TimeSpan m_CurrentComboTime = TimeSpan.Zero;
+
+        //The amount of time till the combo resets
+        public TimeSpan m_ComboCoolDown = TimeSpan.FromSeconds(2);
+
+
         //Get the width of the player ship sprite
         public int m_iSpriteWidth
         {
@@ -62,6 +75,13 @@ namespace Thro_Bot
 
             // Set rotation speed
             rotationSpeed = 0.05f;
+
+            //Set the combo multiplier
+            m_iComboMultiplier = 0;
+
+            //Set the state of the combo
+            m_bComboActive = false;
+
 
         }
 
