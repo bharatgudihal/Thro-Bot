@@ -69,7 +69,6 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Enemy1.cs" />
     <Compile Include="EnemyBase.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="LinearTriangleEnemy.cs" />

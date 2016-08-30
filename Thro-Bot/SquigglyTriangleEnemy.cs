@@ -26,7 +26,7 @@ namespace Thro_Bot {
 		}
 
 		public override void InitializeBehaviors() {
-			_movementBehavior = new SquigglyMovementBehavior(0.15f, 2f);
+			_movementBehavior = new SquigglyMovementBehavior(0.15f, 5f);
 			_rotationBehavior = null;
 		}
 	}
