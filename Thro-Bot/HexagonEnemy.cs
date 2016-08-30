@@ -15,7 +15,7 @@ namespace Thro_Bot
         {
             get
             {
-                return Color.White;
+                return Color.Orange;
             }
         }
 

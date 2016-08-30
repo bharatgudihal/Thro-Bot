@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Thro_Bot
 {
@@ -15,7 +16,7 @@ namespace Thro_Bot
         {
             get
             {
-                return Color.White;
+                return Color.Orange;
             }
         }
 
@@ -69,13 +70,19 @@ namespace Thro_Bot
 
         private float radius = 50f;
 
-        private float rotationSpeed = 0.05f;
+        private float rotationSpeed = 0.03f;
 
         private EnemyBase originEnemy;
 
-            public Shield(ref EnemyBase originEnemy)
+        public Shield(ref EnemyBase originEnemy)
         {
-            this.originEnemy = originEnemy;
+            this.originEnemy = originEnemy;            
+        }
+
+        public override void Initialize(Texture2D texture, Vector2 position)
+        {
+            base.Initialize(texture, position);
+            m_Origin = new Vector2(Texture.Width / 2, Texture.Height / 2);
         }
 
         public override void InitializeBehaviors()

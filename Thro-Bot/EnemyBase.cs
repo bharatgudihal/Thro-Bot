@@ -107,8 +107,8 @@ namespace Thro_Bot
 
         public Vector2 Move(Vector2 position,float rotation)
         {
-            position.X = originEnemy.m_Position.X + originEnemy.Texture.Width / 2 - (float)(radius * Math.Cos(rotation)); ;
-            position.Y = originEnemy.m_Position.Y + originEnemy.Texture.Height / 2 - (float)(radius * Math.Sin(rotation)); ;
+            position.X = originEnemy.m_Position.X + originEnemy.Texture.Width/2 - (float)(radius * Math.Cos(rotation));
+            position.Y = originEnemy.m_Position.Y + originEnemy.Texture.Height/2 - (float)(radius * Math.Sin(rotation));
             return position;
         }
 
