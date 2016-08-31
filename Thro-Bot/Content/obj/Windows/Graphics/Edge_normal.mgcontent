@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Edge_normal.png</SourceFile>
-  <SourceTime>2016-08-28T19:53:26.6602749-06:00</SourceTime>
-  <DestFile>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/bin/Windows/Graphics/Edge_normal.xnb</DestFile>
-  <DestTime>2016-08-31T14:43:22.6587501-06:00</DestTime>
+  <SourceFile>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Edge_normal.png</SourceFile>
+  <SourceTime>2016-08-29T10:26:41.3023079-06:00</SourceTime>
+  <DestFile>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/bin/Windows/Graphics/Edge_normal.xnb</DestFile>
+  <DestTime>2016-08-31T16:53:23.3089009-06:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2016-03-30T00:36:08-06:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

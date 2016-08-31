@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Ring_Line.png</SourceFile>
-  <SourceTime>2016-08-31T15:04:35.421314-06:00</SourceTime>
-  <DestFile>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/bin/Windows/Graphics/Ring_Line.xnb</DestFile>
-  <DestTime>2016-08-31T15:04:49.6162775-06:00</DestTime>
+  <SourceFile>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Ring_Line.png</SourceFile>
+  <SourceTime>2016-08-31T16:39:25.2906103-06:00</SourceTime>
+  <DestFile>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/bin/Windows/Graphics/Ring_Line.xnb</DestFile>
+  <DestTime>2016-08-31T16:53:23.4060156-06:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2016-03-30T00:36:08-06:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

@@ -246,7 +246,7 @@ namespace Thro_Bot
                     {
                         if (enemy.GetType() != typeof(Shield))
                         {
-                            if ((enemy.m_Type == EnemyBase.Type.SquigglyTriangle) && CheckCollision(enemy, gameTime))
+                            if ((enemy.m_Type == EnemyBase.Type.SquigglyTriangle))
                             {
 
                                 if (!projectile.selfRotate)
@@ -255,11 +255,18 @@ namespace Thro_Bot
                                     enemy.m_Active = true;
 
                                 }
-                                else {
+                                else
+                                {
                                     enemy.m_Active = false;
+                                    //Add points to the player score
+                                    ui.score += 100 * player.m_iComboMultiplier;
                                 }
-                            }else {
+                            }
+                            else
+                            {
                                 enemy.m_Active = false;
+                                //Add points to the player score
+                                ui.score += 100 * player.m_iComboMultiplier;
                                 if (enemy.GetType() == typeof(HexagonEnemy))
                                 {
                                     ((HexagonEnemy)enemy).shield.m_Active = false;
@@ -267,10 +274,10 @@ namespace Thro_Bot
                             }
                         }
                         // Bounce off the shield
-                        else if (CheckCollision(enemy,gameTime))
+                        else
                         {
-                            previousCollisionTime = gameTime.TotalGameTime;
-                            
+
+
                             if (0 < Math.Abs(enemy.m_Rotation) && Math.Abs(enemy.m_Rotation) <= Math.PI / 3)
                             {
                                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
@@ -296,43 +303,32 @@ namespace Thro_Bot
                                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
                             }
                         }
-                        
-           
-                    }
-                }else
-                {
-                    //Kill the enemy
-					enemy.Kill();
-                    enemiesList.RemoveAt(i);
-
-
-                    if (enemy.GetType() != typeof(Shield) && CheckCollision(enemy, gameTime))
-                    {
-
-                        //Add points to the player score
-                        ui.score += 100 * player.m_iComboMultiplier;
-
 
 
                     }
-
-                    //Cause damage to the player
-                    if (!CheckCollision(enemy, gameTime) && enemy.m_Position.Y > GraphicsDevice.Viewport.Height)
+                    else if (CheckCollisionWithPlayerShield(enemy))
                     {
-
-                        if (enemy.GetType() != typeof(Shield))
+                        player.m_iHealth -= 10;
+                        enemy.m_Active = false;
+                        //Cap the maximum health to lose
+                        if (player.m_iHealth > 0f)
                         {
-
-                            player.m_iHealth -= 10;
-
-                            //Cap the maximum health to lose
-                            if (ui.playerHealth > 0f)
-                                ui.playerHealth = player.m_iHealth;
+                            ui.playerHealth = player.m_iHealth;
                         }
+
+                        //Game over man! Game over!!
+                        else if (player.m_iHealth == 0f)
+                           Exit();
+                        //
+
                     }
+                }
+                else
+                {
+                    enemy.Kill();
+                    enemiesList.RemoveAt(i);
+                }
 
-
-                }            
             }
         }
 
@@ -340,16 +336,16 @@ namespace Thro_Bot
         {
             bool collision = false;
             Rectangle enemyRectangle;
-            enemyRectangle = GetEnemyRectangle(enemy);            
-            Rectangle playerShieldRectangle = new Rectangle(0, 910, ringLineTexture.Width/2, 2);
+            enemyRectangle = GetEnemyRectangle(enemy);
+            Rectangle playerShieldRectangle = new Rectangle(0, 910, ringLineTexture.Width / 2, 2);
             if (enemyRectangle.Intersects(playerShieldRectangle))
             {
                 collision = true;
             }
             else
             {
-                float distance = Vector2.Distance(player.m_Position, new Vector2(enemy.m_Position.X+enemy.Texture.Width/2,enemy.m_Position.Y+enemy.Texture.Height/2));
-                if(distance <= projectile.rotationRadius+projectile.m_iSpriteWidth/2)
+                float distance = Vector2.Distance(player.m_Position, new Vector2(enemy.m_Position.X + enemy.Texture.Width / 2, enemy.m_Position.Y + enemy.Texture.Height / 2));
+                if (distance <= projectile.rotationRadius + projectile.m_iSpriteWidth / 2)
                 {
                     collision = true;
                 }
@@ -519,7 +515,7 @@ namespace Thro_Bot
             {
 
                 player.m_CurrentComboTime += gameTime.ElapsedGameTime;
-                
+
 
                 if (player.m_CurrentComboTime >= player.m_ComboCoolDown)
                 {
@@ -531,7 +527,7 @@ namespace Thro_Bot
             }
         }
 
-        private void CheckEnemyType(EnemyBase enemy,Rectangle enemyRectangle,GameTime gameTime)
+        private void CheckEnemyType(EnemyBase enemy, Rectangle enemyRectangle, GameTime gameTime)
         {
 
             //Check the enemy type
@@ -552,7 +548,7 @@ namespace Thro_Bot
 
                         if (previousProjectilePosition.Y < enemy.m_Position.Y + 20f)
                         {
-                         
+
                             //Bounce it off enemy on the y component
                             projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
                         }
@@ -582,7 +578,7 @@ namespace Thro_Bot
 
                         if (previousProjectilePosition.Y < enemy.m_Position.Y + 20f)
                         {
-                           
+
                             //Bounce it off enemy on the y component
                             projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
                         }
@@ -601,7 +597,7 @@ namespace Thro_Bot
                     player.m_CurrentComboTime = TimeSpan.Zero;
                     player.m_bComboActive = true;
                     player.m_iComboMultiplier += 1;
-                   
+
                 }
 
 
