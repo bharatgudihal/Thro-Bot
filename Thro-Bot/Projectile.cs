@@ -57,7 +57,7 @@ namespace Thro_Bot
         public Vector2 m_ProjectileOrigin;
 
         // Projectile rotation radius
-        private float rotationRadius = 55f;
+        public float rotationRadius = 55f;
 
         //Get the width of the player ship sprite
         public int m_iSpriteWidth
