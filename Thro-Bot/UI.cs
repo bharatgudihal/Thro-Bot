@@ -106,7 +106,7 @@ namespace Thro_Bot
         public void Update() {
 
             sourceRectangleHealthBar.Width = (int)Math.Round((playerHealth / 100f) * intitialFullWidth);
-            Console.WriteLine(sourceRectangleHealthBar.Width);
+            
         }
 
 

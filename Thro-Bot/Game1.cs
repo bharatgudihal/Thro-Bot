@@ -23,6 +23,9 @@ namespace Thro_Bot
         Projectile projectile;
         Vector2 projectilePosition;
 
+        //represents the previous projectile position
+        Vector2 previousProjectilePosition;
+
         //texture of the projectile
         Texture2D projectileTexture;
 
@@ -60,7 +63,7 @@ namespace Thro_Bot
         // Random
         Random random;
 
-        TimeSpan collisionTime = TimeSpan.FromSeconds(1);
+        TimeSpan collisionTime = TimeSpan.FromSeconds(0.1);
         TimeSpan previousCollisionTime = TimeSpan.Zero;
 
         // Screen resolution
@@ -210,6 +213,7 @@ namespace Thro_Bot
             //Update the player
             UpdatePlayer(gameTime);
 
+
             //Update the projectile
             UpdateProjectile(gameTime);
 
@@ -240,17 +244,31 @@ namespace Thro_Bot
                     {
                         if (enemy.GetType() != typeof(Shield))
                         {
-                            // Destroy enemy
-                            enemy.m_Active = false;
-                            if (enemy.GetType() == typeof(HexagonEnemy))
+                            if ((enemy.m_Type == EnemyBase.Type.SquigglyTriangle) && CheckCollision(enemy, gameTime))
                             {
-                                ((HexagonEnemy)enemy).shield.m_Active = false;
+
+                                if (!projectile.selfRotate)
+                                {
+                                    // Destroy enemy
+                                    enemy.m_Active = true;
+
+                                }
+                                else {
+                                    enemy.m_Active = false;
+                                }
+                            }else {
+                                enemy.m_Active = false;
+                                if (enemy.GetType() == typeof(HexagonEnemy))
+                                {
+                                    ((HexagonEnemy)enemy).shield.m_Active = false;
+                                }
                             }
                         }
-                        else if (CheckCollision(enemy) && gameTime.TotalGameTime - previousCollisionTime > collisionTime)
+                        // Bounce off the shield
+                        else if (CheckCollision(enemy,gameTime))
                         {
                             previousCollisionTime = gameTime.TotalGameTime;
-                            // Bounce off the shield
+                            
                             if (0 < Math.Abs(enemy.m_Rotation) && Math.Abs(enemy.m_Rotation) <= Math.PI / 3)
                             {
                                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
@@ -276,34 +294,49 @@ namespace Thro_Bot
                                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
                             }
                         }
-                        //Cause damage to the player
-                        if (!CheckCollision(enemy,gameTime))
+                        
+           
+                    }
+                }else
+                {
+                    //Kill the enemy
+					enemy.Kill();
+                    enemiesList.RemoveAt(i);
+
+
+                    if (enemy.GetType() != typeof(Shield) && CheckCollision(enemy, gameTime))
+                    {
+
+                        //Add points to the player score
+                        ui.score += 100 * player.m_iComboMultiplier;
+
+
+
+                    }
+
+                    //Cause damage to the player
+                    if (!CheckCollision(enemy, gameTime) && enemy.m_Position.Y > GraphicsDevice.Viewport.Height)
+                    {
+
+                        if (enemy.GetType() != typeof(Shield))
                         {
+
                             player.m_iHealth -= 10;
 
                             //Cap the maximum health to lose
                             if (ui.playerHealth > 0f)
-                            ui.playerHealth = (float)player.m_iHealth;
-                        }
-                        
-                        //Initiate the combo system
-                        else
-                        {
-                            //Add points to the player score
-                            ui.score += 100;
+                                ui.playerHealth = player.m_iHealth;
                         }
                     }
-                }else
-                {
-					enemy.Kill();
-                    enemiesList.RemoveAt(i);
+
+
                 }            
             }
         }
 
 
 
-        private bool CheckCollision(EnemyBase enemy, GameTime gameTime)
+        private bool CheckCollision(EnemyBase enemy,GameTime gameTime)
         {
             bool collision = false;
             Rectangle enemyRectangle;
@@ -323,6 +356,7 @@ namespace Thro_Bot
             if (collision)
             {
                 CheckEnemyType(enemy,enemyRectangle,gameTime);
+               
             }
 
             return collision;
@@ -404,6 +438,8 @@ namespace Thro_Bot
 
         protected void UpdateProjectile(GameTime gameTime) {
 
+            previousProjectilePosition = projectile.m_Position;
+
             if (projectile.m_Position.X <= 10f || projectile.m_Position.X >= GraphicsDevice.Viewport.TitleSafeArea.Width - 10f)
             {
                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
@@ -441,91 +477,95 @@ namespace Thro_Bot
 
             if (player.m_bComboActive) {
 
-                if(player.m_CurrentComboTime >= player.m_ComboCoolDown)
+                player.m_CurrentComboTime += gameTime.ElapsedGameTime;
+                
+
+                if (player.m_CurrentComboTime >= player.m_ComboCoolDown)
                 {
                     player.m_iComboMultiplier = 0;
                     player.m_bComboActive = false;
+                    player.m_CurrentComboTime = TimeSpan.Zero;
                 }
 
             }
         }
 
-        private void CheckEnemyType(EnemyBase enemy,Rectangle enemyRectangle, GameTime gameTime)
+        private void CheckEnemyType(EnemyBase enemy,Rectangle enemyRectangle,GameTime gameTime)
         {
 
             //Check the enemy type
-
-            //Compare to yellow triangle
-            if (enemy.m_Type == EnemyBase.Type.LinearTriangle)
+            if (gameTime.TotalGameTime - previousCollisionTime > collisionTime)
             {
+                previousCollisionTime = gameTime.TotalGameTime;
 
-                player.m_bComboActive = true;
-                player.m_iComboMultiplier += 1;
-                ResetComboTime(gameTime);
-
-                //Check if the projectile is not spinning
-                if (!projectile.selfRotate)
+                //Compare to yellow triangle
+                if (enemy.m_Type == EnemyBase.Type.LinearTriangle)
                 {
-
-                    if (projectile.m_Position.Y < enemy.m_Position.Y)
-                    {
-
-                        //Bounce it off enemy on the y component
-                        projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
-                    }
-                    else {
-                        //Bounce it off enemy on the x component
-                        projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
-                    }
-                }
-
-            }
-
-            //Compare to purple triangle
-            if (enemy.m_Type == EnemyBase.Type.SquigglyTriangle)
-            {
-
-                //Check if the projectile is spinning
-                if (projectile.selfRotate)
-                {
+                    player.m_CurrentComboTime = TimeSpan.Zero;
                     player.m_bComboActive = true;
                     player.m_iComboMultiplier += 1;
-                    ResetComboTime(gameTime);
+
+                    //Check if the projectile is not spinning
+                    if (!projectile.selfRotate)
+                    {
+
+                        if (previousProjectilePosition.Y < enemy.m_Position.Y + 20f)
+                        {
+                         
+                            //Bounce it off enemy on the y component
+                            projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
+                        }
+                        else
+                        {
+                            //Bounce it off enemy on the x component
+                            projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+                        }
+                    }
+
                 }
 
-                else
+                //Compare to purple triangle
+                if (enemy.m_Type == EnemyBase.Type.SquigglyTriangle)
                 {
 
-                    if (projectile.m_Position.Y < enemy.m_Position.Y)
+                    //Check if the projectile is spinning
+                    if (projectile.selfRotate)
                     {
-
-                        //Bounce it off enemy on the y component
-                        projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
+                        player.m_CurrentComboTime = TimeSpan.Zero;
+                        player.m_bComboActive = true;
+                        player.m_iComboMultiplier += 1;
                     }
+
                     else
                     {
-                        //Bounce it off enemy on the x component
-                        projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+
+                        if (previousProjectilePosition.Y < enemy.m_Position.Y + 20f)
+                        {
+                           
+                            //Bounce it off enemy on the y component
+                            projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
+                        }
+                        else
+                        {
+                            //Bounce it off enemy on the x component
+                            projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+                        }
                     }
+
                 }
 
-            }
-
-            //Compare to orange hexagon
-            if (enemy.m_Type == EnemyBase.Type.Hexagon)
-            {
-                player.m_bComboActive = true;
-                player.m_iComboMultiplier += 1;
-                ResetComboTime(gameTime);
-            }
-
-        }
+                //Compare to orange hexagon
+                if (enemy.m_Type == EnemyBase.Type.Hexagon)
+                {
+                    player.m_CurrentComboTime = TimeSpan.Zero;
+                    player.m_bComboActive = true;
+                    player.m_iComboMultiplier += 1;
+                   
+                }
 
 
 
-        private void ResetComboTime(GameTime gameTime)
-        {
-            player.m_CurrentComboTime = gameTime.ElapsedGameTime;
+            }//end of check collision time
         }
 
 
@@ -574,6 +614,13 @@ namespace Thro_Bot
 
             //Draw the score
             spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(78,40), Color.White);
+
+
+            if (player.m_bComboActive && player.m_iComboMultiplier > 1)
+            {
+                //Draw the combo indicator
+                spriteBatch.DrawString(ui.scoreFont, "Combo: x" + player.m_iComboMultiplier.ToString(), new Vector2(150, 80), Color.White);
+            }
 
             //Draw the player health
             spriteBatch.DrawString(ui.healthFont, ui.playerHealth.ToString() + "%", new Vector2(680, 35), Color.White);

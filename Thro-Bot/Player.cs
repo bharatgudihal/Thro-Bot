@@ -36,7 +36,7 @@ namespace Thro_Bot
         public TimeSpan m_CurrentComboTime = TimeSpan.Zero;
 
         //The amount of time till the combo resets
-        public TimeSpan m_ComboCoolDown = TimeSpan.FromSeconds(2);
+        public TimeSpan m_ComboCoolDown = TimeSpan.FromSeconds(3);
 
 
         //Get the width of the player ship sprite
@@ -82,7 +82,7 @@ namespace Thro_Bot
             //Set the state of the combo
             m_bComboActive = false;
 
-
+            
         }
 
         public void Update()
