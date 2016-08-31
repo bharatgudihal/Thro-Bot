@@ -48,17 +48,18 @@ namespace Thro_Bot
         Texture2D ringLineTexture;
         Vector2 ringLinePosition;
         Vector2 ringLineOrigin;
+        Rectangle ringLineRectangle;
 
         // Enemy list
         List<EnemyBase> enemiesList;
         Texture2D[] enemyTextures;
 
-		// Enemy death particle list
-		List<Texture2D> enemyPiecesList;
+        // Enemy death particle list
+        List<Texture2D> enemyPiecesList;
 
-		// Particle system list
-		ParticleSystemBase enemyDeathPS;
-		List<ParticleSystemBase> activeParticleSystems;
+        // Particle system list
+        ParticleSystemBase enemyDeathPS;
+        List<ParticleSystemBase> activeParticleSystems;
 
         // Random
         Random random;
@@ -102,14 +103,14 @@ namespace Thro_Bot
             ringLinePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.92f));
             enemiesList = new List<EnemyBase>();
 
-			enemyDeathPS = new ParticleSystemBase (0f, 1f, 0.5f, 1.5f,
-				0.1f, 0.25f, 
-				new Vector2 (-4f, -4f), new Vector2 (4f, 4f),
-				0.02f, 0.1f);
-			
-			activeParticleSystems = new List<ParticleSystemBase>() {
-				enemyDeathPS
-			};
+            enemyDeathPS = new ParticleSystemBase(0f, 1f, 0.5f, 1.5f,
+                0.1f, 0.25f,
+                new Vector2(-4f, -4f), new Vector2(4f, 4f),
+                0.02f, 0.1f);
+
+            activeParticleSystems = new List<ParticleSystemBase>() {
+                enemyDeathPS
+            };
 
 
             random = new Random();
@@ -132,7 +133,7 @@ namespace Thro_Bot
             //Load the player resources
             //Vector2 playerPosition = Vector2.Zero;
             Vector2 playerPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.92f));
-            player.Initialize(Content.Load<Texture2D>("Graphics/Player"), playerPosition);          
+            player.Initialize(Content.Load<Texture2D>("Graphics/Player"), playerPosition);
 
             //Load the projectile texture
             projectilePosition = new Vector2(playerPosition.X + 10f, playerPosition.Y);
@@ -146,6 +147,7 @@ namespace Thro_Bot
             // Load ring line
             ringLineTexture = Content.Load<Texture2D>("Graphics/Ring_Line");
             ringLineOrigin = new Vector2(ringLineTexture.Width / 2, ringLineTexture.Height / 2);
+            ringLineRectangle = new Rectangle(0, 0, ringLineTexture.Width, ringLineTexture.Height);
 
             // Load edge textures
             edge_normal = Content.Load<Texture2D>("Graphics/Edge_normal");
@@ -159,17 +161,17 @@ namespace Thro_Bot
             enemyTextures[2] = Content.Load<Texture2D>("Graphics/E3");
             enemyTextures[3] = Content.Load<Texture2D>("Graphics/E3_Shield");
 
-			// Load enemy piece textures
-			enemyPiecesList = new List<Texture2D>() {
-				Content.Load<Texture2D>("Graphics/Piece_01"),
-				Content.Load<Texture2D>("Graphics/Piece_02"),
-				Content.Load<Texture2D>("Graphics/Piece_03"),
-				Content.Load<Texture2D>("Graphics/Piece_04")
-			};
+            // Load enemy piece textures
+            enemyPiecesList = new List<Texture2D>() {
+                Content.Load<Texture2D>("Graphics/Piece_01"),
+                Content.Load<Texture2D>("Graphics/Piece_02"),
+                Content.Load<Texture2D>("Graphics/Piece_03"),
+                Content.Load<Texture2D>("Graphics/Piece_04")
+            };
 
             //Load the score texture
             Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.22f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.040f));
-            ui.InitializeScore(Content.Load<Texture2D>("Graphics/ScoreUI"),scorePosition, Vector2.Zero);
+            ui.InitializeScore(Content.Load<Texture2D>("Graphics/ScoreUI"), scorePosition, Vector2.Zero);
 
             Vector2 healthPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.73f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.030f));
             Vector2 healthBarPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.58f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.030f));
@@ -234,13 +236,13 @@ namespace Thro_Bot
 
         private void UpdateEnemies(GameTime gameTime)
         {
-            for (int i=0;i<enemiesList.Count;i++)
+            for (int i = 0; i < enemiesList.Count; i++)
             {
                 EnemyBase enemy = enemiesList[i];
                 if (enemy.m_Active)
                 {
                     enemy.Update();
-                    if (enemy.m_Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy,gameTime))
+                    if (CheckCollisionWithPlayer(enemy, gameTime))
                     {
                         if (enemy.GetType() != typeof(Shield))
                         {
@@ -334,51 +336,81 @@ namespace Thro_Bot
             }
         }
 
-
-
-        private bool CheckCollision(EnemyBase enemy,GameTime gameTime)
+        private bool CheckCollisionWithPlayerShield(EnemyBase enemy)
         {
             bool collision = false;
+            Rectangle enemyRectangle;
+            enemyRectangle = GetEnemyRectangle(enemy);            
+            Rectangle playerShieldRectangle = new Rectangle(0, 910, ringLineTexture.Width/2, 2);
+            if (enemyRectangle.Intersects(playerShieldRectangle))
+            {
+                collision = true;
+            }
+            else
+            {
+                float distance = Vector2.Distance(player.m_Position, new Vector2(enemy.m_Position.X+enemy.Texture.Width/2,enemy.m_Position.Y+enemy.Texture.Height/2));
+                if(distance <= projectile.rotationRadius+projectile.m_iSpriteWidth/2)
+                {
+                    collision = true;
+                }
+            }
+            return collision;
+        }
+
+        private static Rectangle GetEnemyRectangle(EnemyBase enemy)
+        {
             Rectangle enemyRectangle;
             if (enemy.GetType() != typeof(Shield))
             {
                 enemyRectangle = new Rectangle((int)enemy.m_Position.X, (int)enemy.m_Position.Y, enemy.Texture.Width * 7 / 10, enemy.Texture.Height * 6 / 10);
-            }else
-            {
-                enemyRectangle = new Rectangle((int)enemy.m_Position.X-enemy.Texture.Width/2, (int)enemy.m_Position.Y-enemy.Texture.Height/2, enemy.Texture.Width, enemy.Texture.Height);
             }
-            Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X-projectile.m_ProjectileTexture.Width/2, (int)projectile.m_Position.Y-projectile.m_ProjectileTexture.Height/2, projectile.m_ProjectileTexture.Width, projectile.m_ProjectileTexture.Height);
-            if (enemyRectangle.Intersects(projectileRectangle)){                
-                collision = pixelCollision(enemy, projectile, Rectangle.Intersect(projectileRectangle,enemyRectangle));
+            else
+            {
+                enemyRectangle = new Rectangle((int)enemy.m_Position.X - enemy.Texture.Width / 2, (int)enemy.m_Position.Y - enemy.Texture.Height / 2, enemy.Texture.Width, enemy.Texture.Height);
             }
 
-            //check the enemy type if collision happened
-            if (collision)
-            {
-                CheckEnemyType(enemy,enemyRectangle,gameTime);
-               
-            }
+            return enemyRectangle;
+        }
 
+        private bool CheckCollisionWithPlayer(EnemyBase enemy, GameTime gameTime)
+        {
+            bool collision = false;
+            // Only check collision if projectile is released
+            if (!projectile.m_bInOrbitToPlayer)
+            {
+                Rectangle enemyRectangle;
+                enemyRectangle = GetEnemyRectangle(enemy);
+                Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X - projectile.m_ProjectileTexture.Width / 2, (int)projectile.m_Position.Y - projectile.m_ProjectileTexture.Height / 2, projectile.m_ProjectileTexture.Width, projectile.m_ProjectileTexture.Height);
+                if (enemyRectangle.Intersects(projectileRectangle))
+                {
+                    collision = pixelCollision(enemy, projectile.m_ProjectileTexture, projectile.m_Position, Rectangle.Intersect(projectileRectangle, enemyRectangle));
+                }
+                //check the enemy type if collision happened
+                if (collision)
+                {
+                    CheckEnemyType(enemy, enemyRectangle, gameTime);
+                }
+            }
             return collision;
         }
 
-        private bool pixelCollision(EnemyBase enemy, Projectile projectile, Rectangle rectangle)
-        {            
+        private bool pixelCollision(EnemyBase enemy, Texture2D texture, Vector2 position, Rectangle rectangle)
+        {
             Color[] color1 = new Color[enemy.Texture.Width * enemy.Texture.Height];
-            Color[] color2 = new Color[projectile.m_ProjectileTexture.Width * projectile.m_ProjectileTexture.Height];
+            Color[] color2 = new Color[texture.Width * texture.Height];
             enemy.Texture.GetData(color1);
-            projectile.m_ProjectileTexture.GetData(color2);            
+            texture.GetData(color2);
             int x1 = rectangle.X;
-            int x2 = rectangle.X+rectangle.Width;
+            int x2 = rectangle.X + rectangle.Width;
             int y1 = rectangle.Y;
-            int y2 = rectangle.Y+rectangle.Height;
-            for (int y= y1;y< y2; y++)
+            int y2 = rectangle.Y + rectangle.Height;
+            for (int y = y1; y < y2; y++)
             {
-                for(int x=x1; x < x2; x++)
+                for (int x = x1; x < x2; x++)
                 {
-                    Color a = color1[Math.Abs((x-(int)enemy.m_Position.X)) + Math.Abs((y-(int)enemy.m_Position.Y)) * enemy.Texture.Width];
-                    Color b = color2[Math.Abs((x - (int)projectile.m_Position.X)) + Math.Abs((y - (int)projectile.m_Position.Y)) * projectile.m_ProjectileTexture.Width];
-                    if(a.A !=0 && b.A != 0)
+                    Color a = color1[Math.Abs((x - (int)enemy.m_Position.X)) + Math.Abs((y - (int)enemy.m_Position.Y)) * enemy.Texture.Width];
+                    Color b = color2[Math.Abs((x - (int)position.X)) + Math.Abs((y - (int)position.Y)) * texture.Width];
+                    if (a.A != 0 && b.A != 0)
                     {
                         return true;
                     }
@@ -395,7 +427,8 @@ namespace Thro_Bot
                 int spawn = random.Next(0, 3);
                 EnemyBase enemy = null;
                 EnemyBase shield = null;
-                switch (spawn){
+                switch (spawn)
+                {
                     case 0:
                         enemy = new LinearTriangleEnemy();
                         enemy.Initialize(enemyTextures[0], new Vector2(random.Next(enemyTextures[0].Width, WIDTH - enemyTextures[0].Width), 0));
@@ -411,7 +444,7 @@ namespace Thro_Bot
                         shield.Initialize(enemyTextures[3], Vector2.Zero);
                         ((HexagonEnemy)enemy).setShield(ref shield);
                         break;
-                    default:                        
+                    default:
                         break;
                 }
                 if (null != enemy)
@@ -432,11 +465,12 @@ namespace Thro_Bot
             if (previousKeyboardState.IsKeyUp(Keys.Space) && currentKeyboardState.IsKeyDown(Keys.Space))
             {
                 //Launch the projectile
-                projectile.m_bInOrbitToPlayer = false;                
+                projectile.m_bInOrbitToPlayer = false;
             }
         }
 
-        protected void UpdateProjectile(GameTime gameTime) {
+        protected void UpdateProjectile(GameTime gameTime)
+        {
 
             previousProjectilePosition = projectile.m_Position;
 
@@ -445,37 +479,44 @@ namespace Thro_Bot
                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
                 //projectile.m_iBounces++;
                 edge = edge_hit;
-            }else if (projectile.m_Position.Y <= 10f || projectile.m_Position.Y >= GraphicsDevice.Viewport.TitleSafeArea.Height - 10f)
+            }
+            else if (projectile.m_Position.Y <= 10f || projectile.m_Position.Y >= GraphicsDevice.Viewport.TitleSafeArea.Height - 10f)
             {
                 projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
                 //projectile.m_iBounces++;
                 edge = edge_hit;
-            }else
+            }
+            else
             {
                 edge = edge_normal;
             }
 
-            if (projectile.m_iBounces > 3) {
+            if (projectile.m_iBounces > 3)
+            {
                 projectile = new Projectile();
                 projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
             }
 
 
             //Check is projectile has been launched, rotate it around its center
-            if (currentKeyboardState.IsKeyDown(Keys.Space)){                
+            if (currentKeyboardState.IsKeyDown(Keys.Space))
+            {
                 projectile.selfRotate = true;
-            }else
+            }
+            else
             {
                 projectile.selfRotate = false;
-            }            
+            }
 
             projectile.Update(player.m_Position, gameTime);
         }
 
 
-        private void UpdateCombo(GameTime gameTime) {
+        private void UpdateCombo(GameTime gameTime)
+        {
 
-            if (player.m_bComboActive) {
+            if (player.m_bComboActive)
+            {
 
                 player.m_CurrentComboTime += gameTime.ElapsedGameTime;
                 
@@ -569,10 +610,11 @@ namespace Thro_Bot
         }
 
 
-        void UpdateParticleSystems () {
-			foreach (ParticleSystemBase ps in activeParticleSystems)
-				ps.Update();
-		}
+        void UpdateParticleSystems()
+        {
+            foreach (ParticleSystemBase ps in activeParticleSystems)
+                ps.Update();
+        }
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -588,15 +630,14 @@ namespace Thro_Bot
 
             //Draw the background
             Rectangle sourceRectangle = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            spriteBatch.Draw(backgroundTexture, sourceRectangle,Color.White);
+            spriteBatch.Draw(backgroundTexture, sourceRectangle, Color.White);
 
-            // Draw ring line
-            Rectangle ringLineRectangle = new Rectangle(0, 0, ringLineTexture.Width, ringLineTexture.Height);
+            // Draw ring line            
             spriteBatch.Draw(ringLineTexture, ringLinePosition, ringLineRectangle, Color.White, 0f, ringLineOrigin, 0.5f, SpriteEffects.None, 0f);
 
             // Draw edge
             Rectangle edgeRectangle = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            spriteBatch.Draw(edge, edgeRectangle, Color.White);           
+            spriteBatch.Draw(edge, edgeRectangle, Color.White);
 
             //Draw the Player
             player.Draw(spriteBatch);
@@ -607,13 +648,13 @@ namespace Thro_Bot
             //Draw enemies
             DrawEnemies(spriteBatch);
 
-			DrawParticleSystems(spriteBatch);
+            DrawParticleSystems(spriteBatch);
 
             //Draw ui
             ui.Draw(spriteBatch);
 
             //Draw the score
-            spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(78,40), Color.White);
+            spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(78, 40), Color.White);
 
 
             if (player.m_bComboActive && player.m_iComboMultiplier > 1)
@@ -635,28 +676,30 @@ namespace Thro_Bot
         {
             foreach (EnemyBase enemy in enemiesList)
             {
-				if (!enemy.m_Active) continue;
+                if (!enemy.m_Active) continue;
                 enemy.Draw(spriteBatch);
             }
         }
 
-		void DrawParticleSystems (SpriteBatch spriteBatch) {
-			foreach (ParticleSystemBase ps in activeParticleSystems)
-				ps.Draw(spriteBatch);
-		}
+        void DrawParticleSystems(SpriteBatch spriteBatch)
+        {
+            foreach (ParticleSystemBase ps in activeParticleSystems)
+                ps.Draw(spriteBatch);
+        }
 
-		void ShowEnemyDeath (EnemyBase enemy) {
-			if (enemyDeathPS.m_Sprites == null)
-				enemyDeathPS.m_Sprites = enemyPiecesList;
+        void ShowEnemyDeath(EnemyBase enemy)
+        {
+            if (enemyDeathPS.m_Sprites == null)
+                enemyDeathPS.m_Sprites = enemyPiecesList;
 
-			enemyDeathPS.SetWind (new Vector2 (
-				(float)(projectile.m_fProjectileSpeedX * Math.Sin(projectile.m_fProjectileRotation_fixed)), 
-				-(float)(projectile.m_fProjectileSpeedY * Math.Cos(projectile.m_fProjectileRotation_fixed))
-			) * 0.6f);
-			enemyDeathPS.m_Position = enemy.m_Position + enemy.m_Center;
-			enemyDeathPS.SetTint (enemy.m_Color);
-			enemyDeathPS.Emit (8);
-		}
+            enemyDeathPS.SetWind(new Vector2(
+                (float)(projectile.m_fProjectileSpeedX * Math.Sin(projectile.m_fProjectileRotation_fixed)),
+                -(float)(projectile.m_fProjectileSpeedY * Math.Cos(projectile.m_fProjectileRotation_fixed))
+            ) * 0.6f);
+            enemyDeathPS.m_Position = enemy.m_Position + enemy.m_Center;
+            enemyDeathPS.SetTint(enemy.m_Color);
+            enemyDeathPS.Emit(8);
+        }
     }
 
 }
