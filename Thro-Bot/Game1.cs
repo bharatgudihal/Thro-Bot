@@ -219,6 +219,9 @@ namespace Thro_Bot
             //Update the UI
             ui.Update();
 
+            //Update the combo
+            UpdateCombo(gameTime);
+
             // Update all particle systems
             UpdateParticleSystems();
 
@@ -233,7 +236,7 @@ namespace Thro_Bot
                 if (enemy.m_Active)
                 {
                     enemy.Update();
-                    if (enemy.m_Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy))
+                    if (enemy.m_Position.Y > GraphicsDevice.Viewport.Height || CheckCollision(enemy,gameTime))
                     {
                         if (enemy.GetType() != typeof(Shield))
                         {
@@ -274,7 +277,7 @@ namespace Thro_Bot
                             }
                         }
                         //Cause damage to the player
-                        if (!CheckCollision(enemy))
+                        if (!CheckCollision(enemy,gameTime))
                         {
                             player.m_iHealth -= 10;
 
@@ -286,10 +289,6 @@ namespace Thro_Bot
                         //Initiate the combo system
                         else
                         {
-                            //Check the enemy type
-                           // if(enemy.)
-
-
                             //Add points to the player score
                             ui.score += 100;
                         }
@@ -304,7 +303,7 @@ namespace Thro_Bot
 
 
 
-        private bool CheckCollision(EnemyBase enemy)
+        private bool CheckCollision(EnemyBase enemy, GameTime gameTime)
         {
             bool collision = false;
             Rectangle enemyRectangle;
@@ -319,6 +318,13 @@ namespace Thro_Bot
             if (enemyRectangle.Intersects(projectileRectangle)){                
                 collision = pixelCollision(enemy, projectile, Rectangle.Intersect(projectileRectangle,enemyRectangle));
             }
+
+            //check the enemy type if collision happened
+            if (collision)
+            {
+                CheckEnemyType(enemy,enemyRectangle,gameTime);
+            }
+
             return collision;
         }
 
@@ -430,7 +436,100 @@ namespace Thro_Bot
             projectile.Update(player.m_Position, gameTime);
         }
 
-		void UpdateParticleSystems () {
+
+        private void UpdateCombo(GameTime gameTime) {
+
+            if (player.m_bComboActive) {
+
+                if(player.m_CurrentComboTime >= player.m_ComboCoolDown)
+                {
+                    player.m_iComboMultiplier = 0;
+                    player.m_bComboActive = false;
+                }
+
+            }
+        }
+
+        private void CheckEnemyType(EnemyBase enemy,Rectangle enemyRectangle, GameTime gameTime)
+        {
+
+            //Check the enemy type
+
+            //Compare to yellow triangle
+            if (enemy.m_Type == EnemyBase.Type.LinearTriangle)
+            {
+
+                player.m_bComboActive = true;
+                player.m_iComboMultiplier += 1;
+                ResetComboTime(gameTime);
+
+                //Check if the projectile is not spinning
+                if (!projectile.selfRotate)
+                {
+
+                    if (projectile.m_Position.Y < enemy.m_Position.Y)
+                    {
+
+                        //Bounce it off enemy on the y component
+                        projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
+                    }
+                    else {
+                        //Bounce it off enemy on the x component
+                        projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+                    }
+                }
+
+            }
+
+            //Compare to purple triangle
+            if (enemy.m_Type == EnemyBase.Type.SquigglyTriangle)
+            {
+
+                //Check if the projectile is spinning
+                if (projectile.selfRotate)
+                {
+                    player.m_bComboActive = true;
+                    player.m_iComboMultiplier += 1;
+                    ResetComboTime(gameTime);
+                }
+
+                else
+                {
+
+                    if (projectile.m_Position.Y < enemy.m_Position.Y)
+                    {
+
+                        //Bounce it off enemy on the y component
+                        projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
+                    }
+                    else
+                    {
+                        //Bounce it off enemy on the x component
+                        projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+                    }
+                }
+
+            }
+
+            //Compare to orange hexagon
+            if (enemy.m_Type == EnemyBase.Type.Hexagon)
+            {
+                player.m_bComboActive = true;
+                player.m_iComboMultiplier += 1;
+                ResetComboTime(gameTime);
+            }
+
+        }
+
+
+
+        private void ResetComboTime(GameTime gameTime)
+        {
+            player.m_CurrentComboTime = gameTime.ElapsedGameTime;
+        }
+
+
+        void UpdateParticleSystems () {
 			foreach (ParticleSystemBase ps in activeParticleSystems)
 				ps.Update();
 		}
