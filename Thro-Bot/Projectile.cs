@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Thro_Bot
 {
-    class Projectile
+    public class Projectile
     {
         //The texture that represents the projectile
         public Texture2D m_ProjectileTexture;
@@ -51,7 +52,9 @@ namespace Thro_Bot
         //The duration of time
         private const int duration = 5000;
 
-        
+        //ProjectileTrail m_Trail;
+
+		public ParticleSystemBase m_Trail;
 
         //The origin of the projectile
         public Vector2 m_ProjectileOrigin;
@@ -115,7 +118,22 @@ namespace Thro_Bot
             //The Rectangle to render the texture
             sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
 
+			m_Trail = new ParticleSystemBase (
+				0.01f, 0f, 1,
+				0.8f, 0.8f,
+				0.4f, 0.4f,
+				Vector2.Zero, Vector2.Zero,
+				0f, 2f * (float)Math.PI);
         }
+
+		//public void InitializeTrail (Texture2D trailTexture) {
+		//	m_Trail = new ProjectileTrail();
+		//	m_Trail.Initialize (this, trailTexture);
+		//}
+
+		public void InitializeTrail (List<Texture2D> sprites) {
+			m_Trail.m_Sprites = sprites;
+		}
 
         public void Update(Vector2 origin, GameTime gameTime)
         {
@@ -144,6 +162,9 @@ namespace Thro_Bot
                 }
                
             }
+
+			m_Trail.m_Position = m_Position;
+			m_Trail.Update();
         }
 
 
@@ -188,7 +209,11 @@ namespace Thro_Bot
 
         
         public void Draw(SpriteBatch spriteBatch)
-        {                        
+        {            
+			// Draw trail
+			m_Trail.Draw (spriteBatch);
+
+			// Draw projectile            
             spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, m_fProjectileScale, SpriteEffects.None, 0f);
         }
     }

@@ -28,6 +28,7 @@ namespace Thro_Bot
 
         //texture of the projectile
         Texture2D projectileTexture;
+		Texture2D projectileTrailTexture;
 
         //Represents the UI score board
         UI ui;
@@ -116,7 +117,8 @@ namespace Thro_Bot
             ringLinePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.92f));
             enemiesList = new List<EnemyBase>();
 
-            enemyDeathPS = new ParticleSystemBase(0f, 1f, 0.5f, 1.5f,
+            enemyDeathPS = new ParticleSystemBase(0f, 1f, 4,
+				0.5f, 1.5f,
                 0.05f, 0.25f,
                 new Vector2(-4f, -4f), new Vector2(4f, 4f),
                 0.02f, 0.1f);
@@ -152,7 +154,10 @@ namespace Thro_Bot
             //Load the projectile texture
             projectilePosition = new Vector2(playerPosition.X + 10f, playerPosition.Y);
             projectileTexture = Content.Load<Texture2D>("Graphics/Discv2");
+			projectileTrailTexture = Content.Load<Texture2D>("Graphics/Discv2");
             projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
+			projectile.InitializeTrail (new List<Texture2D>() { projectileTrailTexture });
+			activeParticleSystems.Add (projectile.m_Trail);
 
 
             //Load the background 
@@ -524,8 +529,11 @@ namespace Thro_Bot
 
             if (projectile.m_iBounces > 3)
             {
+				activeParticleSystems.Remove(projectile.m_Trail);
                 projectile = new Projectile();
                 projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
+				projectile.InitializeTrail (new List<Texture2D>() { projectileTrailTexture });
+				activeParticleSystems.Add (projectile.m_Trail);
             }
 
 
@@ -533,10 +541,12 @@ namespace Thro_Bot
             if (currentKeyboardState.IsKeyDown(Keys.Space))
             {
                 projectile.selfRotate = true;
+				projectile.m_Trail.SetAllTint (Color.Red);
             }
             else
             {
                 projectile.selfRotate = false;
+				projectile.m_Trail.SetAllTint (Color.White);
             }
 
             projectile.Update(player.m_Position, gameTime);
