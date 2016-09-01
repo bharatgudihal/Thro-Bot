@@ -34,10 +34,10 @@ namespace Thro_Bot
         public float m_fProjectileScale;
 
         //The max scale of the projectile
-        private const float MAX_PROJECTILE_SCALE = 1.15f;
+        private const float MAX_PROJECTILE_SCALE = 1.65f;
 
         //The min scale of the projectile
-        private const float MIN_PROJECTILE_SCALE = 0.95f;
+        private const float MIN_PROJECTILE_SCALE = 1.15f;
 
         //The direction of scaling the projectile
         private bool m_bScaleUp;
@@ -51,7 +51,7 @@ namespace Thro_Bot
         //The duration of time
         private const int duration = 5000;
 
-        
+        private Color m_projectileColor = Color.White;
 
         //The origin of the projectile
         public Vector2 m_ProjectileOrigin;
@@ -96,8 +96,8 @@ namespace Thro_Bot
             m_fProjectileRotation = 0f;
             m_fProjectileRotation_fixed = 0f;
 
-            m_fProjectileSpeedX = 10f;
-            m_fProjectileSpeedY = 10f;
+            m_fProjectileSpeedX = 15f;
+            m_fProjectileSpeedY = 15f;
 
             rotationSpeed = 0.05f;
 
@@ -111,6 +111,10 @@ namespace Thro_Bot
 
             //Set the value to scale up every time
             m_bScaleUp = true;
+
+            //Set the color of the disc to white
+            m_projectileColor = Color.White;
+
 
             //The Rectangle to render the texture
             sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
@@ -136,11 +140,13 @@ namespace Thro_Bot
                 {
                     m_fProjectileRotation -= rotationSpeed * 10f;
                     AlterProjectileScale(gameTime);
+                    m_projectileColor = Color.Red;
                 }
 
                 //Return the projectile to its original scale
                 else {
                     m_fProjectileScale = 1f;
+                    m_projectileColor = Color.White;
                 }
                
             }
@@ -189,7 +195,7 @@ namespace Thro_Bot
         
         public void Draw(SpriteBatch spriteBatch)
         {                        
-            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, m_fProjectileScale, SpriteEffects.None, 0f);
+            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle, m_projectileColor, m_fProjectileRotation, m_ProjectileOrigin, m_fProjectileScale, SpriteEffects.None, 0f);
         }
     }
 }

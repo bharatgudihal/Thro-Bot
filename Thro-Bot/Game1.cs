@@ -16,6 +16,8 @@ namespace Thro_Bot
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        bool gamePaused = false;
+
         //Represents the player
         Player player;
 
@@ -80,7 +82,7 @@ namespace Thro_Bot
         const int HEIGHT = 1000;
 
         // Spawn interval
-        const float SPAWN_INTERVAL = 2f;
+        const float SPAWN_INTERVAL = 2.5f;
         TimeSpan spawnTimeSpan;
 
         // Current game time
@@ -90,6 +92,13 @@ namespace Thro_Bot
         TimeSpan damageFlashTime = TimeSpan.FromSeconds(0.4);
         // Current damage falshgame time
         TimeSpan currentDamagFlashTime = TimeSpan.Zero;
+
+        //The timespan for a single tap
+        TimeSpan currentpaceBarTap = TimeSpan.Zero;
+
+        //the timespan for two tap
+        TimeSpan doubleTap = TimeSpan.FromSeconds(0.2);
+        private int spaceCounter = 0;
 
         public Game1()
         {
@@ -223,26 +232,26 @@ namespace Thro_Bot
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            // Spawn enemies
-            SpawnEnemies(gameTime);
-
             // Save the previous state of the keyboard 
             previousKeyboardState = currentKeyboardState;
 
             //Read the current state
             currentKeyboardState = Keyboard.GetState();
-
+            if (!gamePaused)
+            {
+                // Spawn enemies
+                SpawnEnemies(gameTime);
+            }
             //Update the player
             UpdatePlayer(gameTime);
+            if (!gamePaused)
+            {
+                //Update the projectile
+                UpdateProjectile(gameTime);
 
-
-            //Update the projectile
-            UpdateProjectile(gameTime);
-
-            // Update enemy
-            UpdateEnemies(gameTime);
-
+                // Update enemy
+                UpdateEnemies(gameTime);
+            }
             //Update the UI
             ui.Update();
 
@@ -253,7 +262,7 @@ namespace Thro_Bot
             UpdateParticleSystems();
 
             UpdateDamageFlash(gameTime);
-
+            
             base.Update(gameTime);
         }
 
@@ -473,13 +482,16 @@ namespace Thro_Bot
 
         private void UpdatePlayer(GameTime gameTime)
         {
-            player.Update();
-
-            //Check the case where the space bar is pressed
-            if (previousKeyboardState.IsKeyUp(Keys.Space) && currentKeyboardState.IsKeyDown(Keys.Space))
+            if (!gamePaused)
             {
-                //Launch the projectile
-                projectile.m_bInOrbitToPlayer = false;
+                player.Update();
+
+                //Check the case where the space bar is pressed
+                if (previousKeyboardState.IsKeyUp(Keys.Space) && currentKeyboardState.IsKeyDown(Keys.Space))
+                {
+                    //Launch the projectile
+                    projectile.m_bInOrbitToPlayer = false;
+                }
             }
 
             //Check if the player pressed Yor N and the game over context is on
@@ -492,6 +504,7 @@ namespace Thro_Bot
                 else if(currentKeyboardState.IsKeyDown(Keys.Y)){
 
                     ResetGame();
+                    gamePaused = false;
 
                 }
 
@@ -508,13 +521,13 @@ namespace Thro_Bot
             if (projectile.m_Position.X <= 10f || projectile.m_Position.X >= GraphicsDevice.Viewport.TitleSafeArea.Width - 10f)
             {
                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
-                projectile.m_iBounces++;
+                //projectile.m_iBounces++;
                 edge = edge_hit;
             }
             else if (projectile.m_Position.Y <= 10f || projectile.m_Position.Y >= GraphicsDevice.Viewport.TitleSafeArea.Height - 10f)
             {
                 projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
-                projectile.m_iBounces++;
+                //projectile.m_iBounces++;
                 edge = edge_hit;
             }
             else
@@ -532,14 +545,36 @@ namespace Thro_Bot
             //Check is projectile has been launched, rotate it around its center
             if (currentKeyboardState.IsKeyDown(Keys.Space))
             {
-                projectile.selfRotate = true;
+                //if (spaceCounter == 0)
+                //{
+                //    currentpaceBarTap = gameTime.TotalGameTime;
+                //    spaceCounter++;
+               // }
+
+
+                // if (gameTime.TotalGameTime - currentpaceBarTap <= doubleTap && previousKeyboardState.IsKeyUp(Keys.Space) && spaceCounter>0)
+                //{
+                //    projectile = new Projectile();
+                //    projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
+                //    spaceCounter = 0;
+                //}
+
+                //else
+                //{
+                    projectile.selfRotate = true;
+                //}
             }
             else
             {
                 projectile.selfRotate = false;
             }
 
-            projectile.Update(player.m_Position, gameTime);
+            if (currentKeyboardState.IsKeyDown(Keys.R) && !projectile.m_bInOrbitToPlayer)
+            {
+                projectile = new Projectile();
+                projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
+            }
+                projectile.Update(player.m_Position, gameTime);
         }
 
 
@@ -632,7 +667,7 @@ namespace Thro_Bot
                     player.m_CurrentComboTime = TimeSpan.Zero;
                     player.m_bComboActive = true;
                     player.m_iComboMultiplier += 1;
-
+                  
                 }
 
 
@@ -724,6 +759,7 @@ namespace Thro_Bot
                 //Draw the combo indicator
                 spriteBatch.DrawString(ui.gameOverFont, "Replay Y/N?", new Vector2(GraphicsDevice.Viewport.Width/2 - 200, GraphicsDevice.Viewport.Height/2 - 20), Color.White);
                 gameOver = true;
+                gamePaused = true;
             }
 
             //Stop drawing
@@ -739,6 +775,7 @@ namespace Thro_Bot
             enemiesList.Clear();
             ui.playerHealth = 100;
             gameOver = false;
+            ui.score = 0;
         }
 
 
