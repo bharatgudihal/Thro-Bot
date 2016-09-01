@@ -50,6 +50,9 @@ namespace Thro_Bot
 
         public float playerHealth;
 
+        //Font for the gameover
+        public SpriteFont gameOverFont;
+
 
         //Initializes the Score UI
         public void InitializeScore(Texture2D texture, Vector2 position, Vector2 origin)

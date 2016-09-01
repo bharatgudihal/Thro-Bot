@@ -44,6 +44,14 @@ namespace Thro_Bot
         Texture2D edge_normal;
         Texture2D edge_hit;
 
+        //The texture of the player damage
+        Texture2D playerDamageTexture;
+        //Flash the damage texture
+        bool flashDamage;
+
+        //Check if the game over context is active
+        bool gameOver;
+
         //Ring+line texture
         Texture2D ringLineTexture;
         Vector2 ringLinePosition;
@@ -77,6 +85,11 @@ namespace Thro_Bot
 
         // Current game time
         TimeSpan currentTime;
+
+        //The damage flash time
+        TimeSpan damageFlashTime = TimeSpan.FromSeconds(0.4);
+        // Current damage falshgame time
+        TimeSpan currentDamagFlashTime = TimeSpan.Zero;
 
         public Game1()
         {
@@ -117,6 +130,7 @@ namespace Thro_Bot
             currentTime = TimeSpan.Zero;
             spawnTimeSpan = TimeSpan.FromSeconds(SPAWN_INTERVAL);
             ui = new UI();
+            gameOver = false;
 
             base.Initialize();
         }
@@ -169,6 +183,10 @@ namespace Thro_Bot
                 Content.Load<Texture2D>("Graphics/Piece_04")
             };
 
+            //Load the player damage texture
+            playerDamageTexture = Content.Load<Texture2D>("Graphics/EdgeFadeV2");
+
+
             //Load the score texture
             Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.22f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.040f));
             ui.InitializeScore(Content.Load<Texture2D>("Graphics/ScoreUI"), scorePosition, Vector2.Zero);
@@ -182,6 +200,9 @@ namespace Thro_Bot
 
             //Load the health font
             ui.healthFont = Content.Load<SpriteFont>("Fonts/Health");
+
+            //Load the game over font
+            ui.gameOverFont = Content.Load<SpriteFont>("Fonts/GameOver");
         }
 
         /// <summary>
@@ -230,6 +251,8 @@ namespace Thro_Bot
 
             // Update all particle systems
             UpdateParticleSystems();
+
+            UpdateDamageFlash(gameTime);
 
             base.Update(gameTime);
         }
@@ -310,17 +333,12 @@ namespace Thro_Bot
                     {
                         player.m_iHealth -= 10;
                         enemy.m_Active = false;
+                        flashDamage = true;
                         //Cap the maximum health to lose
-                        if (player.m_iHealth > 0f)
+                        if (player.m_iHealth >= 0f)
                         {
                             ui.playerHealth = player.m_iHealth;
                         }
-
-                        //Game over man! Game over!!
-                        else if (player.m_iHealth == 0f)
-                           Exit();
-                        //
-
                     }
                 }
                 else
@@ -463,6 +481,23 @@ namespace Thro_Bot
                 //Launch the projectile
                 projectile.m_bInOrbitToPlayer = false;
             }
+
+            //Check if the player pressed Yor N and the game over context is on
+            if (gameOver)
+            {
+                if (currentKeyboardState.IsKeyDown(Keys.N))
+                {
+                    Exit();
+                }
+                else if(currentKeyboardState.IsKeyDown(Keys.Y)){
+
+                    ResetGame();
+
+                }
+
+
+
+            }
         }
 
         protected void UpdateProjectile(GameTime gameTime)
@@ -473,13 +508,13 @@ namespace Thro_Bot
             if (projectile.m_Position.X <= 10f || projectile.m_Position.X >= GraphicsDevice.Viewport.TitleSafeArea.Width - 10f)
             {
                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
-                //projectile.m_iBounces++;
+                projectile.m_iBounces++;
                 edge = edge_hit;
             }
             else if (projectile.m_Position.Y <= 10f || projectile.m_Position.Y >= GraphicsDevice.Viewport.TitleSafeArea.Height - 10f)
             {
                 projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
-                //projectile.m_iBounces++;
+                projectile.m_iBounces++;
                 edge = edge_hit;
             }
             else
@@ -605,6 +640,18 @@ namespace Thro_Bot
             }//end of check collision time
         }
 
+        void UpdateDamageFlash(GameTime gameTime) {
+
+            currentDamagFlashTime += gameTime.ElapsedGameTime;
+
+            if (currentDamagFlashTime >= damageFlashTime) {
+
+                flashDamage = false;
+                currentDamagFlashTime = TimeSpan.Zero;
+            }
+
+        }
+
 
         void UpdateParticleSystems()
         {
@@ -662,11 +709,38 @@ namespace Thro_Bot
             //Draw the player health
             spriteBatch.DrawString(ui.healthFont, ui.playerHealth.ToString() + "%", new Vector2(680, 35), Color.White);
 
+            //Draw the damage rectangle
+            Rectangle damageRectangle = new Rectangle(0, 0, playerDamageTexture.Width, playerDamageTexture.Height);
+            Vector2 origin = new Vector2(playerDamageTexture.Width/2,playerDamageTexture.Height/2);
+            Vector2 position = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height - 200);
+
+            //Draw the flash damage
+            if (flashDamage) {
+                spriteBatch.Draw(playerDamageTexture, position,damageRectangle, Color.Red,0f, origin, 1f, SpriteEffects.None, 0f);
+            }
+
+            //Draw the game over screen
+            if (ui.playerHealth <= 0) {
+                //Draw the combo indicator
+                spriteBatch.DrawString(ui.gameOverFont, "Replay Y/N?", new Vector2(GraphicsDevice.Viewport.Width/2 - 200, GraphicsDevice.Viewport.Height/2 - 20), Color.White);
+                gameOver = true;
+            }
+
             //Stop drawing
             spriteBatch.End();
 
             base.Draw(gameTime);
         }
+
+        private void ResetGame() {
+            player.Reset();
+            projectile = new Projectile();
+            projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
+            enemiesList.Clear();
+            ui.playerHealth = 100;
+            gameOver = false;
+        }
+
 
         private void DrawEnemies(SpriteBatch spriteBatch)
         {
