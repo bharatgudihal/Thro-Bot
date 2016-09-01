@@ -126,7 +126,7 @@ namespace Thro_Bot
             enemiesList = new List<EnemyBase>();
 
             enemyDeathPS = new ParticleSystemBase(0f, 1f, 0.5f, 1.5f,
-                0.1f, 0.25f,
+                0.05f, 0.25f,
                 new Vector2(-4f, -4f), new Vector2(4f, 4f),
                 0.02f, 0.1f);
 
