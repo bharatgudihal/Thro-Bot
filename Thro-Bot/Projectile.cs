@@ -186,10 +186,7 @@ namespace Thro_Bot
             return initialScale;
         }
 
-
-
-
-
+        
         public void Draw(SpriteBatch spriteBatch)
         {                        
             spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, m_fProjectileScale, SpriteEffects.None, 0f);

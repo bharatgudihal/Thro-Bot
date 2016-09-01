@@ -99,5 +99,10 @@ namespace Thro_Bot
 
         }
 
+        public void Reset() {
+            m_iHealth = 100;
+
+        }
+
     }
 }
