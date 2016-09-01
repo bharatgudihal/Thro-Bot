@@ -564,8 +564,10 @@ namespace Thro_Bot
 
             if (currentKeyboardState.IsKeyDown(Keys.R) && !projectile.m_bInOrbitToPlayer)
             {
+				activeParticleSystems.Remove(projectile.m_Trail);
                 projectile = new Projectile();
                 projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
+				projectile.InitializeTrail (new List<Texture2D>() { projectileTrailTexture });
             }
                 projectile.Update(player.m_Position, gameTime);
         }

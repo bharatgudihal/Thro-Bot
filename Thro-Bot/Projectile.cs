@@ -52,11 +52,11 @@ namespace Thro_Bot
         //The duration of time
         private const int duration = 5000;
 
+        private Color m_projectileColor = Color.White;
+
         //ProjectileTrail m_Trail;
 
 		public ParticleSystemBase m_Trail;
-
-        private Color m_projectileColor = Color.White;
 
         //The origin of the projectile
         public Vector2 m_ProjectileOrigin;
