@@ -149,7 +149,9 @@ namespace Thro_Bot {
 			for (int i = 0; i < numParticles; i++) {
 
 				Particle particle;
-				Texture2D sprite = m_Sprites.Random();
+				
+				Texture2D sprite = m_Sprites.Random(RNG);
+				Debug.WriteLine (sprite.Name);
 
 				// Either create new particle or recycle old one
 				if (_deadParticles.Count > 0) {
