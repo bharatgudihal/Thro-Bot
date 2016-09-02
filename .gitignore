@@ -91,7 +91,15 @@ Temporary Items
 /Thro-Bot/Content/Graphics
 /Thro-Bot/Content/bin/Windows/Graphics/Trail.xnb
 /Thro-Bot/Content/bin/Windows/Graphics
-/Thro-Bot/Content
 /Thro-Bot/bin/Windows/x86/Debug/Content/Graphics/Trail.xnb
 /Thro-Bot/bin/Windows/x86/Debug/Content/Graphics
-/Thro-Bot
+/Thro-Bot/bin/Windows/x86/Debug/Content/Sounds/ThrowDisc.xnb
+/Thro-Bot/bin/Windows/x86/Debug/Content/Sounds/RecallDisc.xnb
+/Thro-Bot/bin/Windows/x86/Debug/Content/Sounds/PlayerHurt.xnb
+/Thro-Bot/bin/Windows/x86/Debug/Content/Sounds/DiscHitShield.xnb
+/Thro-Bot/bin/Windows/x86/Debug/Content/Sounds/DiscHitEnemy.xnb
+/Thro-Bot/Content/obj/Windows/Sounds/ThrowDisc.mgcontent
+/Thro-Bot/Content/obj/Windows/Sounds/RecallDisc.mgcontent
+/Thro-Bot/Content/obj/Windows/Sounds/PlayerHurt.mgcontent
+/Thro-Bot/Content/obj/Windows/Sounds/DiscHitShield.mgcontent
+/Thro-Bot/Content/obj/Windows/Sounds/DiscHitEnemy.mgcontent
