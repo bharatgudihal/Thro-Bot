@@ -125,17 +125,12 @@ namespace Thro_Bot
             sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
 
 			m_Trail = new ParticleSystemBase (
-				0.01f, 0f, 1,
+				0.005f, 0f, 1,
 				0.8f, 0.8f,
-				0.4f, 0.4f,
+				0.6f, 0.6f,
 				Vector2.Zero, Vector2.Zero,
-				0f, 2f * (float)Math.PI);
+				0f, 2f * (float)Math.PI, true);
         }
-
-		//public void InitializeTrail (Texture2D trailTexture) {
-		//	m_Trail = new ProjectileTrail();
-		//	m_Trail.Initialize (this, trailTexture);
-		//}
 
 		public void InitializeTrail (List<Texture2D> sprites) {
 			m_Trail.m_Sprites = sprites;
