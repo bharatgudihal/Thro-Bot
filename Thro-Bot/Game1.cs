@@ -114,6 +114,9 @@ namespace Thro_Bot
         private SoundEffect wallBounce;
 		SoundEffect discHitEnemySnd;
 		SoundEffect discHitShieldSnd;
+		SoundEffect throwDiscSnd;
+		SoundEffect recallDiscSnd;
+		SoundEffect playerHurtSnd;
 
         public Game1()
         {
@@ -183,7 +186,8 @@ namespace Thro_Bot
 			spinLoopSnd = Content.Load<SoundEffect>("Sounds/SpinLoop");
 			discHitEnemySnd = Content.Load<SoundEffect>("Sounds/DiscHitEnemy");
 			discHitShieldSnd = Content.Load<SoundEffect>("Sounds/DiscHitShield");
-
+			recallDiscSnd = Content.Load<SoundEffect>("Sounds/RecallDisc");
+			throwDiscSnd = Content.Load<SoundEffect>("Sounds/ThrowDisc");
 
             //Load the background 
             backgroundTexture = Content.Load<Texture2D>("Graphics/Background");
@@ -218,7 +222,7 @@ namespace Thro_Bot
 
             //Load the player damage texture
             playerDamageTexture = Content.Load<Texture2D>("Graphics/EdgeFadeV2");
-
+			playerHurtSnd = Content.Load<SoundEffect>("Sounds/PlayerHurt");
 
             //Load the score texture
             Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.22f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.040f));
@@ -371,6 +375,7 @@ namespace Thro_Bot
                     {
                         player.m_iHealth -= 10;
                         enemy.m_Active = false;
+						playerHurtSnd.Play (1f, random.RandomFloat (-0.1f, 0.1f), 0f);
                         flashDamage = true;
                         //Cap the maximum health to lose
                         if (player.m_iHealth >= 0f)
@@ -521,6 +526,7 @@ namespace Thro_Bot
                 {
                     //Launch the projectile
                     projectile.m_bInOrbitToPlayer = false;
+					throwDiscSnd.Play (1f, random.RandomFloat (-0.1f, 0.1f), 0f);
                 }
             }
 
@@ -601,6 +607,7 @@ namespace Thro_Bot
                 projectile = new Projectile();
                 projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
 				projectile.InitializeTrail (new List<Texture2D>() { projectileTrailTexture });
+				recallDiscSnd.Play (1f, random.RandomFloat (-0.1f, 0.1f), 0f);
             }
                 projectile.Update(player.m_Position, gameTime);
         }
