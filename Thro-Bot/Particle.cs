@@ -101,6 +101,7 @@ namespace Thro_Bot {
 			m_Lifetime -= 1f/ 60f;
 			if (m_Lifetime <= 0f) Kill();
 			else {
+				//Debug.WriteLine (m_Position);
 				m_Position += m_Velocity;
 				m_Rotation += m_AngularVelocity;
 
@@ -114,7 +115,6 @@ namespace Thro_Bot {
 
 		public void Kill () {
 			if (OnDeath != null) OnDeath (this);
-
 			m_Active = false;
 		}
 	}
