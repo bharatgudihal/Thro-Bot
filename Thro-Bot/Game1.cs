@@ -585,7 +585,7 @@ namespace Thro_Bot
                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
                 //projectile.m_iBounces++;
                 edge = edge_hit;
-				ShowBounce (projectile.m_Position, Color.White);
+				ShowBounce (projectile.m_Position, projectile.selfRotate ? Color.Red : Color.White);
             }
             else if (projectile.m_Position.Y <= 10f || projectile.m_Position.Y >= GraphicsDevice.Viewport.TitleSafeArea.Height - 10f)
             {
@@ -593,7 +593,7 @@ namespace Thro_Bot
                 projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
                 //projectile.m_iBounces++;
                 edge = edge_hit;
-				ShowBounce (projectile.m_Position, Color.White);
+				ShowBounce (projectile.m_Position, projectile.selfRotate ? Color.Red : Color.White);
             }
             else
             {
@@ -635,13 +635,15 @@ namespace Thro_Bot
                 {
                     // Make projectile inactive to negate collisions
                     projectile.m_bActive = false;
-                    activeParticleSystems.Remove(projectile.m_Trail);
                     recallDiscSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
+					projectile.m_ProjectileColor = Color.Gray;
+					projectile.m_Trail.SetAllTint (Color.Gray);
                 }
                 projectile.Update(player.m_Position, gameTime);
             }// Update lerp position
             else if(projectile.m_Position != player.m_Position){
                 projectile.ReturnProjectile(player.m_Position, gameTime);
+				projectile.m_ProjectileColor = Color.Gray;
             }// Create new projectile
             else
             {
@@ -649,6 +651,7 @@ namespace Thro_Bot
                 projectile = new Projectile();
                 projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
                 projectile.InitializeTrail(new List<Texture2D>() { projectileTrailTexture });
+				projectile.m_Trail.SetAllTint (Color.White);
             }
         }
 
