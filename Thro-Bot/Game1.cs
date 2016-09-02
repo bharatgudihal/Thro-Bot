@@ -77,6 +77,7 @@ namespace Thro_Bot
 
         // Particle system list
         ParticleSystemBase enemyDeathPS;
+		ParticleSystemBase bouncePS;
         List<ParticleSystemBase> activeParticleSystems;
 
         // Random
@@ -150,8 +151,15 @@ namespace Thro_Bot
                 new Vector2(-4f, -4f), new Vector2(4f, 4f),
                 0.02f, 0.1f);
 
+			bouncePS = new ParticleSystemBase (0f, 0.5f, 5,
+				0.4f, 1.2f,
+				0.05f, 0.15f,
+				new Vector2 (-2f, -2f), new Vector2 (2f, 2f),
+				0.02f, 0.1f);
+
             activeParticleSystems = new List<ParticleSystemBase>() {
-                enemyDeathPS
+                enemyDeathPS,
+				bouncePS
             };
 
 
@@ -217,7 +225,8 @@ namespace Thro_Bot
                 Content.Load<Texture2D>("Graphics/Piece_01"),
                 Content.Load<Texture2D>("Graphics/Piece_02"),
                 Content.Load<Texture2D>("Graphics/Piece_03"),
-                Content.Load<Texture2D>("Graphics/Piece_04")
+                Content.Load<Texture2D>("Graphics/Piece_04"),
+				Content.Load<Texture2D>("Graphics/SmallPiece")
             };
 
 			enemyDeathSnd = Content.Load<SoundEffect>("Sounds/EnemyDeath");
@@ -312,6 +321,8 @@ namespace Thro_Bot
                     enemy.Update();
                     if (CheckCollisionWithProjectile(enemy, gameTime))
                     {
+						ShowBounce (projectile.m_Position, enemy.m_Color);
+
                         if (enemy.GetType() != typeof(Shield))
                         {
                             if ((enemy.m_Type == EnemyBase.Type.SquigglyTriangle))
@@ -372,7 +383,7 @@ namespace Thro_Bot
                             }
                         }
 
-
+						
                     }
                     else if (CheckCollisionWithPlayerShield(enemy))
                     {
@@ -574,6 +585,7 @@ namespace Thro_Bot
                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
                 //projectile.m_iBounces++;
                 edge = edge_hit;
+				ShowBounce (projectile.m_Position, Color.White);
             }
             else if (projectile.m_Position.Y <= 10f || projectile.m_Position.Y >= GraphicsDevice.Viewport.TitleSafeArea.Height - 10f)
             {
@@ -581,6 +593,7 @@ namespace Thro_Bot
                 projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
                 //projectile.m_iBounces++;
                 edge = edge_hit;
+				ShowBounce (projectile.m_Position, Color.White);
             }
             else
             {
@@ -632,6 +645,7 @@ namespace Thro_Bot
             }// Create new projectile
             else
             {
+				activeParticleSystems.Remove (projectile.m_Trail);
                 projectile = new Projectile();
                 projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
                 projectile.InitializeTrail(new List<Texture2D>() { projectileTrailTexture });
@@ -720,6 +734,7 @@ namespace Thro_Bot
                         }
 
 						discHitEnemySnd.Play(1f, random.RandomFloat (-0.1f, 0.1f), 0f);
+						ShowBounce (projectile.m_Position, enemy.m_Color);
                     }
 
                 }
@@ -875,6 +890,16 @@ namespace Thro_Bot
 
 			enemyDeathSnd.Play(0.8f, random.RandomFloat (-0.1f, 0.1f), 0f);
         }
+
+		void ShowBounce (Vector2 pos, Color color, float windX=0f, float windY=0f) {
+			if (bouncePS.m_Sprites == null)
+				bouncePS.m_Sprites = new List<Texture2D>() { enemyPiecesList[4] };
+
+			bouncePS.SetWind (new Vector2 (windX, windY));
+			bouncePS.m_Position = pos;
+			bouncePS.SetTint (color);
+			bouncePS.Emit();
+		}
     }
 
 }
