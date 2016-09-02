@@ -341,7 +341,7 @@ namespace Thro_Bot
                         else
                         {
 
-							discHitShieldSnd.Play(1f, random.RandomFloat (-0.1f, 0.1f), 0f);
+							discHitShieldSnd.Play(0.7f, random.RandomFloat (-0.1f, 0.1f), 0f);
 
                             if (0 < Math.Abs(enemy.m_Rotation) && Math.Abs(enemy.m_Rotation) <= Math.PI / 3)
                             {
@@ -556,14 +556,14 @@ namespace Thro_Bot
 
             if (projectile.m_Position.X <= 10f || projectile.m_Position.X >= GraphicsDevice.Viewport.TitleSafeArea.Width - 10f)
             {
-				wallBoundSnd.Play (1f, random.RandomFloat (-0.1f, 0.1f), 0f);
+				wallBoundSnd.Play (0.8f, random.RandomFloat (-0.1f, 0.1f), 0f);
                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
                 //projectile.m_iBounces++;
                 edge = edge_hit;
             }
             else if (projectile.m_Position.Y <= 10f || projectile.m_Position.Y >= GraphicsDevice.Viewport.TitleSafeArea.Height - 10f)
             {
-				wallBoundSnd.Play (1f, random.RandomFloat (-0.1f, 0.1f), 0f);
+				wallBoundSnd.Play (0.8f, random.RandomFloat (-0.1f, 0.1f), 0f);
                 projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
                 //projectile.m_iBounces++;
                 edge = edge_hit;
@@ -795,8 +795,8 @@ namespace Thro_Bot
             if (ui.playerHealth <= 0) {
                 //Draw the combo indicator
                 spriteBatch.DrawString(ui.gameOverFont, "Replay Y/N?", new Vector2(GraphicsDevice.Viewport.Width/2 - 200, GraphicsDevice.Viewport.Height/2 - 20), Color.White);
+				if (!gameOver) playerDeath.Play();
                 gameOver = true;
-                playerDeath.Play();
                 gamePaused = true;
             }
 
@@ -808,8 +808,10 @@ namespace Thro_Bot
 
         private void ResetGame() {
             player.Reset();
+			activeParticleSystems.Remove (projectile.m_Trail);
             projectile = new Projectile();
             projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
+			projectile.InitializeTrail(new List<Texture2D>() { projectileTrailTexture });
             enemiesList.Clear();
             ui.playerHealth = 100;
             gameOver = false;
@@ -845,7 +847,7 @@ namespace Thro_Bot
             enemyDeathPS.SetTint(enemy.m_Color);
             enemyDeathPS.Emit(8);
 
-			enemyDeathSnd.Play(1f, random.RandomFloat (-0.1f, 0.1f), 0f);
+			enemyDeathSnd.Play(0.8f, random.RandomFloat (-0.1f, 0.1f), 0f);
         }
     }
 
