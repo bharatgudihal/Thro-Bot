@@ -253,3 +253,33 @@
 /processorParam:Quality=Best
 /build:Sounds/WallBounce.wav
 
+#begin Sounds/DiscHitEnemy.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/DiscHitEnemy.wav
+
+#begin Sounds/DiscHitShield.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/DiscHitShield.wav
+
+#begin Sounds/PlayerHurt.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/PlayerHurt.wav
+
+#begin Sounds/RecallDisc.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/RecallDisc.wav
+
+#begin Sounds/ThrowDisc.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/ThrowDisc.wav
+
