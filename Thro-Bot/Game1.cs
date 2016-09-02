@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
-using Microsoft.Xna.Framework.Audio;
 
 // Testing commit sync
 namespace Thro_Bot
@@ -155,7 +154,7 @@ namespace Thro_Bot
             spawnTimeSpan = TimeSpan.FromSeconds(SPAWN_INTERVAL);
             ui = new UI();
             gameOver = false;
-
+            playerDeath.Play();
             base.Initialize();
         }
 
@@ -180,12 +179,12 @@ namespace Thro_Bot
             projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
 			projectile.InitializeTrail (new List<Texture2D>() { projectileTrailTexture });
 			activeParticleSystems.Add (projectile.m_Trail);
-			spinLoopSnd = Content.Load<SoundEffect>("Audio/SpinLoop");
+			spinLoopSnd = Content.Load<SoundEffect>("Sounds/SpinLoop");
 
 
             //Load the background 
             backgroundTexture = Content.Load<Texture2D>("Graphics/Background");
-			wallBoundSnd = Content.Load<SoundEffect>("Audio/WallBounce");
+			wallBoundSnd = Content.Load<SoundEffect>("Sounds/WallBounce");
 
             // Load ring line
             ringLineTexture = Content.Load<Texture2D>("Graphics/Ring_Line");
@@ -212,7 +211,7 @@ namespace Thro_Bot
                 Content.Load<Texture2D>("Graphics/Piece_04")
             };
 
-			enemyDeathSnd = Content.Load<SoundEffect>("Audio/EnemyDeath");
+			enemyDeathSnd = Content.Load<SoundEffect>("Sounds/EnemyDeath");
 
             //Load the player damage texture
             playerDamageTexture = Content.Load<Texture2D>("Graphics/EdgeFadeV2");
@@ -523,8 +522,7 @@ namespace Thro_Bot
 
             //Check if the player pressed Yor N and the game over context is on
             if (gameOver)
-            {
-                playerDeath.Play();
+            {             
                 if (currentKeyboardState.IsKeyDown(Keys.N))
                 {
                     Exit();
