@@ -235,7 +235,7 @@ namespace Thro_Bot
 			m_Trail.Draw (spriteBatch);
 
 			// Draw projectile            
-            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle,  Color.White, m_fProjectileRotation, m_ProjectileOrigin, m_fProjectileScale, SpriteEffects.None, 0f);
+            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle, m_projectileColor, m_fProjectileRotation, m_ProjectileOrigin, m_fProjectileScale, SpriteEffects.None, 0f);
         }
     }
 }

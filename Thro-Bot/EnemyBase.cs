@@ -231,7 +231,14 @@ namespace Thro_Bot
 			InitializeBehaviors();
 		}
 
-		public virtual void Update () {
+        public virtual void Initialize(Texture2D texture, Vector2 position, float rotation)
+        {
+            Initialize(texture, position);
+            m_Rotation = rotation;
+        }
+
+
+        public virtual void Update () {
 			if (_movementBehavior != null)
 				m_Position = _movementBehavior.Move (m_Position, m_Rotation, m_MovementSpeed);
 

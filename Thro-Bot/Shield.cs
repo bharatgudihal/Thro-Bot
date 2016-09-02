@@ -72,17 +72,17 @@ namespace Thro_Bot
 
         private float rotationSpeed = 0.03f;
 
-        private EnemyBase originEnemy;
+        private EnemyBase originEnemy;                
 
         public Shield(ref EnemyBase originEnemy)
         {
             this.originEnemy = originEnemy;            
         }
 
-        public override void Initialize(Texture2D texture, Vector2 position)
+        public override void Initialize(Texture2D texture, Vector2 position,float rotation)
         {
-            base.Initialize(texture, position);
-            m_Origin = new Vector2(Texture.Width / 2, Texture.Height / 2);
+            base.Initialize(texture, position,rotation);
+            m_Origin = new Vector2(Texture.Width / 2, Texture.Height / 2);            
         }
 
         public override void InitializeBehaviors()

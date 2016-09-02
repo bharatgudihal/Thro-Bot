@@ -30,6 +30,7 @@ namespace Thro_Bot
 
         //texture of the projectile
         Texture2D projectileTexture;
+        Texture2D spinningProjectileTexture;
 		Texture2D projectileTrailTexture;
 
 		SoundEffect spinLoopSnd;
@@ -180,6 +181,7 @@ namespace Thro_Bot
             projectilePosition = new Vector2(playerPosition.X + 10f, playerPosition.Y);
             projectileTexture = Content.Load<Texture2D>("Graphics/Discv2");
 			projectileTrailTexture = Content.Load<Texture2D>("Graphics/Discv2");
+            spinningProjectileTexture = Content.Load<Texture2D>("Graphics/DiscFinal_spin");
             projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
 			projectile.InitializeTrail (new List<Texture2D>() { projectileTrailTexture });
 			activeParticleSystems.Add (projectile.m_Trail);
@@ -333,7 +335,8 @@ namespace Thro_Bot
                                 ui.score += 100 * player.m_iComboMultiplier;
                                 if (enemy.GetType() == typeof(HexagonEnemy))
                                 {
-                                    ((HexagonEnemy)enemy).shield.m_Active = false;
+                                    ((HexagonEnemy)enemy).shield1.m_Active = false;
+                                    ((HexagonEnemy)enemy).shield2.m_Active = false;
                                 }
                             }
                         }
@@ -484,7 +487,8 @@ namespace Thro_Bot
                 currentTime = gameTime.TotalGameTime;
                 int spawn = random.Next(0, 3);
                 EnemyBase enemy = null;
-                EnemyBase shield = null;
+                EnemyBase shield1 = null;
+                EnemyBase shield2 = null;
                 switch (spawn)
                 {
                     case 0:
@@ -498,9 +502,12 @@ namespace Thro_Bot
                     case 2:
                         enemy = new HexagonEnemy();
                         enemy.Initialize(enemyTextures[2], new Vector2(random.Next(enemyTextures[2].Width, WIDTH - enemyTextures[2].Width), 0));
-                        shield = new Shield(ref enemy);
-                        shield.Initialize(enemyTextures[3], Vector2.Zero);
-                        ((HexagonEnemy)enemy).setShield(ref shield);
+                        shield1 = new Shield(ref enemy);
+                        shield1.Initialize(enemyTextures[3], Vector2.Zero,0);
+                        shield2 = new Shield(ref enemy);
+                        shield2.Initialize(enemyTextures[3], Vector2.Zero,(float)Math.PI);
+                        ((HexagonEnemy)enemy).setShield1(ref shield1);
+                        ((HexagonEnemy)enemy).setShield2(ref shield2);
                         break;
                     default:
                         break;
@@ -510,8 +517,14 @@ namespace Thro_Bot
                     enemy.onDeath += new EnemyBase.EnemyEventHandler(ShowEnemyDeath);
                     enemiesList.Add(enemy);
                 }
-                if (null != shield)
-                    enemiesList.Add(shield);
+                if (null != shield1)
+                {
+                    enemiesList.Add(shield1);
+                }
+                if (null != shield2)
+                {
+                    enemiesList.Add(shield2);
+                }
             }
         }
 
@@ -588,6 +601,7 @@ namespace Thro_Bot
                 if (currentKeyboardState.IsKeyDown(Keys.Space))
                 {
                     projectile.selfRotate = true;
+                    projectile.m_ProjectileTexture = spinningProjectileTexture;
                     projectile.m_Trail.SetAllTint(Color.Red);
                     if (spinLoopInstance == null)
                     {
@@ -599,6 +613,7 @@ namespace Thro_Bot
                 else
                 {
                     projectile.selfRotate = false;
+                    projectile.m_ProjectileTexture = projectileTexture;
                     projectile.m_Trail.SetAllTint(Color.White);
                     if (spinLoopInstance != null) spinLoopInstance.Pause();
                 }
