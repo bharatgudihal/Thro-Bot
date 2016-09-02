@@ -789,7 +789,7 @@ namespace Thro_Bot
                 //Draw the combo indicator
                 spriteBatch.DrawString(ui.gameOverFont, "Replay Y/N?", new Vector2(GraphicsDevice.Viewport.Width/2 - 200, GraphicsDevice.Viewport.Height/2 - 20), Color.White);
                 gameOver = true;
-				playerDeath.Play();
+                playerDeath.Play();
                 gamePaused = true;
             }
 
