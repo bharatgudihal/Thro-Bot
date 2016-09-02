@@ -308,7 +308,7 @@ namespace Thro_Bot
                 if (enemy.m_Active)
                 {
                     enemy.Update();
-                    if (CheckCollisionWithPlayer(enemy, gameTime))
+                    if (CheckCollisionWithProjectile(enemy, gameTime))
                     {
                         if (enemy.GetType() != typeof(Shield))
                         {
@@ -430,11 +430,11 @@ namespace Thro_Bot
             return enemyRectangle;
         }
 
-        private bool CheckCollisionWithPlayer(EnemyBase enemy, GameTime gameTime)
+        private bool CheckCollisionWithProjectile(EnemyBase enemy, GameTime gameTime)
         {
             bool collision = false;
-            // Only check collision if projectile is released
-            if (!projectile.m_bInOrbitToPlayer)
+            // Only check collision if projectile is released and is active
+            if (!projectile.m_bInOrbitToPlayer && projectile.m_bActive)
             {
                 Rectangle enemyRectangle;
                 enemyRectangle = GetEnemyRectangle(enemy);
@@ -551,8 +551,9 @@ namespace Thro_Bot
 
         protected void UpdateProjectile(GameTime gameTime)
         {
-
-            previousProjectilePosition = projectile.m_Position;
+            if (projectile.m_bActive)
+            {
+                previousProjectilePosition = projectile.m_Position;
 
             if (projectile.m_Position.X <= 10f || projectile.m_Position.X >= GraphicsDevice.Viewport.TitleSafeArea.Width - 10f)
             {
@@ -573,43 +574,53 @@ namespace Thro_Bot
                 edge = edge_normal;
             }
 
-            if (projectile.m_iBounces > 3)
-            {
-				activeParticleSystems.Remove(projectile.m_Trail);
-                projectile = new Projectile();
-                projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
-				projectile.InitializeTrail (new List<Texture2D>() { projectileTrailTexture });
-				activeParticleSystems.Add (projectile.m_Trail);
-            }
+                if (projectile.m_iBounces > 3)
+                {
+                    activeParticleSystems.Remove(projectile.m_Trail);
+                    projectile = new Projectile();
+                    projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
+                    projectile.InitializeTrail(new List<Texture2D>() { projectileTrailTexture });
+                    activeParticleSystems.Add(projectile.m_Trail);
+                }
 
 
-            //Check is projectile has been launched, rotate it around its center
-            if (currentKeyboardState.IsKeyDown(Keys.Space))
-            {
-                projectile.selfRotate = true;
-				projectile.m_Trail.SetAllTint (Color.Red);
-				if (spinLoopInstance == null) {
-					spinLoopInstance = spinLoopSnd.CreateInstance();
-					spinLoopInstance.IsLooped = true;
-				}
-				spinLoopInstance.Play();
-            }
+                //Check is projectile has been launched, rotate it around its center
+                if (currentKeyboardState.IsKeyDown(Keys.Space))
+                {
+                    projectile.selfRotate = true;
+                    projectile.m_Trail.SetAllTint(Color.Red);
+                    if (spinLoopInstance == null)
+                    {
+                        spinLoopInstance = spinLoopSnd.CreateInstance();
+                        spinLoopInstance.IsLooped = true;
+                    }
+                    spinLoopInstance.Play();
+                }
+                else
+                {
+                    projectile.selfRotate = false;
+                    projectile.m_Trail.SetAllTint(Color.White);
+                    if (spinLoopInstance != null) spinLoopInstance.Pause();
+                }
+
+                if (currentKeyboardState.IsKeyDown(Keys.R) && !projectile.m_bInOrbitToPlayer)
+                {
+                    // Make projectile inactive to negate collisions
+                    projectile.m_bActive = false;
+                    activeParticleSystems.Remove(projectile.m_Trail);
+                    recallDiscSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
+                }
+                projectile.Update(player.m_Position, gameTime);
+            }// Update lerp position
+            else if(projectile.m_Position != player.m_Position){
+                projectile.ReturnProjectile(player.m_Position, gameTime);
+            }// Create new projectile
             else
             {
-                projectile.selfRotate = false;
-				projectile.m_Trail.SetAllTint (Color.White);
-				if (spinLoopInstance != null) spinLoopInstance.Pause();
-            }
-
-            if (currentKeyboardState.IsKeyDown(Keys.R) && !projectile.m_bInOrbitToPlayer)
-            {
-				activeParticleSystems.Remove(projectile.m_Trail);
                 projectile = new Projectile();
                 projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
-				projectile.InitializeTrail (new List<Texture2D>() { projectileTrailTexture });
-				recallDiscSnd.Play (1f, random.RandomFloat (-0.1f, 0.1f), 0f);
+                projectile.InitializeTrail(new List<Texture2D>() { projectileTrailTexture });
             }
-                projectile.Update(player.m_Position, gameTime);
         }
 
 
