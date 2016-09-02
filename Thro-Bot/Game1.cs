@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
@@ -32,6 +33,9 @@ namespace Thro_Bot
         Texture2D projectileTexture;
 		Texture2D projectileTrailTexture;
 
+		SoundEffect spinLoopSnd;
+		SoundEffectInstance spinLoopInstance;
+
         //Represents the UI score board
         UI ui;
 
@@ -46,6 +50,8 @@ namespace Thro_Bot
         Texture2D edge;
         Texture2D edge_normal;
         Texture2D edge_hit;
+
+		SoundEffect wallBoundSnd;
 
         //The texture of the player damage
         Texture2D playerDamageTexture;
@@ -67,6 +73,7 @@ namespace Thro_Bot
 
         // Enemy death particle list
         List<Texture2D> enemyPiecesList;
+		SoundEffect enemyDeathSnd;
 
         // Particle system list
         ParticleSystemBase enemyDeathPS;
@@ -173,10 +180,12 @@ namespace Thro_Bot
             projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
 			projectile.InitializeTrail (new List<Texture2D>() { projectileTrailTexture });
 			activeParticleSystems.Add (projectile.m_Trail);
+			spinLoopSnd = Content.Load<SoundEffect>("Audio/SpinLoop");
 
 
             //Load the background 
             backgroundTexture = Content.Load<Texture2D>("Graphics/Background");
+			wallBoundSnd = Content.Load<SoundEffect>("Audio/WallBounce");
 
             // Load ring line
             ringLineTexture = Content.Load<Texture2D>("Graphics/Ring_Line");
@@ -202,6 +211,8 @@ namespace Thro_Bot
                 Content.Load<Texture2D>("Graphics/Piece_03"),
                 Content.Load<Texture2D>("Graphics/Piece_04")
             };
+
+			enemyDeathSnd = Content.Load<SoundEffect>("Audio/EnemyDeath");
 
             //Load the player damage texture
             playerDamageTexture = Content.Load<Texture2D>("Graphics/EdgeFadeV2");
@@ -537,12 +548,14 @@ namespace Thro_Bot
 
             if (projectile.m_Position.X <= 10f || projectile.m_Position.X >= GraphicsDevice.Viewport.TitleSafeArea.Width - 10f)
             {
+				wallBoundSnd.Play (1f, random.RandomFloat (-0.1f, 0.1f), 0f);
                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
                 //projectile.m_iBounces++;
                 edge = edge_hit;
             }
             else if (projectile.m_Position.Y <= 10f || projectile.m_Position.Y >= GraphicsDevice.Viewport.TitleSafeArea.Height - 10f)
             {
+				wallBoundSnd.Play (1f, random.RandomFloat (-0.1f, 0.1f), 0f);
                 projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
                 //projectile.m_iBounces++;
                 edge = edge_hit;
@@ -567,11 +580,17 @@ namespace Thro_Bot
             {
                 projectile.selfRotate = true;
 				projectile.m_Trail.SetAllTint (Color.Red);
+				if (spinLoopInstance == null) {
+					spinLoopInstance = spinLoopSnd.CreateInstance();
+					spinLoopInstance.IsLooped = true;
+				}
+				spinLoopInstance.Play();
             }
             else
             {
                 projectile.selfRotate = false;
 				projectile.m_Trail.SetAllTint (Color.White);
+				if (spinLoopInstance != null) spinLoopInstance.Pause();
             }
 
             if (currentKeyboardState.IsKeyDown(Keys.R) && !projectile.m_bInOrbitToPlayer)
@@ -813,6 +832,8 @@ namespace Thro_Bot
             enemyDeathPS.m_Position = enemy.m_Position + enemy.m_Center;
             enemyDeathPS.SetTint(enemy.m_Color);
             enemyDeathPS.Emit(8);
+
+			enemyDeathSnd.Play(1f, random.RandomFloat (-0.1f, 0.1f), 0f);
         }
     }
 
