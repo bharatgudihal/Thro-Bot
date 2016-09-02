@@ -78,6 +78,10 @@ namespace Thro_Bot
         // Projectile Rectangle
         public Rectangle sourceRectangle;
 
+        // Projectile return delay
+        TimeSpan returnDelay = TimeSpan.FromSeconds(2f);
+        TimeSpan returnTime = TimeSpan.Zero;       
+
         public void Initialize(Texture2D texture, Vector2 position,Vector2 origin)
         {
             m_ProjectileTexture = texture;
@@ -122,7 +126,7 @@ namespace Thro_Bot
 
 
             //The Rectangle to render the texture
-            sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
+            sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);            
 
 			m_Trail = new ParticleSystemBase (
 				0.005f, 0f, 1,
@@ -208,6 +212,20 @@ namespace Thro_Bot
 
 
             return initialScale;
+        }
+
+        public void ReturnProjectile(Vector2 playerPosition,GameTime gameTime)
+        {
+            returnTime += gameTime.ElapsedGameTime;
+            if(returnTime >= returnDelay)
+            {
+                returnTime = TimeSpan.Zero;
+            }
+            else
+            {
+                float amount = (float)returnTime.Ticks / returnDelay.Ticks;
+                m_Position = Vector2.Lerp(m_Position, playerPosition, amount);
+            }
         }
 
         
