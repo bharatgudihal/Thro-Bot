@@ -229,3 +229,27 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/GameOver.spritefont
 
+#begin Sounds/EnemyDeath.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/EnemyDeath.wav
+
+#begin Sounds/player_death.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/player_death.wav
+
+#begin Sounds/SpinLoop.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/SpinLoop.wav
+
+#begin Sounds/WallBounce.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/WallBounce.wav
+

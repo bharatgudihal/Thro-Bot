@@ -21,5 +21,11 @@
     <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Piece_02.png</File>
     <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Piece_03.png</File>
     <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Piece_04.png</File>
+    <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/EdgeFadeV2.png</File>
+    <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Fonts/GameOver.spritefont</File>
+    <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/EnemyDeath.wav</File>
+    <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/player_death.wav</File>
+    <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/SpinLoop.wav</File>
+    <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/WallBounce.wav</File>
   </SourceFiles>
 </SourceFileCollection>

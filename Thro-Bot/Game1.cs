@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
-using System.Diagnostics;
+using Microsoft.Xna.Framework.Audio;
 
 // Testing commit sync
 namespace Thro_Bot
@@ -90,6 +90,12 @@ namespace Thro_Bot
         TimeSpan damageFlashTime = TimeSpan.FromSeconds(0.4);
         // Current damage falshgame time
         TimeSpan currentDamagFlashTime = TimeSpan.Zero;
+
+        // Sound effects
+        private SoundEffect enemyDeath;
+        private SoundEffect playerDeath;
+        private SoundEffect spinLoop;
+        private SoundEffect wallBounce;
 
         public Game1()
         {
@@ -203,6 +209,12 @@ namespace Thro_Bot
 
             //Load the game over font
             ui.gameOverFont = Content.Load<SpriteFont>("Fonts/GameOver");
+
+            //Loading sounds
+            enemyDeath = Content.Load<SoundEffect>("Sounds/EnemyDeath");
+            playerDeath = Content.Load<SoundEffect>("Sounds/player_death");
+            spinLoop = Content.Load<SoundEffect>("Sounds/SpinLoop");
+            wallBounce = Content.Load<SoundEffect>("Sounds/WallBounce");
         }
 
         /// <summary>
