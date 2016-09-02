@@ -112,6 +112,8 @@ namespace Thro_Bot
         private SoundEffect playerDeath;
         private SoundEffect spinLoop;
         private SoundEffect wallBounce;
+		SoundEffect discHitEnemySnd;
+		SoundEffect discHitShieldSnd;
 
         public Game1()
         {
@@ -179,6 +181,8 @@ namespace Thro_Bot
 			projectile.InitializeTrail (new List<Texture2D>() { projectileTrailTexture });
 			activeParticleSystems.Add (projectile.m_Trail);
 			spinLoopSnd = Content.Load<SoundEffect>("Sounds/SpinLoop");
+			discHitEnemySnd = Content.Load<SoundEffect>("Sounds/DiscHitEnemy");
+			discHitShieldSnd = Content.Load<SoundEffect>("Sounds/DiscHitShield");
 
 
             //Load the background 
@@ -333,6 +337,7 @@ namespace Thro_Bot
                         else
                         {
 
+							discHitShieldSnd.Play(1f, random.RandomFloat (-0.1f, 0.1f), 0f);
 
                             if (0 < Math.Abs(enemy.m_Rotation) && Math.Abs(enemy.m_Rotation) <= Math.PI / 3)
                             {
@@ -680,6 +685,8 @@ namespace Thro_Bot
                             //Bounce it off enemy on the x component
                             projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
                         }
+
+						discHitEnemySnd.Play(1f, random.RandomFloat (-0.1f, 0.1f), 0f);
                     }
 
                 }

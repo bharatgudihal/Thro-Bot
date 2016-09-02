@@ -253,3 +253,15 @@
 /processorParam:Quality=Best
 /build:Sounds/WallBounce.wav
 
+#begin Sounds/DiscHitEnemy.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/DiscHitEnemy.wav
+
+#begin Sounds/DiscHitShield.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/DiscHitShield.wav
+
