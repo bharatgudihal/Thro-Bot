@@ -299,10 +299,8 @@ namespace Thro_Bot
                             {
 
                                 if (!projectile.selfRotate)
-                                {
-                                    // Destroy enemy
-                                    enemy.m_Active = true;
-
+                                {                                    
+                                    enemy.m_Active = true;                                    
                                 }
                                 else
                                 {
@@ -371,6 +369,7 @@ namespace Thro_Bot
                 {
                     enemy.Kill();
                     enemiesList.RemoveAt(i);
+                    enemyDeath.Play();
                 }
 
             }
@@ -514,6 +513,7 @@ namespace Thro_Bot
             //Check if the player pressed Yor N and the game over context is on
             if (gameOver)
             {
+                playerDeath.Play();
                 if (currentKeyboardState.IsKeyDown(Keys.N))
                 {
                     Exit();
