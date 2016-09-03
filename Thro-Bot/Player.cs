@@ -39,6 +39,38 @@ namespace Thro_Bot
         public TimeSpan m_ComboCoolDown = TimeSpan.FromSeconds(3);
 
 
+        //The image representing the player's death
+        Texture2D deathSpriteStrip;
+
+        //The time since the last update
+        int elapsedTime;
+
+        //The time we display a frame until the next one
+        int frameTime;
+
+        //The number of frames that the animation contains
+        int frameCount;
+
+        //The index of the current frame we are displaying
+        int currentFrame;
+
+        //The area of the rectangle to display the death animation
+        Rectangle sourceRectDeath = new Rectangle();
+
+        //The width of a given frame
+        int FrameWidth;
+
+        //The height of a given frame
+        int FrameHeight;
+
+        //Determines if the animation is looping
+        public bool Looping;
+
+        //Activate the death animation
+        public bool deathAnimationActivate;
+
+        public bool finishedAnimation = false;
+
         //Get the width of the player ship sprite
         public int m_iSpriteWidth
         {
@@ -85,23 +117,106 @@ namespace Thro_Bot
             
         }
 
-        public void Update()
+        public void Update(GameTime gametime)
         {
-            m_fRotation -= rotationSpeed;                       
+
+
+            if (m_iHealth <= 0)
+            {
+                m_fRotation = 0;
+                deathAnimationActivate = true;
+                PlayDeathAnimation(gametime);
+
+            }
+            else {
+                m_fRotation -= rotationSpeed;
+
+            }
+                               
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             //The Rectangle to render the texture
             Rectangle sourceRectangle = new Rectangle(0, 0, m_PlayerTexture.Width, m_PlayerTexture.Height);
-            
-            spriteBatch.Draw(m_PlayerTexture,m_Position,sourceRectangle,Color.White,m_fRotation, m_PlayerOrigin, .1f,SpriteEffects.None,0f);
+
+            if (!deathAnimationActivate)
+            {
+                spriteBatch.Draw(m_PlayerTexture, m_Position, sourceRectangle, Color.White, m_fRotation, m_PlayerOrigin, .1f, SpriteEffects.None, 0f);
+            }
+            else {
+                spriteBatch.Draw(deathSpriteStrip, new Vector2(m_Position.X - 50, m_Position.Y - 50), sourceRectDeath, Color.White);
+            }
 
         }
 
+        public void DeathAnimation(Texture2D deathSprite, int frameWidth, int frameHeight, int frameCount, int frametime, bool looping )
+        {
+
+            this.FrameWidth = frameWidth;
+
+            this.FrameHeight = frameHeight;
+
+            this.frameCount = frameCount;
+
+            this.frameTime = frametime;
+
+            Looping = looping;
+
+            deathSpriteStrip = deathSprite;
+
+            //Set the time to 
+            elapsedTime = 0;
+
+            currentFrame = 0;
+
+            deathAnimationActivate = false;
+
+            finishedAnimation = false;
+        }
+
+
+        public void PlayDeathAnimation(GameTime gameTime) {
+
+            if (!deathAnimationActivate)
+            {
+                return;
+            }
+
+            elapsedTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
+
+
+            if (elapsedTime > frameTime) {
+
+                currentFrame++;
+
+                if (currentFrame == frameCount)
+                {
+                
+                        deathAnimationActivate = false;
+                        finishedAnimation = true;
+
+                }
+
+                //Reset the the elapsed time to zero
+                elapsedTime = 0; 
+
+            }
+
+            sourceRectDeath = new Rectangle(currentFrame * FrameWidth, 0, FrameWidth, FrameHeight);
+
+            //Grab the correct frame in the image strip by multiplying the current frame index by the frame width
+          
+
+        }
+
+
+
         public void Reset() {
             m_iHealth = 100;
-
+            finishedAnimation = false;
+            deathAnimationActivate = false;
+            currentFrame = 0;
         }
 
     }

@@ -52,7 +52,7 @@ namespace Thro_Bot
         //The duration of time
         private const int duration = 5000;
 
-        private Color m_projectileColor = Color.White;
+        public Color m_ProjectileColor = Color.White;
 
         //ProjectileTrail m_Trail;
 
@@ -122,7 +122,7 @@ namespace Thro_Bot
             m_bScaleUp = true;
 
             //Set the color of the disc to white
-            m_projectileColor = Color.White;
+            m_ProjectileColor = Color.White;
 
 
             //The Rectangle to render the texture
@@ -159,17 +159,17 @@ namespace Thro_Bot
                 {
                     m_fProjectileRotation -= rotationSpeed * 10f;
                     AlterProjectileScale(gameTime);
-                    m_projectileColor = Color.Red;
+                    m_ProjectileColor = Color.Red;
+                    
                 }
 
                 //Return the projectile to its original scale
                 else {
                     m_fProjectileScale = 1f;
-                    m_projectileColor = Color.White;
+                    m_ProjectileColor = Color.White;
                 }
                
             }
-
 			m_Trail.m_Position = m_Position;
 			m_Trail.Update();
         }
@@ -225,6 +225,8 @@ namespace Thro_Bot
             {
                 float amount = (float)returnTime.Ticks / returnDelay.Ticks;
                 m_Position = Vector2.Lerp(m_Position, playerPosition, amount);
+				m_Trail.m_Position = m_Position;
+				m_Trail.Update();
             }
         }
 
@@ -235,7 +237,7 @@ namespace Thro_Bot
 			m_Trail.Draw (spriteBatch);
 
 			// Draw projectile            
-            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle, m_projectileColor, m_fProjectileRotation, m_ProjectileOrigin, m_fProjectileScale, SpriteEffects.None, 0f);
+            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle, m_ProjectileColor, m_fProjectileRotation, m_ProjectileOrigin, m_fProjectileScale, SpriteEffects.None, 0f);
         }
     }
 }

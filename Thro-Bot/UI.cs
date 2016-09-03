@@ -53,6 +53,40 @@ namespace Thro_Bot
         //Font for the gameover
         public SpriteFont gameOverFont;
 
+        //The stamina bar frame texture
+        public Texture2D m_staminaBarFrame;
+
+        //The position of the stamina bar frame
+        public Vector2 m_staminaFramePosition;
+
+        //The origin of the stamina frame
+        public Vector2 m_staminaFrameOrigin;
+
+        //The stamina bar texture
+        public Texture2D m_staminaBar;
+
+        //The position of the stamina bar
+        public Vector2 m_staminaBarPosition;
+
+        //The origin of the stamina bar
+        public Vector2 m_staminaBarOrigin;
+
+        //The rectangle for the stamina bar
+        private Rectangle sourceRectangleStaminaBar;
+
+        //The initial width of the stamina  bar
+        private int initialWidthStaminaBar;
+
+        //The amount of stamina the projectile has
+        public float m_staminaAmount = 100;
+
+        //The state of the stamina bar
+        public bool m_rechargingStamina = false;
+
+        //The Combo font
+        //Font for the gameover
+        public SpriteFont comboFont;
+
 
         //Initializes the Score UI
         public void InitializeScore(Texture2D texture, Vector2 position, Vector2 origin)
@@ -105,11 +139,58 @@ namespace Thro_Bot
         }
 
 
+        public void InitializeStamina(Texture2D textureFrame, Vector2 positionFrame, Texture2D textureBar, Vector2 positionBar)
+        {
+            //Set the stamina frame texture
+            m_staminaBarFrame = textureFrame;
+
+            //Set the position of the frame
+            m_staminaFramePosition = positionFrame;
+
+            //Set the origin of the stamina frame
+            m_staminaFrameOrigin = new Vector2(m_staminaBarFrame.Width / 2, m_staminaBarFrame.Height / 2);
+
+            //Set the texture of the stamina
+            m_staminaBar = textureBar;
+
+            //Set the position of the stamina bar
+            m_staminaBarPosition = positionBar;
+
+            //Set the origin of the stamina bar
+            m_staminaBarOrigin = new Vector2(m_staminaBar.Width / 2, m_staminaBar.Height / 2);
+
+            //Set the rectangle of the stamnina bar
+            sourceRectangleStaminaBar = new Rectangle(0, 0, m_staminaBar.Width, m_staminaBar.Height);
+
+            //Set the initial width of the stamina bar
+            initialWidthStaminaBar = sourceRectangleStaminaBar.Width;
+
+        }
+
+
+
         //Ui updated the health bar
         public void Update() {
 
-            sourceRectangleHealthBar.Width = (int)Math.Round((playerHealth / 100f) * intitialFullWidth);
             
+            sourceRectangleHealthBar.Width = (int)Math.Round((playerHealth / 100f) * intitialFullWidth);
+
+
+            if (m_rechargingStamina)
+            {
+                //Maybe add lerp
+                if (m_staminaAmount < 100)
+                {
+                    m_staminaAmount += 0.25f;
+                }
+                else {
+                    m_rechargingStamina = false;
+                }
+            }
+           
+
+
+            sourceRectangleStaminaBar.Width = (int)Math.Round((m_staminaAmount / 100f) * initialWidthStaminaBar);
         }
 
 
@@ -132,7 +213,7 @@ namespace Thro_Bot
             }
             else {
                 //Draw the Health Bar UI element
-                spriteBatch.Draw(m_HealthBarTexture, m_PositionHealthBar, sourceRectangleHealthBar, Color.DarkRed, angle, m_OriginHealthBar, 0.7f, SpriteEffects.None, 0f);
+                spriteBatch.Draw(m_HealthBarTexture, m_PositionHealthBar, sourceRectangleHealthBar, Color.Red, angle, m_OriginHealthBar, 0.7f, SpriteEffects.None, 0f);
             }
 
             //Draw the Score UI element
@@ -143,7 +224,17 @@ namespace Thro_Bot
             Rectangle sourceRectangleHealthBarFrame = new Rectangle(0, 0, m_HealthBarFrameTexture.Width, m_HealthBarFrameTexture.Height);
             spriteBatch.Draw(m_HealthBarFrameTexture,m_HealthBarFramePosition, sourceRectangleHealthBarFrame, Color.White, 0f, m_HealthBarFrameOrigin, .60f, SpriteEffects.None, 0f);
 
-           
+            //Check the value of the stamina bar
+
+
+
+            //Draw the stamina bar
+            spriteBatch.Draw(m_staminaBar, m_staminaBarPosition, sourceRectangleStaminaBar, Color.OrangeRed,angle, m_staminaBarOrigin, 0.27f, SpriteEffects.None, 0f);
+
+
+            //Draw the stamina Frame UI element
+            Rectangle sourceRectangleStaminaBarFrame = new Rectangle(0, 0, m_staminaBarFrame.Width, m_staminaBarFrame.Height);
+            spriteBatch.Draw(m_staminaBarFrame, m_staminaFramePosition, sourceRectangleStaminaBarFrame,Color.White, 0f, m_staminaFrameOrigin, 0.27f, SpriteEffects.None, 0f);
 
         }
 
