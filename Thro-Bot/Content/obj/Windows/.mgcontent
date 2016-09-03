@@ -33,5 +33,9 @@
     <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/PlayerHurt.wav</File>
     <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/RecallDisc.wav</File>
     <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/ThrowDisc.wav</File>
+    <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Boss.png</File>
+    <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Boss_Shield.png</File>
+    <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Boss_core.png</File>
+    <File>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Lazer.png</File>
   </SourceFiles>
 </SourceFileCollection>

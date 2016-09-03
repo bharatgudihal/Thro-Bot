@@ -68,7 +68,7 @@ namespace Thro_Bot
             }
         }
 
-        private float radius = 50f;
+        public float radius = 50f;
 
         private float rotationSpeed = 0.03f;
 
