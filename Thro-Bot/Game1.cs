@@ -64,6 +64,10 @@ namespace Thro_Bot
         List<EnemyBase> enemiesList;
         Texture2D[] enemyTextures;
 
+        //Power Up list
+        List<PowerUp> powerUpsList;
+        Texture2D[] powerUpTextures;
+
         // Enemy death particle list
         List<Texture2D> enemyPiecesList;
 
@@ -85,6 +89,17 @@ namespace Thro_Bot
         const float SPAWN_INTERVAL = 2.5f;
         TimeSpan spawnTimeSpan;
 
+        //Create the power up
+        bool createPowerUp = true;
+
+        //Power ups spawn interval
+        float POWERUP_INTERVAL = 10f;
+        TimeSpan powerUpTimeSpan;
+
+        // Current game time
+        TimeSpan currentPowerUpTime;
+
+
         // Current game time
         TimeSpan currentTime;
 
@@ -98,7 +113,9 @@ namespace Thro_Bot
 
         //the timespan for two tap
         TimeSpan doubleTap = TimeSpan.FromSeconds(0.2);
-        private int spaceCounter = 0;
+
+        //the last killed enemy
+        EnemyBase lastKilledEnemy = null;
 
         public Game1()
         {
@@ -124,6 +141,7 @@ namespace Thro_Bot
             projectile = new Projectile();
             ringLinePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.92f));
             enemiesList = new List<EnemyBase>();
+            powerUpsList = new List<PowerUp>();
 
             enemyDeathPS = new ParticleSystemBase(0f, 1f, 0.5f, 1.5f,
                 0.05f, 0.25f,
@@ -138,6 +156,8 @@ namespace Thro_Bot
             random = new Random();
             currentTime = TimeSpan.Zero;
             spawnTimeSpan = TimeSpan.FromSeconds(SPAWN_INTERVAL);
+            powerUpTimeSpan = TimeSpan.FromSeconds(POWERUP_INTERVAL);
+            currentPowerUpTime = TimeSpan.Zero;
             ui = new UI();
             gameOver = false;
 
@@ -157,6 +177,8 @@ namespace Thro_Bot
             //Vector2 playerPosition = Vector2.Zero;
             Vector2 playerPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.92f));
             player.Initialize(Content.Load<Texture2D>("Graphics/Player"), playerPosition);
+            player.DeathAnimation(Content.Load<Texture2D>("Graphics/DeathShake"), 100, 100, 8, 90, false);
+
 
             //Load the projectile texture
             projectilePosition = new Vector2(playerPosition.X + 10f, playerPosition.Y);
@@ -184,6 +206,10 @@ namespace Thro_Bot
             enemyTextures[2] = Content.Load<Texture2D>("Graphics/E3");
             enemyTextures[3] = Content.Load<Texture2D>("Graphics/E3_Shield");
 
+            //Load the powerUp textures
+            powerUpTextures = new Texture2D[1];
+            powerUpTextures[0] = Content.Load<Texture2D>("Graphics/HealthPowerUp");
+
             // Load enemy piece textures
             enemyPiecesList = new List<Texture2D>() {
                 Content.Load<Texture2D>("Graphics/Piece_01"),
@@ -200,10 +226,17 @@ namespace Thro_Bot
             Vector2 scorePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.22f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.040f));
             ui.InitializeScore(Content.Load<Texture2D>("Graphics/ScoreUI"), scorePosition, Vector2.Zero);
 
+            //Load the health textures
             Vector2 healthPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.73f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.030f));
             Vector2 healthBarPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.58f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.030f));
             ui.InitializeHealth(Content.Load<Texture2D>("Graphics/HealthUI"), healthPosition, Content.Load<Texture2D>("Graphics/HealthBarUI"), healthBarPosition);
 
+            //Load the stamina textures
+            Vector2 staminaFramePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.805f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.064f));
+            Vector2 staminaBarPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.82f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.064f));
+            ui.InitializeStamina(Content.Load<Texture2D>("Graphics/StaminaFrameUI"), staminaFramePosition, Content.Load<Texture2D>("Graphics/StaminaBarUI"), staminaBarPosition);
+            
+            
             //Load the score font
             ui.scoreFont = Content.Load<SpriteFont>("Fonts/Score");
 
@@ -212,6 +245,9 @@ namespace Thro_Bot
 
             //Load the game over font
             ui.gameOverFont = Content.Load<SpriteFont>("Fonts/GameOver");
+
+            //Load the combo font
+            ui.comboFont = Content.Load<SpriteFont>("Fonts/Combo");
         }
 
         /// <summary>
@@ -241,6 +277,9 @@ namespace Thro_Bot
             {
                 // Spawn enemies
                 SpawnEnemies(gameTime);
+
+                //Spawn a power up
+                SpawnPowerUps(gameTime);
             }
             //Update the player
             UpdatePlayer(gameTime);
@@ -251,6 +290,10 @@ namespace Thro_Bot
 
                 // Update enemy
                 UpdateEnemies(gameTime);
+
+                //Update powerUps
+                UpdatePowerUps(gameTime);
+
             }
             //Update the UI
             ui.Update();
@@ -262,7 +305,16 @@ namespace Thro_Bot
             UpdateParticleSystems();
 
             UpdateDamageFlash(gameTime);
-            
+
+
+            if (player.finishedAnimation)
+            {
+
+                //Freeze the game
+                gameOver = true;
+                gamePaused = true;
+            }
+
             base.Update(gameTime);
         }
 
@@ -353,6 +405,7 @@ namespace Thro_Bot
                 else
                 {
                     enemy.Kill();
+                    lastKilledEnemy = enemiesList[i];
                     enemiesList.RemoveAt(i);
                 }
 
@@ -480,11 +533,81 @@ namespace Thro_Bot
             }
         }
 
+
+        private void SpawnPowerUps(GameTime gameTime) {
+
+            if (gameTime.TotalGameTime - currentPowerUpTime > powerUpTimeSpan)
+            {
+                currentPowerUpTime = gameTime.TotalGameTime;
+
+                PowerUp powerUp = new HealthPowerUp();
+                powerUp.Initialize(powerUpTextures[0], new Vector2(random.Next(powerUpTextures[0].Width, WIDTH - powerUpTextures[0].Width), random.Next(200, HEIGHT - 200)));
+                powerUpsList.Add(powerUp);
+
+                
+            }
+        }
+
+
+        private void UpdatePowerUps(GameTime gameTime) {
+
+            for (int i = 0; i < powerUpsList.Count; i++)
+            {
+
+                powerUpsList[i].Update(gameTime);
+
+                //if the projectile collides with the player
+                if (CheckPowerUpWithPlayer(powerUpsList[i], gameTime))
+                {
+
+                    if (player.m_iHealth < 100)
+                    {
+                        player.m_iHealth += 20;
+
+                        if (player.m_iHealth > 100) {
+                            player.m_iHealth = 100;
+                        }
+
+                    }
+                    ui.playerHealth = player.m_iHealth;
+                    powerUpsList[i].m_Active = false;
+                }
+
+                if (!powerUpsList[i].m_Active) {
+                    powerUpsList.RemoveAt(i);
+                }
+
+            }
+        }
+
+        private bool CheckPowerUpWithPlayer(PowerUp powerUp, GameTime gameTime)
+        {
+            bool collision = false;
+            // Only check collision if projectile is released
+            if (!projectile.m_bInOrbitToPlayer)
+            {
+                Rectangle powerUpRectangle;
+                powerUpRectangle = new Rectangle((int)powerUp.m_Position.X, (int)powerUp.m_Position.Y, powerUp.Texture.Width * 7 / 10, powerUp.Texture.Height * 6 / 10);
+                Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X - projectile.m_ProjectileTexture.Width / 2, (int)projectile.m_Position.Y - projectile.m_ProjectileTexture.Height / 2, projectile.m_ProjectileTexture.Width, projectile.m_ProjectileTexture.Height);
+                if (powerUpRectangle.Intersects(projectileRectangle))
+                {
+                    collision = true;
+                }
+                
+                else
+                    collision = false;
+
+            }
+            return collision;
+        }
+
+
+
         private void UpdatePlayer(GameTime gameTime)
         {
             if (!gamePaused)
             {
-                player.Update();
+                player.Update(gameTime);
 
                 //Check the case where the space bar is pressed
                 if (previousKeyboardState.IsKeyUp(Keys.Space) && currentKeyboardState.IsKeyDown(Keys.Space))
@@ -543,31 +666,31 @@ namespace Thro_Bot
 
 
             //Check is projectile has been launched, rotate it around its center
-            if (currentKeyboardState.IsKeyDown(Keys.Space))
-            {
-                //if (spaceCounter == 0)
-                //{
-                //    currentpaceBarTap = gameTime.TotalGameTime;
-                //    spaceCounter++;
-               // }
+
+           
+                if (currentKeyboardState.IsKeyDown(Keys.Space))
+                {
+
+                    
+                    if (ui.m_staminaAmount > 0f)
+                    {
+                        ui.m_rechargingStamina = false;
+                        projectile.selfRotate = true;
+                        ui.m_staminaAmount -= 1f;
+                    }
+                    else {
+                        
+                        projectile.selfRotate = false;
+                    }
+
+                }
 
 
-                // if (gameTime.TotalGameTime - currentpaceBarTap <= doubleTap && previousKeyboardState.IsKeyUp(Keys.Space) && spaceCounter>0)
-                //{
-                //    projectile = new Projectile();
-                //    projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
-                //    spaceCounter = 0;
-                //}
-
-                //else
-                //{
-                    projectile.selfRotate = true;
-                //}
-            }
-            else
-            {
+           else{
+                ui.m_rechargingStamina = true;
                 projectile.selfRotate = false;
             }
+
 
             if (currentKeyboardState.IsKeyDown(Keys.R) && !projectile.m_bInOrbitToPlayer)
             {
@@ -723,10 +846,22 @@ namespace Thro_Bot
             //Draw the projectile
             projectile.Draw(spriteBatch);
 
+            //Draw the power ups
+            DrawPowerUps(spriteBatch);
+
             //Draw enemies
             DrawEnemies(spriteBatch);
 
             DrawParticleSystems(spriteBatch);
+
+            if (player.m_bComboActive && player.m_iComboMultiplier > 1)
+            {
+                //Draw the combo indicator
+                spriteBatch.DrawString(ui.comboFont, "Combo: x" + player.m_iComboMultiplier.ToString(), new Vector2(250, 490), Color.White);
+
+                //Draw the multiplier 
+                spriteBatch.DrawString(ui.scoreFont, "x" + player.m_iComboMultiplier.ToString(), lastKilledEnemy.m_Position, Color.White);
+            }
 
             //Draw ui
             ui.Draw(spriteBatch);
@@ -735,11 +870,7 @@ namespace Thro_Bot
             spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(78, 40), Color.White);
 
 
-            if (player.m_bComboActive && player.m_iComboMultiplier > 1)
-            {
-                //Draw the combo indicator
-                spriteBatch.DrawString(ui.scoreFont, "Combo: x" + player.m_iComboMultiplier.ToString(), new Vector2(150, 80), Color.White);
-            }
+           
 
             //Draw the player health
             spriteBatch.DrawString(ui.healthFont, ui.playerHealth.ToString() + "%", new Vector2(680, 35), Color.White);
@@ -755,11 +886,11 @@ namespace Thro_Bot
             }
 
             //Draw the game over screen
-            if (ui.playerHealth <= 0) {
+            if (player.finishedAnimation) {
+                
                 //Draw the combo indicator
                 spriteBatch.DrawString(ui.gameOverFont, "Replay Y/N?", new Vector2(GraphicsDevice.Viewport.Width/2 - 200, GraphicsDevice.Viewport.Height/2 - 20), Color.White);
-                gameOver = true;
-                gamePaused = true;
+                
             }
 
             //Stop drawing
@@ -775,7 +906,9 @@ namespace Thro_Bot
             enemiesList.Clear();
             ui.playerHealth = 100;
             gameOver = false;
+            gamePaused = false;
             ui.score = 0;
+            powerUpsList.Clear();
         }
 
 
@@ -807,6 +940,16 @@ namespace Thro_Bot
             enemyDeathPS.SetTint(enemy.m_Color);
             enemyDeathPS.Emit(8);
         }
+
+        private void DrawPowerUps(SpriteBatch spriteBatch)
+        {
+            foreach (PowerUp powerUp in powerUpsList)
+            {
+                if (!powerUp.m_Active) continue;
+                powerUp.Draw(spriteBatch);
+            }
+        }
+
     }
 
 }

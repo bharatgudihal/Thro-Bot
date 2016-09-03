@@ -74,12 +74,14 @@
   <ItemGroup>
     <Compile Include="EnemyBase.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="HealthPowerUp.cs" />
     <Compile Include="HexagonEnemy.cs" />
     <Compile Include="LinearTriangleEnemy.cs" />
     <Compile Include="ListExtension.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleSystemBase.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PowerUp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
