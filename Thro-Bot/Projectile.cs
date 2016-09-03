@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Thro_Bot
 {
-    class Projectile
+    public class Projectile
     {
         //The texture that represents the projectile
         public Texture2D m_ProjectileTexture;
@@ -51,7 +52,11 @@ namespace Thro_Bot
         //The duration of time
         private const int duration = 5000;
 
-        private Color m_projectileColor = Color.White;
+        public Color m_ProjectileColor = Color.White;
+
+        //ProjectileTrail m_Trail;
+
+		public ParticleSystemBase m_Trail;
 
         //The origin of the projectile
         public Vector2 m_ProjectileOrigin;
@@ -72,6 +77,10 @@ namespace Thro_Bot
 
         // Projectile Rectangle
         public Rectangle sourceRectangle;
+
+        // Projectile return delay
+        TimeSpan returnDelay = TimeSpan.FromSeconds(2f);
+        TimeSpan returnTime = TimeSpan.Zero;       
 
         public void Initialize(Texture2D texture, Vector2 position,Vector2 origin)
         {
@@ -113,13 +122,23 @@ namespace Thro_Bot
             m_bScaleUp = true;
 
             //Set the color of the disc to white
-            m_projectileColor = Color.White;
+            m_ProjectileColor = Color.White;
 
 
             //The Rectangle to render the texture
-            sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);
+            sourceRectangle = new Rectangle(0, 0, m_ProjectileTexture.Width, m_ProjectileTexture.Height);            
 
+			m_Trail = new ParticleSystemBase (
+				0.005f, 0f, 1,
+				0.8f, 0.8f,
+				0.6f, 0.6f,
+				Vector2.Zero, Vector2.Zero,
+				0f, 2f * (float)Math.PI, true);
         }
+
+		public void InitializeTrail (List<Texture2D> sprites) {
+			m_Trail.m_Sprites = sprites;
+		}
 
         public void Update(Vector2 origin, GameTime gameTime)
         {
@@ -147,10 +166,12 @@ namespace Thro_Bot
                 //Return the projectile to its original scale
                 else {
                     m_fProjectileScale = 1f;
-                    m_projectileColor = Color.White;
+                    m_ProjectileColor = Color.White;
                 }
                
             }
+			m_Trail.m_Position = m_Position;
+			m_Trail.Update();
         }
 
 
@@ -193,10 +214,30 @@ namespace Thro_Bot
             return initialScale;
         }
 
+        public void ReturnProjectile(Vector2 playerPosition,GameTime gameTime)
+        {
+            returnTime += gameTime.ElapsedGameTime;
+            if(returnTime >= returnDelay)
+            {
+                returnTime = TimeSpan.Zero;
+            }
+            else
+            {
+                float amount = (float)returnTime.Ticks / returnDelay.Ticks;
+                m_Position = Vector2.Lerp(m_Position, playerPosition, amount);
+				m_Trail.m_Position = m_Position;
+				m_Trail.Update();
+            }
+        }
+
         
         public void Draw(SpriteBatch spriteBatch)
-        {                        
-            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle, m_projectileColor, m_fProjectileRotation, m_ProjectileOrigin, m_fProjectileScale, SpriteEffects.None, 0f);
+        {            
+			// Draw trail
+			m_Trail.Draw (spriteBatch);
+
+			// Draw projectile            
+            spriteBatch.Draw(m_ProjectileTexture, m_Position, sourceRectangle, m_ProjectileColor, m_fProjectileRotation, m_ProjectileOrigin, m_fProjectileScale, SpriteEffects.None, 0f);
         }
     }
 }

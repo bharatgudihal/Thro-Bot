@@ -10,11 +10,16 @@ namespace Thro_Bot
       
     class HexagonEnemy : EnemyBase
     {
-        public Shield shield;
+        public Shield shield1;
+        public Shield shield2;
 
-        public void setShield(ref EnemyBase shield)
+        public void setShield1(ref EnemyBase shield)
         {
-            this.shield = (Shield)shield;
+            shield1 = (Shield)shield;
+        }
+        public void setShield2(ref EnemyBase shield)
+        {
+            shield2 = (Shield)shield;
         }
         public override Color m_Color
         {

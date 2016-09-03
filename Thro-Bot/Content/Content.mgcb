@@ -229,7 +229,31 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/GameOver.spritefont
 
-#begin Graphics/StaminaBarUI.png
+#begin Sounds/EnemyDeath.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/EnemyDeath.wav
+
+#begin Sounds/player_death.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/player_death.wav
+
+#begin Sounds/SpinLoop.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/SpinLoop.wav
+
+#begin Sounds/WallBounce.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/WallBounce.wav
+
+#begin Graphics/DiscFinal_spin.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -239,9 +263,39 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Graphics/StaminaBarUI.png
+/build:Graphics/DiscFinal_spin.png
 
-#begin Graphics/StaminaFrameUI.png
+#begin Sounds/DiscHitEnemy.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/DiscHitEnemy.wav
+
+#begin Sounds/DiscHitShield.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/DiscHitShield.wav
+
+#begin Sounds/PlayerHurt.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/PlayerHurt.wav
+
+#begin Sounds/RecallDisc.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/RecallDisc.wav
+
+#begin Sounds/ThrowDisc.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/ThrowDisc.wav
+
+#begin Graphics/SmallPiece.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -251,35 +305,5 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Graphics/StaminaFrameUI.png
-
-#begin Graphics/HealthPowerUp.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Graphics/HealthPowerUp.png
-
-#begin Graphics/DeathShake.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Graphics/DeathShake.png
-
-#begin Fonts/Combo.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:TextureFormat=Compressed
-/build:Fonts/Combo.spritefont
+/build:Graphics/SmallPiece.png
 

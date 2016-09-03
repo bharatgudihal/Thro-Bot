@@ -29,9 +29,19 @@ namespace Thro_Bot {
 		public float m_Rotation;
 
 		/// <summary>
-		/// Scale of this particle.
+		/// Initial scale of this particle.
+		/// </summary>
+		public float m_InitialScale;
+
+		/// <summary>
+		/// Current scale of this particle.
 		/// </summary>
 		public float m_Scale;
+
+		/// <summary>
+		/// If true, particle will scale down until death.
+		/// </summary>
+		public bool m_ScaleDown;
 
 		/// <summary>
 		/// Texture used by this particle.
@@ -53,6 +63,9 @@ namespace Thro_Bot {
 		/// </summary>
 		public Color m_InitialColor;
 
+		/// <summary>
+		/// Current color on this particle.
+		/// </summary>
 		protected Color m_Color;
 
 		protected float m_MaxLifetime;
@@ -79,7 +92,7 @@ namespace Thro_Bot {
 
 		public void Initialize (Texture2D texture, Vector2 position, 
 			float rotation, float scale, Color color, float lifetime, 
-			Vector2 velocity, float angularVelocity)
+			Vector2 velocity, float angularVelocity, bool scaleDown=false)
 		{
 			m_Active = true;
 			m_Texture = texture;
@@ -88,7 +101,9 @@ namespace Thro_Bot {
 			m_Rect = new Rectangle (0, 0, m_Texture.Width, m_Texture.Height);
 			m_Origin = new Vector2 (m_Texture.Width/2, m_Texture.Height/2);
 			m_Scale = scale;
+			m_InitialScale = scale;
 			m_InitialColor = color;
+			m_ScaleDown = scaleDown;
 			m_Color = color;
 			m_MaxLifetime = lifetime;
 			m_Lifetime = lifetime;
@@ -104,7 +119,11 @@ namespace Thro_Bot {
 				m_Position += m_Velocity;
 				m_Rotation += m_AngularVelocity;
 
-				m_Color = Color.Lerp (m_InitialColor, Color.Transparent, 1f-(m_Lifetime/m_MaxLifetime));
+				float lifetimeVal = 1f-(m_Lifetime/m_MaxLifetime);
+
+				m_Color = Color.Lerp (m_InitialColor, Color.Transparent, lifetimeVal);
+
+				if (m_ScaleDown) m_Scale = MathHelper.Lerp (m_InitialScale, 0f, lifetimeVal);
 			}
 		}
 
@@ -114,7 +133,6 @@ namespace Thro_Bot {
 
 		public void Kill () {
 			if (OnDeath != null) OnDeath (this);
-
 			m_Active = false;
 		}
 	}

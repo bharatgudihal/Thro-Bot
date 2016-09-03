@@ -50,6 +50,8 @@ namespace Thro_Bot {
 		/// </summary>
 		protected float m_EmissionTimer;
 
+		protected int m_ParticlesPerEmission;
+
 		/// <summary>
 		/// Radius within which particles can be emitted.
 		/// </summary>
@@ -69,6 +71,12 @@ namespace Thro_Bot {
 		/// Particle scale range.
 		/// </summary>
 		protected float m_MinScale, m_MaxScale;
+
+		/// <summary>
+		/// If true, particles will start at MaxScale and scale down to
+		/// MinScale until death.
+		/// </summary>
+		protected bool m_ScaleDown;
 
 		/// <summary>
 		/// Particle initial velocity range.
@@ -95,17 +103,21 @@ namespace Thro_Bot {
 
 			// Init RNG
 			RNG = new Random();
+
+			// Init color tint
+			m_ColorTint = Color.White;
 		}
 
-		public ParticleSystemBase (float emissionRate, float emissionRadius,
+		public ParticleSystemBase (float emissionRate, float emissionRadius, int particlesPerEmission,
 			float minLifetime, float maxLifetime, float minScale, float maxScale, Vector2 minVelocity, Vector2 maxVelocity,
-			float minAngularVelocity, float maxAngularVelocity) : 
+			float minAngularVelocity, float maxAngularVelocity, bool scaleDown=false) : 
 			this() 
 		{
 			m_EmissionRate = emissionRate;
 			if (m_EmissionRate > 0f) m_EmissionTimer = m_EmissionRate;
 
 			m_EmissionRadius = emissionRadius;
+			m_ParticlesPerEmission = particlesPerEmission;
 			m_MinLifetime = minLifetime;
 			m_MaxLifetime = maxLifetime;
 			m_MinScale = minScale;
@@ -114,28 +126,36 @@ namespace Thro_Bot {
 			m_MaxVelocity = maxVelocity;
 			m_MinAngularVelocity = minAngularVelocity;
 			m_MaxAngularVelocity = maxAngularVelocity;
+			m_ScaleDown = scaleDown;
 		}
 
 		public void Update () {
-			
+			// If automatic, handle timer logic
+			if (m_EmissionRate > 0f) {
+				m_EmissionTimer -= 1f / 60f;
+				if (m_EmissionTimer <= 0f) {
+					Emit ();
+					m_EmissionTimer = m_EmissionRate;
+				}
+			}
 
 			// Update each particle
 			for (int i = 0; i < _activeParticles.Count; i++)
 				_activeParticles[i].Update();
-			//foreach (Particle particle in _activeParticles)
-				//particle.Update();
-
-			// Flush dead particles
-			//foreach (Particle deadParticle in _particlesToRemove)
-			//	_deadParticles.Add (deadParticle);
-		
-			//_deadParticles.Clear();
 		}
 
 		public void Draw (SpriteBatch spriteBatch) {
 
+			// Draw each active particle.
 			foreach (Particle particle in _activeParticles)
 				particle.Draw(spriteBatch);
+		}
+
+		/// <summary>
+		/// Emits m_ParticlesPerEmission particles.
+		/// </summary>
+		public void Emit () {
+			Emit (m_ParticlesPerEmission);
 		}
 
 		/// <summary>
@@ -148,12 +168,11 @@ namespace Thro_Bot {
 
 			for (int i = 0; i < numParticles; i++) {
 
-				Particle particle;
-				
+				// Pick new random sprite
 				Texture2D sprite = m_Sprites.Random(RNG);
-				Debug.WriteLine (sprite.Name);
 
 				// Either create new particle or recycle old one
+				Particle particle;
 				if (_deadParticles.Count > 0) {
 					particle = _deadParticles[0];
 					_deadParticles.RemoveAt(0);
@@ -165,16 +184,23 @@ namespace Thro_Bot {
 				// Randomize lifetime
 				float l = RNG.RandomFloat (m_MinLifetime, m_MaxLifetime);
 
-				// Calculate random position (polar)
-				float a = RNG.RandomFloat(0f, 2f * (float)Math.PI);
-				Vector2 pos = new Vector2 ((float)Math.Cos (a), (float)Math.Sin (a)) 
-					* RNG.RandomFloat (0f, m_EmissionRadius) + m_Position;
+				// Pick a position
+				Vector2 pos;
+				if (m_EmissionRadius == 0f) pos = m_Position;
+				else {
+					// Calculate random position (polar)
+					float a = RNG.RandomFloat(0f, 2f * (float)Math.PI);
+					pos = new Vector2 ((float)Math.Cos (a), (float)Math.Sin (a)) 
+						* RNG.RandomFloat (0f, m_EmissionRadius) + m_Position;
+				}
 
 				// Randomize starting rotation
 				float r = RNG.RandomFloat(0f, 2f * (float)Math.PI);
 
 				// Randomize starting scale
-				float scale = RNG.RandomFloat (m_MinScale, m_MaxScale);
+				float scale;
+				if (m_ScaleDown) scale = m_MaxScale;
+				else scale = RNG.RandomFloat (m_MinScale, m_MaxScale);
 
 				// Randomize starting velocity
 				Vector2 v = new Vector2 (
@@ -186,7 +212,7 @@ namespace Thro_Bot {
 				float av = RNG.RandomFloat (m_MinAngularVelocity, m_MaxAngularVelocity);
 
 				// Init particle
-				particle.Initialize (sprite, pos, r, scale, m_ColorTint, l, v, av);
+				particle.Initialize (sprite, pos, r, scale, m_ColorTint, l, v, av, m_ScaleDown);
 
 				_activeParticles.Add (particle);
 			}
@@ -205,6 +231,20 @@ namespace Thro_Bot {
 			m_ColorTint = color;
 		}
 
+		/// <summary>
+		/// Sets the tint of all past and future particles.
+		/// </summary>
+		/// <param name="color">New color to use.</param>
+		public void SetAllTint (Color color) {
+			m_ColorTint = color;
+			foreach (Particle particle in _activeParticles)
+				particle.m_InitialColor = color;
+		}
+
+		/// <summary>
+		/// Sets the wind for this particle system.
+		/// </summary>
+		/// <param name="wind"></param>
 		public void SetWind (Vector2 wind) {
 			m_Wind = wind;
 		}

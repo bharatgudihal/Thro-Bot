@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/PlayerTestv2.png</SourceFile>
-  <SourceTime>2016-08-24T21:39:55.502458-06:00</SourceTime>
-  <DestFile>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/bin/Windows/Graphics/PlayerTestv2.xnb</DestFile>
-  <DestTime>2016-08-31T16:53:22.7432806-06:00</DestTime>
+  <SourceFile>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/PlayerTestv2.png</SourceFile>
+  <SourceTime>2016-08-25T08:49:27.5951738-06:00</SourceTime>
+  <DestFile>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/bin/Windows/Graphics/PlayerTestv2.xnb</DestFile>
+  <DestTime>2016-09-02T11:39:12.9532535-06:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2016-03-30T00:36:08-06:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

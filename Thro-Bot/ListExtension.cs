@@ -20,7 +20,6 @@ namespace Thro_Bot {
 		public static T Random<T>(this List<T> list, Random random) {
 			int count = list.Count;
 			int i = random.Next (0, count);
-			Debug.WriteLine (i);
 			return list[i];
 		}
 	}
