@@ -352,7 +352,7 @@ namespace Thro_Bot
 
             if (player.finishedAnimation)
             {
-                playerDeath.Play();
+               
                 //Freeze the game
                 gameOver = true;
                 gamePaused = true;
@@ -704,7 +704,6 @@ namespace Thro_Bot
             {
 				wallBoundSnd.Play (0.8f, random.RandomFloat (-0.1f, 0.1f), 0f);
                 projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
-                //projectile.m_iBounces++;
                 edge = edge_hit;
 				ShowBounce (projectile.m_Position, projectile.selfRotate ? Color.Red : Color.White);
             }
@@ -712,7 +711,6 @@ namespace Thro_Bot
             {
 				wallBoundSnd.Play (0.8f, random.RandomFloat (-0.1f, 0.1f), 0f);
                 projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
-                //projectile.m_iBounces++;
                 edge = edge_hit;
 				ShowBounce (projectile.m_Position, projectile.selfRotate ? Color.Red : Color.White);
             }
@@ -987,7 +985,10 @@ namespace Thro_Bot
                 
                 //Draw the combo indicator
                 spriteBatch.DrawString(ui.gameOverFont, "Replay Y/N?", new Vector2(GraphicsDevice.Viewport.Width/2 - 200, GraphicsDevice.Viewport.Height/2 - 20), Color.White);
-                
+                player.m_bComboActive = false;
+
+                //playerDeath.Play();
+
             }
 
             //Stop drawing

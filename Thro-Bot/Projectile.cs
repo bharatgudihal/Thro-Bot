@@ -159,7 +159,7 @@ namespace Thro_Bot
                 {
                     m_fProjectileRotation -= rotationSpeed * 10f;
                     AlterProjectileScale(gameTime);
-                    m_projectileColor = Color.Red;
+                    m_ProjectileColor = Color.Red;
                     
                 }
 
