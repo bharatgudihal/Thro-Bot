@@ -70,8 +70,8 @@ namespace Thro_Bot
         public BossShield(ref EnemyBase originEnemy)
         {
             OriginEnemy = originEnemy;
-            Radius = 0;
-            RotationSpeed = .05f;           
+            Radius = originEnemy.Texture.Width/2+40;
+            RotationSpeed = .02f;           
         }
 
         public override void Initialize(Texture2D texture, Vector2 position, float rotation)
@@ -84,12 +84,7 @@ namespace Thro_Bot
         {
             _movementBehavior = null;
             _rotationBehavior = new BossShieldRotationBehaviour(ref OriginEnemy, Radius, RotationSpeed);
-        }
-
-        public void startRotation()
-        {
-            ((BossShieldRotationBehaviour)_rotationBehavior).StartRotation(RotationSpeed);
-        }
+        }        
     }
 
     public class BossShieldRotationBehaviour : RotationBehaviorBase
@@ -102,20 +97,14 @@ namespace Thro_Bot
         }
 
         public override float Rotate(float rotation,GameTime gameTime)
-        {
-            rotation -= rotationSpeed;
-            if(rotation <= -2 * Math.PI * 5)
-            {
-                rotation = 0f;
-                rotationSpeed = 0;
-            }
-            return rotation;
+        {            
+            return base.Rotate(rotation, gameTime);
         }
 
         public override Vector2 Move(Vector2 position, float rotation)
         {
-            position.X = originEnemy.m_Position.X;
-            position.Y = originEnemy.m_Position.Y;
+            position.X = originEnemy.m_Position.X  - (float)(radius * Math.Cos(rotation));
+            position.Y = originEnemy.m_Position.Y  - (float)(radius * Math.Sin(rotation));
             return position;
         }
 

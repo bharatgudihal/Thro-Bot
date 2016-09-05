@@ -12,11 +12,12 @@ namespace Thro_Bot
     {
 
         public float Health;
+        private Color tempColor = Color.Orange;
         public override Color m_Color
         {
             get
             {
-                return Color.Orange;
+                return tempColor;
             }
         }
 
@@ -70,12 +71,12 @@ namespace Thro_Bot
 
         private Vector2 stopPosition;
 
-        private BossShield Shield;
+        private BossShield[] Shields;
 
         public Boss(Vector2 stopPosition)
         {
             this.stopPosition = stopPosition;
-            Health = 100;                      
+            Health = 120;                      
         }
 
         public override void InitializeBehaviors()
@@ -95,15 +96,16 @@ namespace Thro_Bot
             m_Origin = m_Center;
         }
 
-        public void SetBossShield(ref BossShield shield)
+        public void SetBossShield(ref BossShield[] shields)
         {
-            Shield = shield;
+            Shields = shields;
         }
 
-        public void ResetBoss()
+        public void SetColor(Color color)
         {
-            Shield.m_Rotation += (float)(2 * Math.PI);
+            tempColor = color;
         }
+        
     }
 
     public class BossMovementBehaviour : LinearMovementBehavior

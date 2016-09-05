@@ -94,7 +94,7 @@ namespace Thro_Bot
         protected EnemyBase originEnemy;
 
         // Radius of rotation
-        private float radius;
+        protected float radius;
 
         // Rotation speed
         protected float rotationSpeed = 0.0f;
