@@ -220,7 +220,7 @@ namespace Thro_Bot
 			throwDiscSnd = Content.Load<SoundEffect>("Sounds/ThrowDisc");
 
             //Load the background 
-            backgroundTexture = Content.Load<Texture2D>("Graphics/Background");
+            backgroundTexture = Content.Load<Texture2D>("Graphics/BackgroundDark");
 			wallBoundSnd = Content.Load<SoundEffect>("Sounds/WallBounce");
 
             // Load ring line
@@ -396,6 +396,13 @@ namespace Thro_Bot
                                 ui.score += 100 * player.m_iComboMultiplier;
                                 if (enemy.GetType() == typeof(HexagonEnemy))
                                 {
+                                    //Update combo
+                                    player.m_CurrentComboTime = TimeSpan.Zero;
+                                    player.m_bComboActive = true;
+
+                                    if(player.m_iComboMultiplier < 10)
+                                    player.m_iComboMultiplier += 1;
+
                                     ((HexagonEnemy)enemy).shield1.m_Active = false;
                                     ((HexagonEnemy)enemy).shield2.m_Active = false;
                                 }
@@ -641,7 +648,7 @@ namespace Thro_Bot
         {
             bool collision = false;
             // Only check collision if projectile is released
-            if (!projectile.m_bInOrbitToPlayer)
+            if (!projectile.m_bInOrbitToPlayer || projectile.m_bActive)
             {
                 Rectangle powerUpRectangle;
                 powerUpRectangle = new Rectangle((int)powerUp.m_Position.X, (int)powerUp.m_Position.Y, powerUp.Texture.Width * 7 / 10, powerUp.Texture.Height * 6 / 10);
@@ -719,16 +726,6 @@ namespace Thro_Bot
                 edge = edge_normal;
             }
 
-                if (projectile.m_iBounces > 3)
-                {
-                    activeParticleSystems.Remove(projectile.m_Trail);
-                    projectile = new Projectile();
-                    projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
-                    projectile.InitializeTrail(new List<Texture2D>() { projectileTrailTexture });
-                    activeParticleSystems.Add(projectile.m_Trail);
-                }
-
-
             //Check is projectile has been launched, rotate it around its center
 
            
@@ -804,6 +801,7 @@ namespace Thro_Bot
 
                 if (player.m_CurrentComboTime >= player.m_ComboCoolDown)
                 {
+
                     player.m_iComboMultiplier = 0;
                     player.m_bComboActive = false;
                     player.m_CurrentComboTime = TimeSpan.Zero;
@@ -825,7 +823,8 @@ namespace Thro_Bot
                 {
                     player.m_CurrentComboTime = TimeSpan.Zero;
                     player.m_bComboActive = true;
-                    player.m_iComboMultiplier += 1;
+                    if (player.m_iComboMultiplier < 10)
+                        player.m_iComboMultiplier += 1;
 
                     //Check if the projectile is not spinning
                     if (!projectile.selfRotate)
@@ -851,11 +850,13 @@ namespace Thro_Bot
                 {
 
                     //Check if the projectile is spinning
+
                     if (projectile.selfRotate)
                     {
                         player.m_CurrentComboTime = TimeSpan.Zero;
                         player.m_bComboActive = true;
-                        player.m_iComboMultiplier += 1;
+                        if (player.m_iComboMultiplier < 10)
+                            player.m_iComboMultiplier += 1;
                     }
 
                     else
@@ -877,15 +878,6 @@ namespace Thro_Bot
 						ShowBounce (projectile.m_Position, enemy.m_Color);
                     }
 
-                }
-
-                //Compare to orange hexagon
-                if (enemy.m_Type == EnemyBase.Type.Hexagon)
-                {
-                    player.m_CurrentComboTime = TimeSpan.Zero;
-                    player.m_bComboActive = true;
-                    player.m_iComboMultiplier += 1;
-                  
                 }
 
 

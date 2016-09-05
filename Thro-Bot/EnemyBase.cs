@@ -144,6 +144,7 @@ namespace Thro_Bot
 		/// </summary>
 		public float m_Rotation = 0f;
 
+
 		/// <summary>
 		/// Scale of this enemy;
 		/// </summary>
@@ -188,6 +189,8 @@ namespace Thro_Bot
 		/// Color tint for this enemy.
 		/// </summary>
 		public abstract Color m_Color { get; }
+
+        
 
 		/// <summary>
 		/// The number of health points taken from the player when this enemy

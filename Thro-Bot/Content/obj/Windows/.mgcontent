@@ -6,7 +6,6 @@
   <SourceFiles>
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/PlayerTestv2.png</File>
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Discv2.png</File>
-    <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Background.png</File>
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Player.png</File>
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Edge_Hit.png</File>
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Edge_normal.png</File>
@@ -34,5 +33,6 @@
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/RecallDisc.wav</File>
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/ThrowDisc.wav</File>
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/SmallPiece.png</File>
+    <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/BackgroundDark.png</File>
   </SourceFiles>
 </SourceFileCollection>
