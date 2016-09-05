@@ -75,7 +75,7 @@ namespace Thro_Bot
         public Boss(Vector2 stopPosition)
         {
             this.stopPosition = stopPosition;
-            Health = 100;
+            Health = 100;                      
         }
 
         public override void InitializeBehaviors()

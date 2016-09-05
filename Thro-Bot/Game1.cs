@@ -98,9 +98,6 @@ namespace Thro_Bot
         const float SPAWN_INTERVAL = 2.5f;
         TimeSpan spawnTimeSpan;
 
-        //Create the power up
-        bool createPowerUp = true;
-
         //Power ups spawn interval
         float POWERUP_INTERVAL = 10f;
         TimeSpan powerUpTimeSpan;
@@ -151,7 +148,7 @@ namespace Thro_Bot
         private TimeSpan currentCoreTime = TimeSpan.Zero;
         private TimeSpan coreAnimationTime = TimeSpan.FromSeconds(1);
         private TimeSpan previousBossCollision = TimeSpan.Zero;
-        private TimeSpan bossCollisionTime = TimeSpan.FromMilliseconds(20);
+        private TimeSpan bossCollisionTime = TimeSpan.FromMilliseconds(50);
 
         public Game1()
         {
@@ -411,7 +408,7 @@ namespace Thro_Bot
                 foreach (EnemyBase enemy in enemiesList)
                 {
                     enemy.Update(gameTime);                       
-                    DetectBossCollisions(enemy);
+                    CheckBossCollisions(enemy,gameTime);
                     // If rotation has stopped start boss animation
                     if (enemy.m_Type == EnemyBase.Type.BossShield && enemy.m_Rotation == 0)
                     {
@@ -460,7 +457,7 @@ namespace Thro_Bot
             }
         }
 
-        private void DetectBossCollisions(EnemyBase enemy)
+        private void CheckBossCollisions(EnemyBase enemy,GameTime gameTime)
         {
             Rectangle enemyRectangle;
             if (enemy.m_Type == EnemyBase.Type.Boss)
@@ -471,11 +468,12 @@ namespace Thro_Bot
                 enemyRectangle = new Rectangle((int)enemy.m_Position.X - 192, (int)enemy.m_Position.Y - 192, 384, 384);
             }
             Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X - projectile.m_ProjectileTexture.Width / 2, (int)projectile.m_Position.Y - projectile.m_ProjectileTexture.Height / 2, projectile.m_ProjectileTexture.Width, projectile.m_ProjectileTexture.Height);
-            if (projectileRectangle.Intersects(enemyRectangle) && pixelCollision(enemy, projectile.m_ProjectileTexture, projectile.m_Position, Rectangle.Intersect(projectileRectangle, enemyRectangle)))
+            if ((Vector2.Distance(enemy.m_Position,player.m_Position) < enemy.Texture.Width/2+player.m_PlayerTexture.Width/2) && pixelCollision(enemy, projectile.m_ProjectileTexture, projectile.m_Position, Rectangle.Intersect(projectileRectangle, enemyRectangle)) && gameTime.TotalGameTime - previousBossCollision > bossCollisionTime)
             {
+                previousBossCollision = gameTime.TotalGameTime;
                 if (enemy.m_Type == EnemyBase.Type.Boss)
                 {
-                    ((Boss)enemy).Health -= 10;
+                    ((Boss)enemy).Health -= 10;                                    
                     ((Boss)enemy).ResetBoss();
                     activeParticleSystems.Remove(projectile.m_Trail);
                     projectile = new Projectile();
