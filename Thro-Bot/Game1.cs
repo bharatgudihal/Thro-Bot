@@ -74,6 +74,8 @@ namespace Thro_Bot
         //Power Up list
         List<PowerUp> powerUpsList;
         Texture2D[] powerUpTextures;
+		Texture2D healthPickupEffect;
+		SoundEffect pickupHealthSnd;
 
         // Enemy death particle list
         List<Texture2D> enemyPiecesList;
@@ -82,6 +84,7 @@ namespace Thro_Bot
         // Particle system list
         ParticleSystemBase enemyDeathPS;
         ParticleSystemBase bouncePS;
+		ParticleSystemBase pickupHealthPS;
         List<ParticleSystemBase> activeParticleSystems;
 
         // Random
@@ -188,9 +191,17 @@ namespace Thro_Bot
                 new Vector2(-2f, -2f), new Vector2(2f, 2f),
                 0.02f, 0.1f);
 
+			pickupHealthPS = new ParticleSystemBase (0f, 1f, 8,
+				1f, 2f,
+				0.25f, 0.5f,
+				new Vector2 (-4f, -4f), new Vector2 (4f, 4f),
+				0f, 0f, true, false);
+
+
             activeParticleSystems = new List<ParticleSystemBase>() {
                 enemyDeathPS,
-                bouncePS
+                bouncePS,
+				pickupHealthPS
             };
 
 
@@ -258,6 +269,8 @@ namespace Thro_Bot
             //Load the powerUp textures
             powerUpTextures = new Texture2D[1];
             powerUpTextures[0] = Content.Load<Texture2D>("Graphics/HealthPowerUp");
+			healthPickupEffect = Content.Load<Texture2D>("Graphics/HealthEffect");
+			pickupHealthSnd = Content.Load<SoundEffect>("Sounds/PickupHealth");
 
             // Load enemy piece textures
             enemyPiecesList = new List<Texture2D>() {
@@ -784,6 +797,8 @@ namespace Thro_Bot
                     }
                     ui.playerHealth = player.m_iHealth;
                     powerUpsList[i].m_Active = false;
+					pickupHealthSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
+					ShowPickupHealth (powerUpsList[i].m_Position);
                 }
 
                 if (!powerUpsList[i].m_Active)
@@ -1231,6 +1246,14 @@ namespace Thro_Bot
             bouncePS.SetTint(color);
             bouncePS.Emit();
         }
+
+		void ShowPickupHealth (Vector2 pos) {
+			if (pickupHealthPS.m_Sprites == null)
+				pickupHealthPS.m_Sprites = new List<Texture2D>() { healthPickupEffect, enemyPiecesList[4] };
+
+			pickupHealthPS.m_Position = pos;
+			pickupHealthPS.Emit();
+		}
 
         private void DrawPowerUps(SpriteBatch spriteBatch)
         {
