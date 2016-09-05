@@ -139,7 +139,8 @@ namespace Thro_Bot
         private Texture2D bossTexture;
         private Texture2D bossShieldTexture;
         private bool bossIsSpawned = false;
-        private BossShield bossShield;
+        //private BossShield bossShield;
+        private BossShield[] bossShields;
         private bool bossAnimationStarted = false;
         private BossCore bossCore;
         private Lazer lazer;
@@ -149,6 +150,8 @@ namespace Thro_Bot
         private TimeSpan coreAnimationTime = TimeSpan.FromSeconds(1);
         private TimeSpan previousBossCollision = TimeSpan.Zero;
         private TimeSpan bossCollisionTime = TimeSpan.FromMilliseconds(50);
+        private TimeSpan previousBossAnimationTime = TimeSpan.Zero;
+        private TimeSpan bossAnimationTime = TimeSpan.FromSeconds(15);
 
         public Game1()
         {
@@ -355,7 +358,7 @@ namespace Thro_Bot
                 }
                 else
                 {
-                    //    // Spawn enemies
+                    // Spawn enemies
                     SpawnEnemies(gameTime);
                 }
                 //Spawn a power up
@@ -401,6 +404,13 @@ namespace Thro_Bot
 
         private void UpdateBoss(GameTime gameTime)
         {
+            if(gameTime.TotalGameTime - previousBossAnimationTime > bossAnimationTime && !bossAnimationStarted)
+            {
+                previousBossAnimationTime = gameTime.TotalGameTime;
+                bossAnimationStarted = true;
+                bossCore = new BossCore();
+                bossCore.Initialize(bossCoreTexture, boss.m_Position);
+            }
             if (!bossAnimationStarted)
             {
                 bossCore = null;
@@ -408,17 +418,9 @@ namespace Thro_Bot
                 foreach (EnemyBase enemy in enemiesList)
                 {
                     enemy.Update(gameTime);
-                    CheckBossCollisions(enemy, gameTime);
-                    // If rotation has stopped start boss animation
-                    if (enemy.m_Type == EnemyBase.Type.BossShield && enemy.m_Rotation == 0)
-                    {
-                        bossAnimationStarted = true;
-                        // Initialize boss core
-                        bossCore = new BossCore();
-                        bossCore.Initialize(bossCoreTexture, boss.m_Position);
-                    }
+                    CheckBossCollisions(enemy, gameTime);                    
                 }
-            }// If the boss core has blinked less than 3 times
+            }// If the boss core has not blinked
             else if (bossCore.GetOpactity() < 1f)
             {
                 // Lerp opacity towards 1
@@ -437,7 +439,7 @@ namespace Thro_Bot
                     currentCoreTime += gameTime.ElapsedGameTime;
                     if (currentCoreTime < coreAnimationTime)
                     {
-                        player.m_iHealth -= 0.3f;
+                        player.m_iHealth -= 0.5f;
                         playerHurtSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
                         flashDamage = true;
                         //Cap the maximum health to lose
@@ -450,8 +452,7 @@ namespace Thro_Bot
                     {
                         // Stop animation and reset boss state
                         currentCoreTime = TimeSpan.Zero;
-                        bossAnimationStarted = false;
-                        bossShield.startRotation();
+                        bossAnimationStarted = false;                        
                     }
                 }
             }
@@ -462,20 +463,20 @@ namespace Thro_Bot
             Rectangle enemyRectangle;
             if (enemy.m_Type == EnemyBase.Type.Boss)
             {
-                enemyRectangle = new Rectangle((int)enemy.m_Position.X - 37, (int)enemy.m_Position.Y - 37, 74, 74);
+                enemyRectangle = new Rectangle((int)enemy.m_Position.X - enemy.Texture.Width/2, (int)enemy.m_Position.Y - enemy.Texture.Height/2, enemy.Texture.Width, enemy.Texture.Height);
             }
             else
             {
-                enemyRectangle = new Rectangle((int)enemy.m_Position.X - 192, (int)enemy.m_Position.Y - 192, 384, 384);
+                enemyRectangle = new Rectangle((int)enemy.m_Position.X, (int)enemy.m_Position.Y, enemy.Texture.Width * 7 / 10, enemy.Texture.Height * 6 / 10);
             }
             Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X - projectile.m_ProjectileTexture.Width / 2, (int)projectile.m_Position.Y - projectile.m_ProjectileTexture.Height / 2, projectile.m_ProjectileTexture.Width, projectile.m_ProjectileTexture.Height);
-            if ((Vector2.Distance(enemy.m_Position, player.m_Position) < enemy.Texture.Width / 2 + player.m_PlayerTexture.Width / 2) && pixelCollision(enemy, projectile.m_ProjectileTexture, projectile.m_Position, Rectangle.Intersect(projectileRectangle, enemyRectangle)) && gameTime.TotalGameTime - previousBossCollision > bossCollisionTime)
+            if (enemyRectangle.Intersects(projectileRectangle) && pixelCollision(enemy, projectile.m_ProjectileTexture, projectile.m_Position, Rectangle.Intersect(projectileRectangle, enemyRectangle)) && gameTime.TotalGameTime - previousBossCollision > bossCollisionTime)
             {
                 previousBossCollision = gameTime.TotalGameTime;
                 if (enemy.m_Type == EnemyBase.Type.Boss)
                 {
                     ((Boss)enemy).Health -= 10;
-                    ((Boss)enemy).ResetBoss();
+                    ((Boss)enemy).SetColor(Color.White);                    
                     activeParticleSystems.Remove(projectile.m_Trail);
                     projectile = new Projectile();
                     projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
@@ -499,6 +500,26 @@ namespace Thro_Bot
                         projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
                     }
                 }
+            }else
+            {
+                if (enemy.m_Type == EnemyBase.Type.Boss)
+                {
+                    if (((Boss)enemy).Health <= 90 && ((Boss)enemy).Health > 60)
+                    {
+                        ((Boss)enemy).SetColor(Color.Purple);
+                    }
+                    else if (((Boss)enemy).Health <= 60 && ((Boss)enemy).Health > 30)
+                    {
+                        ((Boss)enemy).SetColor(Color.YellowGreen);
+                    }
+                    else if (((Boss)enemy).Health <= 30)
+                    {
+                        ((Boss)enemy).SetColor(Color.Red);
+                    }else
+                    {
+                        ((Boss)enemy).SetColor(Color.Orange);
+                    }
+                }
             }
         }
 
@@ -506,10 +527,18 @@ namespace Thro_Bot
         {
             boss = new Boss(new Vector2(GraphicsDevice.Viewport.TitleSafeArea.Width / 2, GraphicsDevice.Viewport.TitleSafeArea.Height / 2));
             boss.Initialize(bossTexture, new Vector2(GraphicsDevice.Viewport.Width / 2, 0));
-            bossShield = new BossShield(ref boss);
-            bossShield.Initialize(bossShieldTexture, boss.m_Position, 0);
-            ((Boss)boss).SetBossShield(ref bossShield);
-            enemiesList.Add(bossShield);
+            BossShield[] shields = new BossShield[8];
+            for(int i=0;i<8; i++)
+            {
+                shields[i] = new BossShield(ref boss);
+                shields[i].Initialize(enemyTextures[3],
+                    Vector2.Zero, (float)(i * Math.PI / 4));
+                enemiesList.Add(shields[i]);
+            }
+            //bossShield = new BossShield(ref boss);
+            //bossShield.Initialize(bossShieldTexture, boss.m_Position, 0);
+            ((Boss)boss).SetBossShield(ref shields);
+            //enemiesList.Add(bossShield);
             enemiesList.Add(boss);
             bossIsSpawned = true;
         }
@@ -590,14 +619,17 @@ namespace Thro_Bot
                     }
                     else if (CheckCollisionWithPlayerShield(enemy))
                     {
-                        player.m_iHealth -= 10;
                         enemy.m_Active = false;
-                        playerHurtSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
-                        flashDamage = true;
-                        //Cap the maximum health to lose
-                        if (player.m_iHealth >= 0f)
+                        if (enemy.m_Type != EnemyBase.Type.Shield)
                         {
-                            ui.playerHealth = player.m_iHealth;
+                            player.m_iHealth -= 10;                            
+                            playerHurtSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
+                            flashDamage = true;
+                            //Cap the maximum health to lose
+                            if (player.m_iHealth >= 0f)
+                            {
+                                ui.playerHealth = player.m_iHealth;
+                            }
                         }
                     }
                 }
@@ -1112,7 +1144,7 @@ namespace Thro_Bot
             // Draw boss shield
             if (bossIsSpawned)
             {
-                bossShield.Draw(spriteBatch);
+                //bossShield.Draw(spriteBatch);
                 if (bossCore != null)
                 {
                     bossCore.Draw(spriteBatch);
