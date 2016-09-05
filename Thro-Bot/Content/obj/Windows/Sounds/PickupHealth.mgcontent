@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/EnemyDeath.wav</SourceFile>
-  <SourceTime>2016-09-02T11:16:43.074162-06:00</SourceTime>
-  <DestFile>C:/Users/u1070597/Documents/GitHub/Thro-Bot/Thro-Bot/Content/bin/Windows/Sounds/EnemyDeath.xnb</DestFile>
-  <DestTime>2016-09-03T17:38:17.4334867-06:00</DestTime>
+  <SourceFile>C:/Users/u1088224/Dropbox/Throwbot/Thro-Bot/Thro-Bot/Content/Sounds/PickupHealth.wav</SourceFile>
+  <SourceTime>2016-09-05T15:29:31.0577885-06:00</SourceTime>
+  <DestFile>C:/Users/u1088224/Dropbox/Throwbot/Thro-Bot/Thro-Bot/Content/bin/Windows/Sounds/PickupHealth.xnb</DestFile>
+  <DestTime>2016-09-05T15:29:48.9870928-06:00</DestTime>
   <Importer>WavImporter</Importer>
   <ImporterTime>2016-03-30T00:36:08-06:00</ImporterTime>
   <Processor>SoundEffectProcessor</Processor>

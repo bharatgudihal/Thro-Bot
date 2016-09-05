@@ -79,6 +79,11 @@ namespace Thro_Bot {
 		protected bool m_ScaleDown;
 
 		/// <summary>
+		/// If true particles will start with a random rotation.
+		/// </summary>
+		protected bool m_RandomRotation;
+
+		/// <summary>
 		/// Particle initial velocity range.
 		/// </summary>
 		protected Vector2 m_MinVelocity, m_MaxVelocity;
@@ -110,7 +115,7 @@ namespace Thro_Bot {
 
 		public ParticleSystemBase (float emissionRate, float emissionRadius, int particlesPerEmission,
 			float minLifetime, float maxLifetime, float minScale, float maxScale, Vector2 minVelocity, Vector2 maxVelocity,
-			float minAngularVelocity, float maxAngularVelocity, bool scaleDown=false) : 
+			float minAngularVelocity, float maxAngularVelocity, bool scaleDown=false, bool randomRotation=true) : 
 			this() 
 		{
 			m_EmissionRate = emissionRate;
@@ -127,6 +132,7 @@ namespace Thro_Bot {
 			m_MinAngularVelocity = minAngularVelocity;
 			m_MaxAngularVelocity = maxAngularVelocity;
 			m_ScaleDown = scaleDown;
+			m_RandomRotation = randomRotation;
 		}
 
 		public void Update () {
@@ -195,7 +201,10 @@ namespace Thro_Bot {
 				}
 
 				// Randomize starting rotation
-				float r = RNG.RandomFloat(0f, 2f * (float)Math.PI);
+				float r;
+				if (m_RandomRotation)
+					r = RNG.RandomFloat(0f, 2f * (float)Math.PI);
+				else r = 0f;
 
 				// Randomize starting scale
 				float scale;

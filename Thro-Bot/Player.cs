@@ -17,7 +17,7 @@ namespace Thro_Bot
         public bool m_bAlive;
 
         //Amount of hit points that player has
-        public int m_iHealth;
+        public float m_iHealth;
 
         //The rotation angle of the player
         public float m_fRotation;
