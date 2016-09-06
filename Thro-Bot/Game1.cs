@@ -449,6 +449,7 @@ namespace Thro_Bot
                 if (!enemiesList[0].m_Active)
                 {
                     enemiesList.Clear();
+                    lastBossTime = gameTime.TotalGameTime;
                 }
             }// If the boss core has not blinked
             else if (bossCore.GetOpactity() < 1f)
@@ -946,7 +947,7 @@ namespace Thro_Bot
                 else if (currentKeyboardState.IsKeyDown(Keys.Y))
                 {
 
-                    ResetGame();
+                    ResetGame(gameTime);
                     gamePaused = false;
 
                 }
@@ -1266,7 +1267,7 @@ namespace Thro_Bot
             base.Draw(gameTime);
         }
 
-        private void ResetGame()
+        private void ResetGame(GameTime gameTime)
         {
             player.Reset();
             activeParticleSystems.Remove(projectile.m_Trail);
@@ -1282,6 +1283,7 @@ namespace Thro_Bot
             bossIsSpawned = false;
             lazer = null;
             bossCore = null;
+            lastBossTime = gameTime.TotalGameTime;
         }
 
 
