@@ -88,6 +88,41 @@ namespace Thro_Bot
         public SpriteFont comboFont;
 
 
+        public bool glitchScreen = false;
+
+        //The glitch Backround texture
+        public Texture2D m_GlitchTexture;
+
+        //The position of the glitch texture
+        public Vector2 m_GlitchPos;
+
+        //The origin of the glitch image
+        public Vector2 m_glitchOrigin;
+
+        //The rectangle of the glitch screen
+        public Rectangle sourceRectangleGlitch;
+
+        //The alpha amount of the glitch
+        private float m_glitchAlpha = 0.4f;
+
+        //The min alpha amount of the glitch
+        private float m_minGlitchAlpha = 0.0f;
+
+        //The max alpha amount of the glitch
+        private float m_maxGlitchAlpha = 0.4f;
+
+        //The theta of the angle
+        private float _theta = 0f;
+
+        //The period of the signal
+        private float _period = 0.05f;
+
+        //The time span of the glitch
+        private TimeSpan m_glitchDuration = TimeSpan.FromSeconds(0.8);
+
+        //The current time
+        private TimeSpan m_currentTime = TimeSpan.Zero;
+
         //Initializes the Score UI
         public void InitializeScore(Texture2D texture, Vector2 position, Vector2 origin)
         {
@@ -167,10 +202,23 @@ namespace Thro_Bot
 
         }
 
+        public void InitializeGlitchScreen(Texture2D glitchScreen, Vector2 position)
+        {
+            //Set the texture of the glitch screen
+            m_GlitchTexture = glitchScreen;
 
+            //Set the position of the glitch screen
+            m_GlitchPos = position;
+
+            //Set the origin of the glitch texture
+            m_glitchOrigin = new Vector2(m_GlitchTexture.Width/2,m_GlitchTexture.Height/2);
+
+            //Set the rectangle
+            sourceRectangleGlitch = new Rectangle(0, 0, m_GlitchTexture.Width, m_GlitchTexture.Height);
+        }
 
         //Ui updated the health bar
-        public void Update() {
+        public void Update(GameTime gameTime) {
 
             
             sourceRectangleHealthBar.Width = (int)Math.Round((playerHealth / 100f) * intitialFullWidth);
@@ -191,12 +239,52 @@ namespace Thro_Bot
 
 
             sourceRectangleStaminaBar.Width = (int)Math.Round((m_staminaAmount / 100f) * initialWidthStaminaBar);
+
+
+            //Flash the glitch screen
+            if(glitchScreen)
+            flashGlitch(gameTime);
+
+        }
+
+        public void flashGlitch(GameTime gameTime)
+        {
+
+            m_currentTime += gameTime.ElapsedGameTime;
+
+
+
+            // dtheta = 1 / framerate / period
+            float dTheta = 1f / 60f / _period;
+
+            // Increment theta, constraint to 0-2PI
+            _theta = (_theta + dTheta) % (2f * (float)Math.PI);
+
+
+            float midpt = (m_maxGlitchAlpha - m_minGlitchAlpha) / 2f;
+
+
+            m_glitchAlpha = m_minGlitchAlpha + midpt + (m_maxGlitchAlpha - m_minGlitchAlpha) * (float)Math.Sin(_theta);
+
+            if (m_currentTime > m_glitchDuration)
+            {
+                glitchScreen = false;
+                m_currentTime = TimeSpan.Zero;
+            }
+
         }
 
 
 
         public void Draw(SpriteBatch spriteBatch)
         {
+
+            if (glitchScreen)
+            {
+                //Draw the glitch texture
+                spriteBatch.Draw(m_GlitchTexture, m_GlitchPos, sourceRectangleGlitch, Color.White * m_glitchAlpha, 0f, m_glitchOrigin, 1.4f, SpriteEffects.None, 0f);
+            }
+
             float angle = (float)Math.PI;  // 180 degrees
             //Check the value of the player health
             if (playerHealth >= 50)
@@ -223,10 +311,6 @@ namespace Thro_Bot
             //Draw the Health Frame UI element
             Rectangle sourceRectangleHealthBarFrame = new Rectangle(0, 0, m_HealthBarFrameTexture.Width, m_HealthBarFrameTexture.Height);
             spriteBatch.Draw(m_HealthBarFrameTexture,m_HealthBarFramePosition, sourceRectangleHealthBarFrame, Color.White, 0f, m_HealthBarFrameOrigin, .60f, SpriteEffects.None, 0f);
-
-            //Check the value of the stamina bar
-
-
 
             //Draw the stamina bar
             spriteBatch.Draw(m_staminaBar, m_staminaBarPosition, sourceRectangleStaminaBar, Color.OrangeRed,angle, m_staminaBarOrigin, 0.27f, SpriteEffects.None, 0f);

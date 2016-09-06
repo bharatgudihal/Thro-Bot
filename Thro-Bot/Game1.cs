@@ -304,6 +304,10 @@ namespace Thro_Bot
             Vector2 staminaBarPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.82f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.064f));
             ui.InitializeStamina(Content.Load<Texture2D>("Graphics/StaminaFrameUI"), staminaFramePosition, Content.Load<Texture2D>("Graphics/StaminaBarUI"), staminaBarPosition);
 
+            //Load the glitch texture
+            Vector2 glitchPosition = new Vector2(GraphicsDevice.Viewport.Width /2, GraphicsDevice.Viewport.Height/2);
+            ui.InitializeGlitchScreen(Content.Load<Texture2D>("Graphics/Glitch"), glitchPosition);
+
 
             //Load the score font
             ui.scoreFont = Content.Load<SpriteFont>("Fonts/Score");
@@ -393,7 +397,7 @@ namespace Thro_Bot
                 UpdatePowerUps(gameTime);
             }
             //Update the UI
-            ui.Update();
+            ui.Update(gameTime);
 
             //Update the combo
             UpdateCombo(gameTime);
@@ -455,6 +459,7 @@ namespace Thro_Bot
                         player.m_iHealth -= 0.5f;
                         playerHurtSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
                         flashDamage = true;
+                        ui.glitchScreen = true;
                         //Cap the maximum health to lose
                         if (player.m_iHealth >= 0f)
                         {
@@ -500,6 +505,7 @@ namespace Thro_Bot
                         {
                             enemiesList[i].m_Active = false;
                         }
+                        bossIsSpawned = false;
                     }
                 }
                 else
@@ -650,6 +656,11 @@ namespace Thro_Bot
                             {
                                 ui.playerHealth = player.m_iHealth;
                             }
+
+                            //Glitch the screen
+                            ui.glitchScreen = true;
+                            
+
                         }
                     }
                 }
@@ -801,13 +812,28 @@ namespace Thro_Bot
 
             if (gameTime.TotalGameTime - currentPowerUpTime > powerUpTimeSpan)
             {
-                currentPowerUpTime = gameTime.TotalGameTime;
+                
 
                 PowerUp powerUp = new HealthPowerUp();
-                powerUp.Initialize(powerUpTextures[0], new Vector2(random.Next(powerUpTextures[0].Width, WIDTH - powerUpTextures[0].Width), random.Next(200, HEIGHT - 200)));
-                powerUpsList.Add(powerUp);
+                if (!bossIsSpawned) {
+                    powerUp.Initialize(powerUpTextures[0], new Vector2(random.Next(powerUpTextures[0].Width, WIDTH - powerUpTextures[0].Width), random.Next(200, HEIGHT - 200)));
+                    currentPowerUpTime = gameTime.TotalGameTime;
+                    powerUpsList.Add(powerUp);
+                }
+                else
+                {
+                    //The boss's radius
+                    float bossRadius = boss.Texture.Width / 2 + 40;
 
+                    Vector2 powerUpPos = new Vector2(random.Next(powerUpTextures[0].Width, WIDTH - powerUpTextures[0].Width), random.Next(200, HEIGHT - 200));
 
+                    if(Vector2.Distance(powerUpPos, new Vector2(GraphicsDevice.Viewport.TitleSafeArea.Width / 2, GraphicsDevice.Viewport.TitleSafeArea.Height / 2)) > bossRadius)
+                    {
+                        powerUp.Initialize(powerUpTextures[0], powerUpPos);
+                        currentPowerUpTime = gameTime.TotalGameTime;
+                        powerUpsList.Add(powerUp);
+                    }
+                }
             }
         }
 
@@ -834,7 +860,7 @@ namespace Thro_Bot
                         }
 
                     }
-                    ui.playerHealth = player.m_iHealth;
+                    ui.playerHealth = (int)player.m_iHealth;
                     powerUpsList[i].m_Active = false;
 					pickupHealthSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
 					ShowPickupHealth (powerUpsList[i].m_Position);
