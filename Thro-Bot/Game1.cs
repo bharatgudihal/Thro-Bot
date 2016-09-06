@@ -99,7 +99,7 @@ namespace Thro_Bot
         const int HEIGHT = 1000;
 
         // Spawn interval
-        const float SPAWN_INTERVAL = 2.5f;
+        const float SPAWN_INTERVAL = 1.5f;
         TimeSpan spawnTimeSpan;
 
         //Power ups spawn interval
@@ -372,7 +372,7 @@ namespace Thro_Bot
                     if (enemiesList.Count == 0)
                     {
                         lastBossTime = gameTime.TotalGameTime;
-                        SpawnBoss();
+                        SpawnBoss(gameTime);
                         previousBossAnimationTime = gameTime.TotalGameTime;
                     }
                 } // Update Boss if spawned
@@ -445,6 +445,11 @@ namespace Thro_Bot
                     enemy.Update(gameTime);
                     CheckBossCollisions(enemy, gameTime);                    
                 }
+                // If boss is killed, clear the list
+                if (!enemiesList[0].m_Active)
+                {
+                    enemiesList.Clear();
+                }
             }// If the boss core has not blinked
             else if (bossCore.GetOpactity() < 1f)
             {
@@ -511,10 +516,14 @@ namespace Thro_Bot
                         projectile.InitializeTrail(new List<Texture2D>() { projectileTrailTexture });
                         if (((Boss)enemy).Health == 0)
                         {
+                            //Add Boss points
+                            ui.score += boss.m_PointValue;
+
                             for (int i = 0; i < enemiesList.Count; i++)
                             {
                                 enemiesList[i].m_Active = false;
                             }
+                            bossIsSpawned = false;
                         }
                     }
                     else
@@ -554,7 +563,7 @@ namespace Thro_Bot
             }
         }
 
-        private void SpawnBoss()
+        private void SpawnBoss(GameTime gameTime)
         {
             boss = new Boss(new Vector2(GraphicsDevice.Viewport.TitleSafeArea.Width / 2, GraphicsDevice.Viewport.TitleSafeArea.Height / 2));
             boss.Initialize(bossTexture, new Vector2(GraphicsDevice.Viewport.Width / 2, 0));
@@ -572,6 +581,7 @@ namespace Thro_Bot
             //enemiesList.Add(bossShield);
             enemiesList.Add(boss);
             bossIsSpawned = true;
+            previousBossAnimationTime = gameTime.TotalGameTime;
         }
 
         private void UpdateEnemies(GameTime gameTime)
@@ -866,7 +876,7 @@ namespace Thro_Bot
 
                     if (player.m_iHealth < 100)
                     {
-                        player.m_iHealth += 20;
+                        player.m_iHealth += 10;
 
                         if (player.m_iHealth > 100)
                         {
@@ -892,7 +902,7 @@ namespace Thro_Bot
         {
             bool collision = false;
             // Only check collision if projectile is released
-            if (!projectile.m_bInOrbitToPlayer || projectile.m_bActive)
+            if (!projectile.m_bInOrbitToPlayer && projectile.m_bActive)
             {
                 Rectangle powerUpRectangle;
                 powerUpRectangle = new Rectangle((int)powerUp.m_Position.X, (int)powerUp.m_Position.Y, powerUp.Texture.Width * 7 / 10, powerUp.Texture.Height * 6 / 10);
@@ -1266,6 +1276,9 @@ namespace Thro_Bot
             gamePaused = false;
             ui.score = 0;
             powerUpsList.Clear();
+            bossIsSpawned = false;
+            lazer = null;
+            bossCore = null;
         }
 
 
