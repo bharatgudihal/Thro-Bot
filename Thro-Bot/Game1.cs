@@ -1008,6 +1008,9 @@ namespace Thro_Bot
                     {
 
                         projectile.selfRotate = false;
+                        projectile.m_ProjectileTexture = projectileTexture;
+                        projectile.m_Trail.SetAllTint(Color.White);
+                        if (spinLoopInstance != null) spinLoopInstance.Pause();
                     }
 
                 }
