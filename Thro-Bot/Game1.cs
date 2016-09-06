@@ -458,6 +458,7 @@ namespace Thro_Bot
                 if (!enemiesList[0].m_Active)
                 {
                     enemiesList.Clear();
+                    lastBossTime = gameTime.TotalGameTime;
                 }
             }// If the boss core has not blinked
             else if (bossCore.GetOpactity() < 1f)
@@ -983,7 +984,7 @@ namespace Thro_Bot
                 else if (currentKeyboardState.IsKeyDown(Keys.Y))
                 {
 
-                    ResetGame();
+                    ResetGame(gameTime);
                     gamePaused = false;
 
                 }
@@ -998,8 +999,14 @@ namespace Thro_Bot
             if (projectile.m_bActive)
             {
                 previousProjectilePosition = projectile.m_Position;
-
-                if (projectile.m_Position.X <= 10f || projectile.m_Position.X >= GraphicsDevice.Viewport.TitleSafeArea.Width - 10f)
+                if (CheckCornerCollision()) {
+                    projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
+                    projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+                    wallBoundSnd.Play(0.8f, random.RandomFloat(-0.1f, 0.1f), 0f);
+                    edge = edge_hit;
+                    ShowBounce(projectile.m_Position, projectile.selfRotate ? Color.Red : Color.White);
+                }
+                else if (projectile.m_Position.X <= 10f || projectile.m_Position.X >= GraphicsDevice.Viewport.TitleSafeArea.Width - 10f)
                 {
                     wallBoundSnd.Play(0.8f, random.RandomFloat(-0.1f, 0.1f), 0f);
                     projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
@@ -1084,6 +1091,10 @@ namespace Thro_Bot
             }
         }
 
+        private bool CheckCornerCollision()
+        {
+            return projectile.m_Position == new Vector2(0, 0) || projectile.m_Position == new Vector2(0, GraphicsDevice.Viewport.Height) || projectile.m_Position == new Vector2(GraphicsDevice.Viewport.Width, 0) || projectile.m_Position == new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+        }
 
         private void UpdateCombo(GameTime gameTime)
         {
@@ -1300,7 +1311,7 @@ namespace Thro_Bot
             base.Draw(gameTime);
         }
 
-        private void ResetGame()
+        private void ResetGame(GameTime gameTime)
         {
             player.Reset();
             activeParticleSystems.Remove(projectile.m_Trail);
@@ -1316,6 +1327,7 @@ namespace Thro_Bot
             bossIsSpawned = false;
             lazer = null;
             bossCore = null;
+            lastBossTime = gameTime.TotalGameTime;
         }
 
 
