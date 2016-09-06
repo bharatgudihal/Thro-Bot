@@ -10,15 +10,39 @@ namespace Thro_Bot
 {
 
     class Shield : EnemyBase
-    {        
+    {
+
+        private Color m_EnemyColor = Color.Orange;
 
         public override Color m_Color
         {
             get
             {
-                return Color.Orange;
+                return m_EnemyColor;
             }
         }
+
+
+        private Color ColorCorrector(float correctionFactor, Color color)
+        {
+            float red = (255 - color.R) * correctionFactor + color.R;
+            float green = (255 - color.G) * correctionFactor + color.G;
+            float blue = (255 - color.B) * correctionFactor + color.B;
+            color = new Color((int)red, (int)green, (int)blue, 1);
+            return color;
+        }
+
+        public void SetColor(Color color)
+        {
+            m_EnemyColor = color;
+        }
+
+        private void UseColorCorrect()
+        {
+            m_EnemyColor = ColorCorrector(0f, m_EnemyColor);
+        }
+
+
 
         public override int m_HurtValue
         {
@@ -81,6 +105,7 @@ namespace Thro_Bot
 
         public override void Initialize(Texture2D texture, Vector2 position,float rotation)
         {
+           // UseColorCorrect();
             base.Initialize(texture, position,rotation);
             m_Origin = new Vector2(Texture.Width / 2, Texture.Height / 2);            
         }

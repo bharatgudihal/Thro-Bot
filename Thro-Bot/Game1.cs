@@ -99,7 +99,7 @@ namespace Thro_Bot
         const int HEIGHT = 1000;
 
         // Spawn interval
-        const float SPAWN_INTERVAL = 2.5f;
+        const float SPAWN_INTERVAL = 1.5f;
         TimeSpan spawnTimeSpan;
 
         //Power ups spawn interval
@@ -256,8 +256,8 @@ namespace Thro_Bot
             throwDiscSnd = Content.Load<SoundEffect>("Sounds/ThrowDisc");
 
             //Load the background 
-            backgroundTexture = Content.Load<Texture2D>("Graphics/Background");
-            wallBoundSnd = Content.Load<SoundEffect>("Sounds/WallBounce");
+            backgroundTexture = Content.Load<Texture2D>("Graphics/BackgroundDark");
+			wallBoundSnd = Content.Load<SoundEffect>("Sounds/WallBounce");
 
             // Load ring line
             ringLineTexture = Content.Load<Texture2D>("Graphics/Ring_Line");
@@ -310,6 +310,10 @@ namespace Thro_Bot
             Vector2 staminaFramePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.805f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.064f));
             Vector2 staminaBarPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.82f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.064f));
             ui.InitializeStamina(Content.Load<Texture2D>("Graphics/StaminaFrameUI"), staminaFramePosition, Content.Load<Texture2D>("Graphics/StaminaBarUI"), staminaBarPosition);
+
+            //Load the glitch texture
+            Vector2 glitchPosition = new Vector2(GraphicsDevice.Viewport.Width /2, GraphicsDevice.Viewport.Height/2);
+            ui.InitializeGlitchScreen(Content.Load<Texture2D>("Graphics/Glitch"), glitchPosition);
 
 
             //Load the score font
@@ -368,7 +372,7 @@ namespace Thro_Bot
                     if (enemiesList.Count == 0)
                     {
                         lastBossTime = gameTime.TotalGameTime;
-                        SpawnBoss();
+                        SpawnBoss(gameTime);
                         previousBossAnimationTime = gameTime.TotalGameTime;
                     }
                 } // Update Boss if spawned
@@ -401,7 +405,7 @@ namespace Thro_Bot
                 UpdatePowerUps(gameTime);
             }
             //Update the UI
-            ui.Update();
+            ui.Update(gameTime);
 
             //Update the combo
             UpdateCombo(gameTime);
@@ -441,6 +445,11 @@ namespace Thro_Bot
                     enemy.Update(gameTime);
                     CheckBossCollisions(enemy, gameTime);                    
                 }
+                // If boss is killed, clear the list
+                if (!enemiesList[0].m_Active)
+                {
+                    enemiesList.Clear();
+                }
             }// If the boss core has not blinked
             else if (bossCore.GetOpactity() < 1f)
             {
@@ -463,6 +472,7 @@ namespace Thro_Bot
                         player.m_iHealth -= 0.5f;
                         playerHurtSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
                         flashDamage = true;
+                        ui.glitchScreen = true;
                         //Cap the maximum health to lose
                         if (player.m_iHealth >= 0f)
                         {
@@ -506,10 +516,14 @@ namespace Thro_Bot
                         projectile.InitializeTrail(new List<Texture2D>() { projectileTrailTexture });
                         if (((Boss)enemy).Health == 0)
                         {
+                            //Add Boss points
+                            ui.score += boss.m_PointValue;
+
                             for (int i = 0; i < enemiesList.Count; i++)
                             {
                                 enemiesList[i].m_Active = false;
                             }
+                            bossIsSpawned = false;
                         }
                     }
                     else
@@ -549,7 +563,7 @@ namespace Thro_Bot
             }
         }
 
-        private void SpawnBoss()
+        private void SpawnBoss(GameTime gameTime)
         {
             boss = new Boss(new Vector2(GraphicsDevice.Viewport.TitleSafeArea.Width / 2, GraphicsDevice.Viewport.TitleSafeArea.Height / 2));
             boss.Initialize(bossTexture, new Vector2(GraphicsDevice.Viewport.Width / 2, 0));
@@ -567,6 +581,7 @@ namespace Thro_Bot
             //enemiesList.Add(bossShield);
             enemiesList.Add(boss);
             bossIsSpawned = true;
+            previousBossAnimationTime = gameTime.TotalGameTime;
         }
 
         private void UpdateEnemies(GameTime gameTime)
@@ -604,6 +619,13 @@ namespace Thro_Bot
                                 ui.score += 100 * player.m_iComboMultiplier;
                                 if (enemy.GetType() == typeof(HexagonEnemy))
                                 {
+                                    //Update combo
+                                    player.m_CurrentComboTime = TimeSpan.Zero;
+                                    player.m_bComboActive = true;
+
+                                    if(player.m_iComboMultiplier < 10)
+                                    player.m_iComboMultiplier += 1;
+
                                     ((HexagonEnemy)enemy).shield1.m_Active = false;
                                     ((HexagonEnemy)enemy).shield2.m_Active = false;
                                 }
@@ -656,6 +678,11 @@ namespace Thro_Bot
                             {
                                 ui.playerHealth = player.m_iHealth;
                             }
+
+                            //Glitch the screen
+                            ui.glitchScreen = true;
+                            
+
                         }
                     }
                 }
@@ -807,13 +834,30 @@ namespace Thro_Bot
 
             if (gameTime.TotalGameTime - currentPowerUpTime > powerUpTimeSpan)
             {
-                currentPowerUpTime = gameTime.TotalGameTime;
+                
 
                 PowerUp powerUp = new HealthPowerUp();
-                powerUp.Initialize(powerUpTextures[0], new Vector2(random.Next(powerUpTextures[0].Width, WIDTH - powerUpTextures[0].Width), random.Next(200, HEIGHT - 200)));
-                powerUpsList.Add(powerUp);
-				ShowPickupSpawn (powerUp.m_Position);
+                if (!bossIsSpawned) {
+                    powerUp.Initialize(powerUpTextures[0], new Vector2(random.Next(powerUpTextures[0].Width, WIDTH - powerUpTextures[0].Width), random.Next(200, HEIGHT - 200)));
+                    currentPowerUpTime = gameTime.TotalGameTime;
+                    powerUpsList.Add(powerUp);
+                    ShowPickupSpawn(powerUp.m_Position);
+                }
+                else
+                {
+                    //The boss's radius
+                    float bossRadius = boss.Texture.Width / 2 + 40;
 
+                    Vector2 powerUpPos = new Vector2(random.Next(powerUpTextures[0].Width, WIDTH - powerUpTextures[0].Width), random.Next(200, HEIGHT - 200));
+
+                    if(Vector2.Distance(powerUpPos, new Vector2(GraphicsDevice.Viewport.TitleSafeArea.Width / 2, GraphicsDevice.Viewport.TitleSafeArea.Height / 2)) > bossRadius)
+                    {
+                        powerUp.Initialize(powerUpTextures[0], powerUpPos);
+                        currentPowerUpTime = gameTime.TotalGameTime;
+                        powerUpsList.Add(powerUp);
+                        ShowPickupSpawn(powerUp.m_Position);
+                    }
+                }
             }
         }
 
@@ -832,7 +876,7 @@ namespace Thro_Bot
 
                     if (player.m_iHealth < 100)
                     {
-                        player.m_iHealth += 20;
+                        player.m_iHealth += 10;
 
                         if (player.m_iHealth > 100)
                         {
@@ -840,7 +884,7 @@ namespace Thro_Bot
                         }
 
                     }
-                    ui.playerHealth = player.m_iHealth;
+                    ui.playerHealth = (int)player.m_iHealth;
                     powerUpsList[i].m_Active = false;
 					pickupHealthSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
 					ShowPickupHealth (powerUpsList[i].m_Position);
@@ -858,7 +902,7 @@ namespace Thro_Bot
         {
             bool collision = false;
             // Only check collision if projectile is released
-            if (!projectile.m_bInOrbitToPlayer)
+            if (!projectile.m_bInOrbitToPlayer && projectile.m_bActive)
             {
                 Rectangle powerUpRectangle;
                 powerUpRectangle = new Rectangle((int)powerUp.m_Position.X, (int)powerUp.m_Position.Y, powerUp.Texture.Width * 7 / 10, powerUp.Texture.Height * 6 / 10);
@@ -937,17 +981,7 @@ namespace Thro_Bot
                     edge = edge_normal;
                 }
 
-                if (projectile.m_iBounces > 3)
-                {
-                    activeParticleSystems.Remove(projectile.m_Trail);
-                    projectile = new Projectile();
-                    projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
-                    projectile.InitializeTrail(new List<Texture2D>() { projectileTrailTexture });
-                    activeParticleSystems.Add(projectile.m_Trail);
-                }
-
-
-                //Check is projectile has been launched, rotate it around its center
+            //Check is projectile has been launched, rotate it around its center
 
 
                 if (currentKeyboardState.IsKeyDown(Keys.Space))
@@ -1025,6 +1059,7 @@ namespace Thro_Bot
 
                 if (player.m_CurrentComboTime >= player.m_ComboCoolDown)
                 {
+
                     player.m_iComboMultiplier = 0;
                     player.m_bComboActive = false;
                     player.m_CurrentComboTime = TimeSpan.Zero;
@@ -1046,7 +1081,8 @@ namespace Thro_Bot
                 {
                     player.m_CurrentComboTime = TimeSpan.Zero;
                     player.m_bComboActive = true;
-                    player.m_iComboMultiplier += 1;
+                    if (player.m_iComboMultiplier < 10)
+                        player.m_iComboMultiplier += 1;
 
                     //Check if the projectile is not spinning
                     if (!projectile.selfRotate)
@@ -1072,11 +1108,13 @@ namespace Thro_Bot
                 {
 
                     //Check if the projectile is spinning
+
                     if (projectile.selfRotate)
                     {
                         player.m_CurrentComboTime = TimeSpan.Zero;
                         player.m_bComboActive = true;
-                        player.m_iComboMultiplier += 1;
+                        if (player.m_iComboMultiplier < 10)
+                            player.m_iComboMultiplier += 1;
                     }
 
                     else
@@ -1097,15 +1135,6 @@ namespace Thro_Bot
                         discHitEnemySnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
                         ShowBounce(projectile.m_Position, enemy.m_Color);
                     }
-
-                }
-
-                //Compare to orange hexagon
-                if (enemy.m_Type == EnemyBase.Type.Hexagon)
-                {
-                    player.m_CurrentComboTime = TimeSpan.Zero;
-                    player.m_bComboActive = true;
-                    player.m_iComboMultiplier += 1;
 
                 }
 
@@ -1247,6 +1276,9 @@ namespace Thro_Bot
             gamePaused = false;
             ui.score = 0;
             powerUpsList.Clear();
+            bossIsSpawned = false;
+            lazer = null;
+            bossCore = null;
         }
 
 
