@@ -85,6 +85,7 @@ namespace Thro_Bot
         ParticleSystemBase enemyDeathPS;
         ParticleSystemBase bouncePS;
 		ParticleSystemBase pickupHealthPS;
+		ParticleSystemBase pickupSpawnPS;
         List<ParticleSystemBase> activeParticleSystems;
 
         // Random
@@ -189,22 +190,28 @@ namespace Thro_Bot
                 0.02f, 0.1f);
 
             bouncePS = new ParticleSystemBase(0f, 0.5f, 5,
-                0.4f, 1.2f,
+                0.3f, 1f,
                 0.05f, 0.15f,
-                new Vector2(-2f, -2f), new Vector2(2f, 2f),
+                new Vector2(-3f, -3f), new Vector2(3f, 3f),
                 0.02f, 0.1f);
 
 			pickupHealthPS = new ParticleSystemBase (0f, 1f, 8,
-				1f, 2f,
+				0.8f, 1.6f,
 				0.25f, 0.5f,
-				new Vector2 (-4f, -4f), new Vector2 (4f, 4f),
+				new Vector2 (-2f, -2f), new Vector2 (2f, 2f),
 				0f, 0f, true, false);
 
+			pickupSpawnPS = new ParticleSystemBase (0f, 1f, 6,
+				0.8f, 1.6f,
+				0.2f, 0.4f,
+				new Vector2 (-4f, -4f), new Vector2 (4f, 4f),
+				0f, 0f, true, false);
 
             activeParticleSystems = new List<ParticleSystemBase>() {
                 enemyDeathPS,
                 bouncePS,
-				pickupHealthPS
+				pickupHealthPS,
+				pickupSpawnPS
             };
 
 
@@ -366,6 +373,7 @@ namespace Thro_Bot
                     {
                         lastBossTime = gameTime.TotalGameTime;
                         SpawnBoss();
+                        previousBossAnimationTime = gameTime.TotalGameTime;
                     }
                 } // Update Boss if spawned
                 else
@@ -478,65 +486,69 @@ namespace Thro_Bot
 
         private void CheckBossCollisions(EnemyBase enemy, GameTime gameTime)
         {
-            Rectangle enemyRectangle;
-            if (enemy.m_Type == EnemyBase.Type.Boss)
+            if (projectile.m_bActive)
             {
-                enemyRectangle = new Rectangle((int)enemy.m_Position.X - enemy.Texture.Width/2, (int)enemy.m_Position.Y - enemy.Texture.Height/2, enemy.Texture.Width, enemy.Texture.Height);
-            }
-            else
-            {
-                enemyRectangle = new Rectangle((int)enemy.m_Position.X, (int)enemy.m_Position.Y, enemy.Texture.Width * 7 / 10, enemy.Texture.Height * 6 / 10);
-            }
-            Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X - projectile.m_ProjectileTexture.Width / 2, (int)projectile.m_Position.Y - projectile.m_ProjectileTexture.Height / 2, projectile.m_ProjectileTexture.Width, projectile.m_ProjectileTexture.Height);
-            if (enemyRectangle.Intersects(projectileRectangle) && pixelCollision(enemy, projectile.m_ProjectileTexture, projectile.m_Position, Rectangle.Intersect(projectileRectangle, enemyRectangle)) && gameTime.TotalGameTime - previousBossCollision > bossCollisionTime)
-            {
-                previousBossCollision = gameTime.TotalGameTime;
+                Rectangle enemyRectangle;
                 if (enemy.m_Type == EnemyBase.Type.Boss)
                 {
-                    ((Boss)enemy).Health -= 10;
-                    ((Boss)enemy).SetColor(Color.White);                    
-                    activeParticleSystems.Remove(projectile.m_Trail);
-                    projectile = new Projectile();
-                    projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
-                    projectile.InitializeTrail(new List<Texture2D>() { projectileTrailTexture });
-                    if (((Boss)enemy).Health == 0)
+                    enemyRectangle = new Rectangle((int)enemy.m_Position.X - enemy.Texture.Width / 2, (int)enemy.m_Position.Y - enemy.Texture.Height / 2, enemy.Texture.Width, enemy.Texture.Height);
+                }
+                else
+                {
+                    enemyRectangle = new Rectangle((int)enemy.m_Position.X, (int)enemy.m_Position.Y, enemy.Texture.Width * 7 / 10, enemy.Texture.Height * 6 / 10);
+                }
+                Rectangle projectileRectangle = new Rectangle((int)projectile.m_Position.X - projectile.m_ProjectileTexture.Width / 2, (int)projectile.m_Position.Y - projectile.m_ProjectileTexture.Height / 2, projectile.m_ProjectileTexture.Width, projectile.m_ProjectileTexture.Height);
+                if (enemyRectangle.Intersects(projectileRectangle) && pixelCollision(enemy, projectile.m_ProjectileTexture, projectile.m_Position, Rectangle.Intersect(projectileRectangle, enemyRectangle)) && gameTime.TotalGameTime - previousBossCollision > bossCollisionTime)
+                {
+                    previousBossCollision = gameTime.TotalGameTime;
+                    if (enemy.m_Type == EnemyBase.Type.Boss)
                     {
-                        for (int i = 0; i < enemiesList.Count; i++)
+                        ((Boss)enemy).Health -= 10;
+                        ((Boss)enemy).SetColor(Color.White);
+                        activeParticleSystems.Remove(projectile.m_Trail);
+                        projectile = new Projectile();
+                        projectile.Initialize(projectileTexture, projectilePosition, Vector2.Zero);
+                        projectile.InitializeTrail(new List<Texture2D>() { projectileTrailTexture });
+                        if (((Boss)enemy).Health == 0)
                         {
-                            enemiesList[i].m_Active = false;
+                            for (int i = 0; i < enemiesList.Count; i++)
+                            {
+                                enemiesList[i].m_Active = false;
+                            }
                         }
-                        bossIsSpawned = false;
+                    }
+                    else
+                    {
+                        if (Math.Abs((previousProjectilePosition.X - projectile.m_Position.X)) > Math.Abs((previousProjectilePosition.Y - projectile.m_Position.Y)))
+                        {
+                            projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
+                        }
+                        else
+                        {
+                            projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
+                        }
                     }
                 }
                 else
                 {
-                    if (Math.Abs((previousProjectilePosition.X - projectile.m_Position.X)) > Math.Abs((previousProjectilePosition.Y - projectile.m_Position.Y)))
+                    if (enemy.m_Type == EnemyBase.Type.Boss)
                     {
-                        projectile.m_fProjectileSpeedX = -projectile.m_fProjectileSpeedX;
-                    }
-                    else
-                    {
-                        projectile.m_fProjectileSpeedY = -projectile.m_fProjectileSpeedY;
-                    }
-                }
-            }else
-            {
-                if (enemy.m_Type == EnemyBase.Type.Boss)
-                {
-                    if (((Boss)enemy).Health <= 90 && ((Boss)enemy).Health > 60)
-                    {
-                        ((Boss)enemy).SetColor(Color.Purple);
-                    }
-                    else if (((Boss)enemy).Health <= 60 && ((Boss)enemy).Health > 30)
-                    {
-                        ((Boss)enemy).SetColor(Color.YellowGreen);
-                    }
-                    else if (((Boss)enemy).Health <= 30)
-                    {
-                        ((Boss)enemy).SetColor(Color.Red);
-                    }else
-                    {
-                        ((Boss)enemy).SetColor(Color.Orange);
+                        if (((Boss)enemy).Health <= 90 && ((Boss)enemy).Health > 60)
+                        {
+                            ((Boss)enemy).SetColor(Color.Purple);
+                        }
+                        else if (((Boss)enemy).Health <= 60 && ((Boss)enemy).Health > 30)
+                        {
+                            ((Boss)enemy).SetColor(Color.YellowGreen);
+                        }
+                        else if (((Boss)enemy).Health <= 30)
+                        {
+                            ((Boss)enemy).SetColor(Color.Red);
+                        }
+                        else
+                        {
+                            ((Boss)enemy).SetColor(Color.Orange);
+                        }
                     }
                 }
             }
@@ -819,6 +831,7 @@ namespace Thro_Bot
                     powerUp.Initialize(powerUpTextures[0], new Vector2(random.Next(powerUpTextures[0].Width, WIDTH - powerUpTextures[0].Width), random.Next(200, HEIGHT - 200)));
                     currentPowerUpTime = gameTime.TotalGameTime;
                     powerUpsList.Add(powerUp);
+                    ShowPickupSpawn(powerUp.m_Position);
                 }
                 else
                 {
@@ -832,6 +845,7 @@ namespace Thro_Bot
                         powerUp.Initialize(powerUpTextures[0], powerUpPos);
                         currentPowerUpTime = gameTime.TotalGameTime;
                         powerUpsList.Add(powerUp);
+                        ShowPickupSpawn(powerUp.m_Position);
                     }
                 }
             }
@@ -1296,6 +1310,14 @@ namespace Thro_Bot
             bouncePS.SetTint(color);
             bouncePS.Emit();
         }
+
+		void ShowPickupSpawn (Vector2 pos) {
+			if (pickupSpawnPS.m_Sprites == null)
+				pickupSpawnPS.m_Sprites = new List<Texture2D>() { enemyPiecesList[4] };
+
+			pickupSpawnPS.m_Position = pos;
+			pickupSpawnPS.Emit();
+		}
 
 		void ShowPickupHealth (Vector2 pos) {
 			if (pickupHealthPS.m_Sprites == null)
