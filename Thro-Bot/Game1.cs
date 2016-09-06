@@ -21,6 +21,9 @@ namespace Thro_Bot
         //Represents the player
         Player player;
 
+        //Represents the GameScene
+        GameScene currentGameScene;
+
         //represents the projectile
         Projectile projectile;
         Vector2 projectilePosition;
@@ -182,6 +185,7 @@ namespace Thro_Bot
             ringLinePosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.92f));
             enemiesList = new List<EnemyBase>();
             powerUpsList = new List<PowerUp>();
+            currentGameScene = new GameScene();
 
             enemyDeathPS = new ParticleSystemBase(0f, 1f, 4,
                 0.5f, 1.5f,
@@ -263,7 +267,7 @@ namespace Thro_Bot
             ringLineTexture = Content.Load<Texture2D>("Graphics/Ring_Line");
             ringLineOrigin = new Vector2(ringLineTexture.Width / 2, ringLineTexture.Height / 2);
             ringLineRectangle = new Rectangle(0, 0, ringLineTexture.Width, ringLineTexture.Height);
-
+            
             // Load edge textures
             edge_normal = Content.Load<Texture2D>("Graphics/Edge_normal");
             edge_hit = Content.Load<Texture2D>("Graphics/Edge_Hit");
@@ -339,6 +343,21 @@ namespace Thro_Bot
             bossShieldTexture = Content.Load<Texture2D>("Graphics/Boss_Shield");
             bossCoreTexture = Content.Load<Texture2D>("Graphics/Boss_core");
             lazerTexture = Content.Load<Texture2D>("Graphics/Lazer");
+
+            //Load the GameScene textures
+            Vector2 playButtonPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.3f));
+            Vector2 credistButtonPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.6f));
+            Vector2 quitButtonPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.9f));
+            Vector2 backButtonPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.9f));
+            Vector2 mainMenuBackgroundPosition = new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.5f);
+            currentGameScene.InitializeButtons();
+            currentGameScene.m_PlayButton.InitializeButton(Content.Load<Texture2D>("Graphics/Play"), playButtonPosition);
+            currentGameScene.m_CreditsButton.InitializeButton(Content.Load<Texture2D>("Graphics/Credits"), credistButtonPosition);
+            currentGameScene.m_QuitButton.InitializeButton(Content.Load<Texture2D>("Graphics/Quit"), quitButtonPosition);
+            currentGameScene.m_BackButton.InitializeButton(Content.Load<Texture2D>("Graphics/Back"), backButtonPosition);
+            currentGameScene.m_MouseTexture = Content.Load<Texture2D>("Graphics/Cursor");
+            currentGameScene.InitializeBackground(Content.Load<Texture2D>("Graphics/MainMenuBackground"), mainMenuBackgroundPosition);
+            currentGameScene.m_CreditsFont = Content.Load<SpriteFont>("Fonts/Score");
         }
 
         /// <summary>
@@ -357,71 +376,82 @@ namespace Thro_Bot
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-            // Save the previous state of the keyboard 
-            previousKeyboardState = currentKeyboardState;
+            currentGameScene.Update();
 
-            //Read the current state
-            currentKeyboardState = Keyboard.GetState();
-            if (!gamePaused)
+            //Check the gamescene state
+            if (currentGameScene.CurrentGameState == GameScene.GameState.Playing)
             {
-                // Spawn Boss
-                if (gameTime.TotalGameTime - lastBossTime > bossSpawnDelay)
+
+                // Save the previous state of the keyboard 
+                previousKeyboardState = currentKeyboardState;
+
+                //Read the current state
+                currentKeyboardState = Keyboard.GetState();
+                if (!gamePaused)
                 {
-                    if (enemiesList.Count == 0)
+                    // Spawn Boss
+                    if (gameTime.TotalGameTime - lastBossTime > bossSpawnDelay)
                     {
-                        lastBossTime = gameTime.TotalGameTime;
-                        SpawnBoss(gameTime);
-                        previousBossAnimationTime = gameTime.TotalGameTime;
+                        if (enemiesList.Count == 0)
+                        {
+                            lastBossTime = gameTime.TotalGameTime;
+                            SpawnBoss(gameTime);
+                            previousBossAnimationTime = gameTime.TotalGameTime;
+                        }
+                    } // Update Boss if spawned
+                    else
+                    if (bossIsSpawned)
+                    {
+                        UpdateBoss(gameTime);
                     }
-                } // Update Boss if spawned
-                else
-                if (bossIsSpawned)
-                {
-                    UpdateBoss(gameTime);
+                    else
+                    {
+                        // Spawn enemies
+                        SpawnEnemies(gameTime);
+                    }
+                    //Spawn a power up
+                    SpawnPowerUps(gameTime);
                 }
-                else
+                //Update the player
+                UpdatePlayer(gameTime);
+                if (!gamePaused)
                 {
-                    // Spawn enemies
-                    SpawnEnemies(gameTime);
+                    //Update the projectile
+                    UpdateProjectile(gameTime);
+
+                    // Update enemy
+                    if (!bossIsSpawned)
+                    {
+                        UpdateEnemies(gameTime);
+                    }
+                    //Update powerUps
+                    UpdatePowerUps(gameTime);
                 }
-                //Spawn a power up
-                SpawnPowerUps(gameTime);
-            }
-            //Update the player
-            UpdatePlayer(gameTime);
-            if (!gamePaused)
+                //Update the UI
+                ui.Update(gameTime);
+
+                //Update the combo
+                UpdateCombo(gameTime);
+
+                // Update all particle systems
+                UpdateParticleSystems();
+
+                UpdateDamageFlash(gameTime);
+
+
+                if (player.finishedAnimation)
+                {
+
+                    //Freeze the game
+                    gameOver = true;
+                    gamePaused = true;
+                }
+            }//end of current gamescene check for playing state
+
+
+            if (currentGameScene.CurrentGameState == GameScene.GameState.Quit)
             {
-                //Update the projectile
-                UpdateProjectile(gameTime);
-
-                // Update enemy
-                if (!bossIsSpawned)
-                {
-                    UpdateEnemies(gameTime);
-                }
-                //Update powerUps
-                UpdatePowerUps(gameTime);
-            }
-            //Update the UI
-            ui.Update(gameTime);
-
-            //Update the combo
-            UpdateCombo(gameTime);
-
-            // Update all particle systems
-            UpdateParticleSystems();
-
-            UpdateDamageFlash(gameTime);
-
-
-            if (player.finishedAnimation)
-            {
-
-                //Freeze the game
-                gameOver = true;
-                gamePaused = true;
+                QuitGame();
             }
 
             base.Update(gameTime);
@@ -942,13 +972,13 @@ namespace Thro_Bot
             {
                 if (currentKeyboardState.IsKeyDown(Keys.N))
                 {
-                    Exit();
+                    currentGameScene.CurrentGameState = GameScene.GameState.MainMenu;
+                    ResetGame(gameTime);
                 }
                 else if (currentKeyboardState.IsKeyDown(Keys.Y))
                 {
 
                     ResetGame(gameTime);
-                    gamePaused = false;
 
                 }
 
@@ -956,6 +986,13 @@ namespace Thro_Bot
 
             }
         }
+
+
+        private void QuitGame() {
+
+            Exit();
+        }
+
 
         protected void UpdateProjectile(GameTime gameTime)
         {
@@ -1179,86 +1216,95 @@ namespace Thro_Bot
             //Start drawing
             spriteBatch.Begin();
 
-
-            //Draw the background
-            Rectangle sourceRectangle = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            spriteBatch.Draw(backgroundTexture, sourceRectangle, Color.White);
-
-            // Draw ring line            
-            spriteBatch.Draw(ringLineTexture, ringLinePosition, ringLineRectangle, Color.White, 0f, ringLineOrigin, 0.5f, SpriteEffects.None, 0f);
-
-            // Draw edge
-            Rectangle edgeRectangle = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            spriteBatch.Draw(edge, edgeRectangle, Color.White);
-
-            //Draw the Player
-            player.Draw(spriteBatch);
-
-            //Draw the projectile
-            projectile.Draw(spriteBatch);
-
-            //Draw the power ups
-            DrawPowerUps(spriteBatch);
-
-            //Draw enemies
-            DrawEnemies(spriteBatch);
-            // Draw boss shield
-            if (bossIsSpawned)
+            //Draw the game scene if the state is playing
+            if (currentGameScene.CurrentGameState == GameScene.GameState.Playing)
             {
-                //bossShield.Draw(spriteBatch);
-                if (bossCore != null)
+
+                //Draw the background
+                Rectangle sourceRectangle = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+                spriteBatch.Draw(backgroundTexture, sourceRectangle, Color.White);
+
+                // Draw ring line            
+                spriteBatch.Draw(ringLineTexture, ringLinePosition, ringLineRectangle, Color.White, 0f, ringLineOrigin, 0.5f, SpriteEffects.None, 0f);
+
+                // Draw edge
+                Rectangle edgeRectangle = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+                spriteBatch.Draw(edge, edgeRectangle, Color.White);
+
+                //Draw the Player
+                player.Draw(spriteBatch);
+
+                //Draw the projectile
+                projectile.Draw(spriteBatch);
+
+                //Draw the power ups
+                DrawPowerUps(spriteBatch);
+
+                //Draw enemies
+                DrawEnemies(spriteBatch);
+                // Draw boss shield
+                if (bossIsSpawned)
                 {
-                    bossCore.Draw(spriteBatch);
+                    //bossShield.Draw(spriteBatch);
+                    if (bossCore != null)
+                    {
+                        bossCore.Draw(spriteBatch);
+                    }
+                    if (lazer != null)
+                    {
+                        lazer.Draw(spriteBatch);
+                    }
                 }
-                if (lazer != null)
+                DrawParticleSystems(spriteBatch);
+
+                if (player.m_bComboActive && player.m_iComboMultiplier > 1)
                 {
-                    lazer.Draw(spriteBatch);
+                    //Draw the combo indicator
+                    spriteBatch.DrawString(ui.comboFont, "Combo: x" + player.m_iComboMultiplier.ToString(), new Vector2(250, 490), Color.White);
+
+                    //Draw the multiplier 
+                    spriteBatch.DrawString(ui.scoreFont, "x" + player.m_iComboMultiplier.ToString(), lastKilledEnemy.m_Position, Color.White);
                 }
-            }
-            DrawParticleSystems(spriteBatch);
 
-            if (player.m_bComboActive && player.m_iComboMultiplier > 1)
-            {
-                //Draw the combo indicator
-                spriteBatch.DrawString(ui.comboFont, "Combo: x" + player.m_iComboMultiplier.ToString(), new Vector2(250, 490), Color.White);
+                //Draw ui
+                ui.Draw(spriteBatch);
 
-                //Draw the multiplier 
-                spriteBatch.DrawString(ui.scoreFont, "x" + player.m_iComboMultiplier.ToString(), lastKilledEnemy.m_Position, Color.White);
-            }
-
-            //Draw ui
-            ui.Draw(spriteBatch);
-
-            //Draw the score
-            spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(78, 40), Color.White);
+                //Draw the score
+                spriteBatch.DrawString(ui.scoreFont, ui.score.ToString(), new Vector2(78, 40), Color.White);
 
 
 
 
-            //Draw the player health
-            spriteBatch.DrawString(ui.healthFont, ui.playerHealth.ToString() + "%", new Vector2(680, 35), Color.White);
+                //Draw the player health
+                spriteBatch.DrawString(ui.healthFont, ui.playerHealth.ToString() + "%", new Vector2(680, 35), Color.White);
 
-            //Draw the damage rectangle
-            Rectangle damageRectangle = new Rectangle(0, 0, playerDamageTexture.Width, playerDamageTexture.Height);
-            Vector2 origin = new Vector2(playerDamageTexture.Width / 2, playerDamageTexture.Height / 2);
-            Vector2 position = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height - 200);
+                //Draw the damage rectangle
+                Rectangle damageRectangle = new Rectangle(0, 0, playerDamageTexture.Width, playerDamageTexture.Height);
+                Vector2 origin = new Vector2(playerDamageTexture.Width / 2, playerDamageTexture.Height / 2);
+                Vector2 position = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height - 200);
 
-            //Draw the flash damage
-            if (flashDamage)
-            {
-                spriteBatch.Draw(playerDamageTexture, position, damageRectangle, Color.Red, 0f, origin, 1f, SpriteEffects.None, 0f);
-            }
+                //Draw the flash damage
+                if (flashDamage)
+                {
+                    spriteBatch.Draw(playerDamageTexture, position, damageRectangle, Color.Red, 0f, origin, 1f, SpriteEffects.None, 0f);
+                }
 
-            //Draw the game over screen
-            if (player.finishedAnimation)
-            {
+                //Draw the game over screen
+                if (player.finishedAnimation)
+                {
 
-                //Draw the combo indicator
-                spriteBatch.DrawString(ui.gameOverFont, "Replay Y/N?", new Vector2(GraphicsDevice.Viewport.Width / 2 - 200, GraphicsDevice.Viewport.Height / 2 - 20), Color.White);
-                player.m_bComboActive = false;
+                    //Draw the combo indicator
+                    spriteBatch.DrawString(ui.gameOverFont, "Replay Y/N?", new Vector2(GraphicsDevice.Viewport.Width / 2 - 200, GraphicsDevice.Viewport.Height / 2 - 20), Color.White);
+                    player.m_bComboActive = false;
 
-                //playerDeath.Play();
+                    //playerDeath.Play();
 
+                }
+
+            }//end of checking if playing
+
+            else {
+                currentGameScene.Draw(spriteBatch);
             }
 
             //Stop drawing

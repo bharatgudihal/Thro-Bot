@@ -77,11 +77,13 @@
     <Compile Include="BossShield.cs" />
     <Compile Include="EnemyBase.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="GameScene.cs" />
     <Compile Include="HealthPowerUp.cs" />
     <Compile Include="HexagonEnemy.cs" />
     <Compile Include="Lazer.cs" />
     <Compile Include="LinearTriangleEnemy.cs" />
     <Compile Include="ListExtension.cs" />
+    <Compile Include="MenuButton.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleSystemBase.cs" />
     <Compile Include="Player.cs" />

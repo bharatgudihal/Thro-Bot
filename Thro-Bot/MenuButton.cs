@@ -15,7 +15,7 @@ namespace Thro_Bot
         public enum ButtonState
         {
             Unpressed,
-            Pressed,
+            Hover,
             Clicked
 
         }
@@ -33,8 +33,13 @@ namespace Thro_Bot
         Vector2 m_ButtonOrigin;
 
         //The rectangle to draw the button
-        Rectangle m_ButtonRec;
+        public Rectangle m_ButtonRec;
 
+        //The rectangle to detect collision the button
+        public Rectangle m_ButtonRecCol;
+
+        //The color of the button
+        public Color m_ButtonColor = Color.White;
 
 
         //Initialize the button
@@ -53,10 +58,42 @@ namespace Thro_Bot
             //Set the rect of the button
             m_ButtonRec = new Rectangle(0,0, m_TextureButton.Width, m_TextureButton.Height);
 
+            //Set the collision rectangle
+            m_ButtonRecCol = new Rectangle((int)m_ButtonPosition.X - m_TextureButton.Width/2, (int)m_ButtonPosition.Y - m_TextureButton.Height / 2, m_TextureButton.Width, m_TextureButton.Height);
+
+        }
+
+        public void Update()
+        {
+            //Check the current state of the button
+            if (currentButtonState.Equals(ButtonState.Unpressed))
+            {
+                m_ButtonColor = Color.White;
+
+            }
+
+            else if (currentButtonState.Equals(ButtonState.Hover))
+            {
+                m_ButtonColor = Color.CornflowerBlue;
+
+            }
+
+            else if (currentButtonState.Equals(ButtonState.Clicked))
+            {
+                m_ButtonColor = Color.Red;
+
+            }
+
         }
 
 
 
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            
+            spriteBatch.Draw(m_TextureButton, m_ButtonPosition, m_ButtonRec, m_ButtonColor, 0f, m_ButtonOrigin, 1f, SpriteEffects.None, 0f);
 
-    }
+        }
+
+   }
 }
