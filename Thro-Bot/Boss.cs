@@ -93,7 +93,7 @@ namespace Thro_Bot
         public override void Initialize(Texture2D texture, Vector2 position)
         {
             base.Initialize(texture, position);
-            m_Origin = m_Center;
+           m_Origin = m_Center;
         }
 
         public void SetBossShield(ref BossShield[] shields)
