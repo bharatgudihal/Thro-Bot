@@ -86,6 +86,7 @@ namespace Thro_Bot
         ParticleSystemBase bouncePS;
 		ParticleSystemBase pickupHealthPS;
 		ParticleSystemBase pickupSpawnPS;
+		ParticleSystemBase bossHurtPS;
         List<ParticleSystemBase> activeParticleSystems;
 
         // Random
@@ -213,11 +214,18 @@ namespace Thro_Bot
 				new Vector2 (-4f, -4f), new Vector2 (4f, 4f),
 				0f, 0f, true, false);
 
+			bossHurtPS = new ParticleSystemBase (0f, 1f, 8,
+				0.6f, 1.2f,
+				0.06f, 0.4f,
+				new Vector2 (-3f, -3f), new Vector2 (3f, 3f),
+				0.03f, 0.12f);
+
             activeParticleSystems = new List<ParticleSystemBase>() {
                 enemyDeathPS,
                 bouncePS,
 				pickupHealthPS,
-				pickupSpawnPS
+				pickupSpawnPS,
+				bossHurtPS
             };
 
 
@@ -457,6 +465,7 @@ namespace Thro_Bot
                 // If boss is killed, clear the list
                 if (!enemiesList[0].m_Active)
                 {
+					bossIdleLoop.Pause();
                     enemiesList.Clear();
                     lastBossTime = gameTime.TotalGameTime;
                 }
@@ -471,6 +480,7 @@ namespace Thro_Bot
 				}
 				if (laserCharge.State != SoundState.Playing) {
 					laserCharge.Play();
+					boss.SetOpacity (0.5f);
 				}
             }
             else
@@ -505,6 +515,7 @@ namespace Thro_Bot
                     }
                     else
                     {
+						boss.SetOpacity (1f);
                         // Stop animation and reset boss state
                         currentCoreTime = TimeSpan.Zero;
                         bossAnimationStarted = false;     
@@ -1359,6 +1370,18 @@ namespace Thro_Bot
 				(enemy.m_Type == EnemyBase.Type.Boss ? Vector2.Zero : enemy.m_Center);
             enemyDeathPS.SetTint(enemy.m_Color);
             enemyDeathPS.Emit(8);
+
+            enemyDeathSnd.Play(0.8f, random.RandomFloat(-0.1f, 0.1f), 0f);
+        }
+
+		void ShowBossHurt(Vector2 pos)
+        {
+            if (bossHurtPS.m_Sprites == null)
+                bossHurtPS.m_Sprites = enemyPiecesList;
+
+            bossHurtPS.m_Position = pos;
+            enemyDeathPS.SetTint(boss.m_Color);
+            enemyDeathPS.Emit();
 
             enemyDeathSnd.Play(0.8f, random.RandomFloat(-0.1f, 0.1f), 0f);
         }
