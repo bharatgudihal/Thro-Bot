@@ -531,7 +531,10 @@ namespace Thro_Bot
                         //Cap the maximum health to lose
                         if (player.m_iHealth >= 0f)
                         {
-                            ui.playerHealth = (int)player.m_iHealth;
+                            ui.playerHealth = (int)player.m_iHealth%10 == 0 ? (int)player.m_iHealth : (int)player.m_iHealth - (int)player.m_iHealth % 10;
+                           
+
+
                         }
                     }
                     else
@@ -1324,7 +1327,7 @@ namespace Thro_Bot
 
 
                 //Draw the player health
-                spriteBatch.DrawString(ui.healthFont, ui.playerHealth.ToString() + "%", new Vector2(680, 35), Color.White);
+                spriteBatch.DrawString(ui.healthFont, (int)ui.playerHealth + "%", new Vector2(680, 35), Color.White);
 
                 //Draw the damage rectangle
                 Rectangle damageRectangle = new Rectangle(0, 0, playerDamageTexture.Width, playerDamageTexture.Height);

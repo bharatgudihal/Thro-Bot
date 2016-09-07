@@ -41,5 +41,9 @@
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/PickupHealth.wav</File>
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/HealthEffect.png</File>
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Glitch.png</File>
+    <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/BackgroundDark.png</File>
+    <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/LaserShootLoop.wav</File>
+    <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/BossIdle.wav</File>
+    <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/LaserCharge.wav</File>
   </SourceFiles>
 </SourceFileCollection>

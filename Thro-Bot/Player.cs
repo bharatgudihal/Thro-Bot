@@ -121,7 +121,7 @@ namespace Thro_Bot
         {
 
 
-            if (m_iHealth <= 0)
+            if (m_iHealth < 10)
             {
                 m_fRotation = 0;
                 deathAnimationActivate = true;
