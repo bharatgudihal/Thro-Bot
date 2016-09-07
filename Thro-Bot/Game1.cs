@@ -759,7 +759,7 @@ namespace Thro_Bot
                             //Cap the maximum health to lose
                             if (player.m_iHealth >= 0f)
                             {
-                                ui.playerHealth = player.m_iHealth;
+                                ui.playerHealth = (int)player.m_iHealth % 10 == 0 ? (int)player.m_iHealth : (int)player.m_iHealth - (int)player.m_iHealth % 10;
                             }
 
                             //Glitch the screen
@@ -967,7 +967,7 @@ namespace Thro_Bot
                         }
 
                     }
-                    ui.playerHealth = (int)player.m_iHealth;
+                    ui.playerHealth = (int)player.m_iHealth % 10 == 0 ? (int)player.m_iHealth : (int)player.m_iHealth - (int)player.m_iHealth % 10;
                     powerUpsList[i].m_Active = false;
 					pickupHealthSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
 					ShowPickupHealth (powerUpsList[i].m_Position + powerUpsList[i].m_Origin);
