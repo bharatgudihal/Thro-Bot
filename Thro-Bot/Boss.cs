@@ -105,6 +105,13 @@ namespace Thro_Bot
         {
             tempColor = color;
         }
+
+		public override void SetOpacity (float opacity) {
+			base.SetOpacity (opacity);
+			for (int i=0; i<Shields.Length; i++) {
+				Shields[i].SetOpacity (opacity);
+			}
+		}
         
     }
 
