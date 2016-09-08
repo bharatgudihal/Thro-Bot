@@ -462,8 +462,8 @@ namespace Thro_Bot
                 if (player.finishedAnimation)
                 {
 
-                   // if (!gameOver)
-                     //   playerDeath.Play();
+                    if (!gameOver)
+                        playerDeath.Play();
 
                     //Freeze the game
                     gameOver = true;
@@ -1363,6 +1363,9 @@ namespace Thro_Bot
                     //Draw the combo indicator
                     spriteBatch.DrawString(ui.gameOverFont, "Replay Y/N?", new Vector2(GraphicsDevice.Viewport.Width / 2 - 200, GraphicsDevice.Viewport.Height / 2 - 20), Color.White);
                     player.m_bComboActive = false;
+
+                    //Turn of the boss laser if the game ends
+                    if(laserShootLoop != null)
                     laserShootLoop.Pause();
                    
                 }
