@@ -36,6 +36,19 @@ namespace Thro_Bot
         //The source rectangle of the background of the main menu
         Rectangle m_MainMenuBackRec;
 
+
+        //Title
+        Texture2D m_GameTitle;
+
+        //Title position
+        Vector2 m_GameTitlePosition;
+
+        //The origin of the Game Title
+        Vector2 m_GameTitleOrigin;
+
+        //The source rectangle of the game title
+        Rectangle m_GameTitleRec;
+
         //The play Button
         public MenuButton m_PlayButton;
 
@@ -80,6 +93,23 @@ namespace Thro_Bot
             //Set the rectangle of the background
             m_MainMenuBackRec = new Rectangle(0, 0, m_MainMenuBackground.Width, m_MainMenuBackground.Height);
         }
+
+        public void InitializeGameTitle(Texture2D texture, Vector2 position)
+        {
+
+            //Set up the game title Texture
+            m_GameTitle = texture;
+
+            //Set up the position
+            m_GameTitlePosition = position;
+
+            //Set up the origin
+            m_GameTitleOrigin = new Vector2(m_GameTitle.Width / 2, m_GameTitle.Height / 2);
+
+            //Set the rectangle of the background
+            m_GameTitleRec = new Rectangle(0, 0, m_GameTitle.Width, m_GameTitle.Height);
+        }
+
 
         public void InitializeButtons() {
             m_PlayButton = new MenuButton();
@@ -189,7 +219,10 @@ namespace Thro_Bot
             if (CurrentGameState == GameState.MainMenu)
             {
                 //Draw the background
-                spriteBatch.Draw(m_MainMenuBackground, m_MainMenuBackPosition, m_MainMenuBackRec, Color.White, 0f, m_MainMenuBackOrigin, 0.7f, SpriteEffects.None, 0f);
+                spriteBatch.Draw(m_MainMenuBackground, m_MainMenuBackPosition, m_MainMenuBackRec, Color.White, 0f, m_MainMenuBackOrigin, 0.85f, SpriteEffects.None, 0f);
+
+                //Draw the title
+                spriteBatch.Draw(m_GameTitle, m_GameTitlePosition, m_GameTitleRec, Color.White, 0f, m_GameTitleOrigin, 1f, SpriteEffects.None, 0f);
 
                 //Draw the buttons
                 m_PlayButton.Draw(spriteBatch);
@@ -205,7 +238,10 @@ namespace Thro_Bot
             {
 
                 //Draw the background
-                spriteBatch.Draw(m_MainMenuBackground, m_MainMenuBackPosition, m_MainMenuBackRec, Color.White, 0f, m_MainMenuBackOrigin, 0.7f, SpriteEffects.None, 0f);
+                spriteBatch.Draw(m_MainMenuBackground, m_MainMenuBackPosition, m_MainMenuBackRec, Color.White, 0f, m_MainMenuBackOrigin, 0.85f, SpriteEffects.None, 0f);
+
+                //Draw the title
+                spriteBatch.Draw(m_GameTitle, m_GameTitlePosition, m_GameTitleRec, Color.White, 0f, m_GameTitleOrigin, 1f, SpriteEffects.None, 0f);
 
                 //Draw the back button
                 m_BackButton.Draw(spriteBatch);
@@ -213,7 +249,7 @@ namespace Thro_Bot
                 //Draw the mouse
                 spriteBatch.Draw(m_MouseTexture, m_MousePositionVect, new Rectangle(0, 0, m_MouseTexture.Width, m_MouseTexture.Height), Color.White, 0f, new Vector2(m_MouseTexture.Width / 2, m_MouseTexture.Height / 2), 0.1f, SpriteEffects.None, 0f);
 
-                spriteBatch.DrawString(m_CreditsFont, "     Producer\n Jaxon Whittaker\n\n     Artist\n  Lalitha Gunda\n\n     Artist\n  Ruohan Tang\n\n Technical Artist\n   Aaron Desin\n\n     Engineer\n  Bharat Gudihal\n\n     Engineer\nJean-Paul Peschard\n\n", new Vector2(140,160), Color.White);
+                spriteBatch.DrawString(m_CreditsFont, "     Producer\n Jaxon Whittaker\n\n     Artist\n  Lalitha Gunda\n\n     Artist\n  Ruohan Tang\n\n Technical Artist\n   Aaron Desin\n\n     Engineer\n  Bharat Gudihal\n\n     Engineer\nJean-Paul Peschard\n\n", new Vector2(140,200), Color.White);
 
             }
 

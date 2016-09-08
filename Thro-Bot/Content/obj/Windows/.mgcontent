@@ -45,5 +45,10 @@
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/LaserShootLoop.wav</File>
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/BossIdle.wav</File>
     <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/LaserCharge.wav</File>
+    <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Thro-BotTitle.png</File>
+    <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Credits.png</File>
+    <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Quit.png</File>
+    <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/MainMenuBackground.png</File>
+    <File>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Play.png</File>
   </SourceFiles>
 </SourceFileCollection>

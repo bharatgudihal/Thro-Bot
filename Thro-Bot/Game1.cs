@@ -364,6 +364,7 @@ namespace Thro_Bot
             Vector2 quitButtonPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.9f));
             Vector2 backButtonPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.9f));
             Vector2 mainMenuBackgroundPosition = new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.5f);
+            Vector2 gameTitlePosition = new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.1f);
             currentGameScene.InitializeButtons();
             currentGameScene.m_PlayButton.InitializeButton(Content.Load<Texture2D>("Graphics/Play"), playButtonPosition);
             currentGameScene.m_CreditsButton.InitializeButton(Content.Load<Texture2D>("Graphics/Credits"), credistButtonPosition);
@@ -371,6 +372,7 @@ namespace Thro_Bot
             currentGameScene.m_BackButton.InitializeButton(Content.Load<Texture2D>("Graphics/Back"), backButtonPosition);
             currentGameScene.m_MouseTexture = Content.Load<Texture2D>("Graphics/Cursor");
             currentGameScene.InitializeBackground(Content.Load<Texture2D>("Graphics/MainMenuBackground"), mainMenuBackgroundPosition);
+            currentGameScene.InitializeGameTitle(Content.Load<Texture2D>("Graphics/Thro-BotTitle"), gameTitlePosition);
             currentGameScene.m_CreditsFont = Content.Load<SpriteFont>("Fonts/Score");
 
             bossIdleSnd = Content.Load<SoundEffect>("Sounds/BossIdle");
@@ -460,8 +462,8 @@ namespace Thro_Bot
                 if (player.finishedAnimation)
                 {
 
-                    if (!gameOver)
-                        playerDeath.Play();
+                   // if (!gameOver)
+                     //   playerDeath.Play();
 
                     //Freeze the game
                     gameOver = true;
