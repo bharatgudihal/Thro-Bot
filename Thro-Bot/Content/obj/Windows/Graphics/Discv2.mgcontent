@@ -3,11 +3,11 @@
   <SourceFile>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Graphics/Discv2.png</SourceFile>
   <SourceTime>2016-08-29T20:12:01.1233434-06:00</SourceTime>
   <DestFile>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/bin/Windows/Graphics/Discv2.xnb</DestFile>
-  <DestTime>2016-09-06T14:39:48.1776816-06:00</DestTime>
+  <DestTime>2016-09-24T14:22:18.8084511-06:00</DestTime>
   <Importer>TextureImporter</Importer>
-  <ImporterTime>2016-03-30T00:36:08-06:00</ImporterTime>
+  <ImporterTime>2016-09-20T09:48:50-06:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
-  <ProcessorTime>2016-03-30T00:36:08-06:00</ProcessorTime>
+  <ProcessorTime>2016-09-20T09:48:50-06:00</ProcessorTime>
   <Parameters>
     <Key>ColorKeyColor</Key>
     <Value>255,0,255,255</Value>

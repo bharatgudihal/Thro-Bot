@@ -24,6 +24,9 @@ namespace Thro_Bot
         //Represents the GameScene
         GameScene currentGameScene;
 
+        //Represents the game tutorial
+        Tutorial tutorial;
+
         //represents the projectile
         Projectile projectile;
         Vector2 projectilePosition;
@@ -97,6 +100,10 @@ namespace Thro_Bot
 
         TimeSpan collisionTime = TimeSpan.FromSeconds(0.1);
         TimeSpan previousCollisionTime = TimeSpan.Zero;
+
+        TimeSpan waitTime = TimeSpan.FromSeconds(2);
+        TimeSpan currentTutorialTime = TimeSpan.Zero;
+        bool constantLoop = false;
 
         // Screen resolution
         const int WIDTH = 750;
@@ -193,6 +200,7 @@ namespace Thro_Bot
             enemiesList = new List<EnemyBase>();
             powerUpsList = new List<PowerUp>();
             currentGameScene = new GameScene();
+            tutorial = new Tutorial();
 
             enemyDeathPS = new ParticleSystemBase(0f, 1f, 4,
                 0.5f, 1.5f,
@@ -360,14 +368,16 @@ namespace Thro_Bot
 
             //Load the GameScene textures
             Vector2 playButtonPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.3f));
-            Vector2 credistButtonPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.6f));
+            Vector2 creditsButtonPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.5f));
+            Vector2 tutorialButtonPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.7f));
             Vector2 quitButtonPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.9f));
             Vector2 backButtonPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X + (GraphicsDevice.Viewport.Width * 0.5f), GraphicsDevice.Viewport.TitleSafeArea.Y + (GraphicsDevice.Viewport.Height * 0.9f));
             Vector2 mainMenuBackgroundPosition = new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.5f);
             Vector2 gameTitlePosition = new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.1f);
             currentGameScene.InitializeButtons();
             currentGameScene.m_PlayButton.InitializeButton(Content.Load<Texture2D>("Graphics/Play"), playButtonPosition);
-            currentGameScene.m_CreditsButton.InitializeButton(Content.Load<Texture2D>("Graphics/Credits"), credistButtonPosition);
+            currentGameScene.m_CreditsButton.InitializeButton(Content.Load<Texture2D>("Graphics/Credits"), creditsButtonPosition);
+            currentGameScene.m_TutorialButton.InitializeButton(Content.Load<Texture2D>("Graphics/Credits"), tutorialButtonPosition);
             currentGameScene.m_QuitButton.InitializeButton(Content.Load<Texture2D>("Graphics/Quit"), quitButtonPosition);
             currentGameScene.m_BackButton.InitializeButton(Content.Load<Texture2D>("Graphics/Back"), backButtonPosition);
             currentGameScene.m_MouseTexture = Content.Load<Texture2D>("Graphics/Cursor");
@@ -399,7 +409,24 @@ namespace Thro_Bot
             currentGameScene.Update();
 
             //Check the gamescene state
-            if (currentGameScene.CurrentGameState == GameScene.GameState.Playing)
+            if (currentGameScene.CurrentGameState == GameScene.GameState.Tutorial)
+            {
+                // Save the previous state of the keyboard 
+                previousKeyboardState = currentKeyboardState;
+
+                //Read the current state
+                currentKeyboardState = Keyboard.GetState();
+
+               
+
+                //Update the tutorial
+                UpdateTutorial(gameTime);
+
+
+            }
+
+                //Check the gamescene state
+                if (currentGameScene.CurrentGameState == GameScene.GameState.Playing)
             {
 
                 // Save the previous state of the keyboard 
@@ -785,6 +812,113 @@ namespace Thro_Bot
             }
         }
 
+        private void UpdateEnemiesTutorial(GameTime gameTime)
+        {
+            for (int i = 0; i < enemiesList.Count; i++)
+            {
+                EnemyBase enemy = enemiesList[i];
+                if (enemy.m_Active)
+                {
+                    enemy.Update(gameTime);
+                    if (CheckCollisionWithProjectile(enemy, gameTime))
+                    {
+                        ShowBounce(projectile.m_Position + projectile.m_ProjectileOrigin, enemy.m_Color);
+
+                        if (enemy.GetType() != typeof(Shield))
+                        {
+                            if ((enemy.m_Type == EnemyBase.Type.SquigglyTriangle))
+                            {
+
+                                if (!projectile.selfRotate)
+                                {
+                                    enemy.m_Active = true;
+                                }
+                                else
+                                {
+                                    enemy.m_Active = false;
+                                }
+                            }
+                            else
+                            {
+                                
+                                
+                            
+
+                            if (tutorial.m_successCounter == 2)
+                            {
+                                    enemy.m_Active = false;
+                                    tutorial.m_bSequenceSuccessful = true;
+                            }
+
+                            if (tutorial.m_successCounter == 3)
+                            {
+                                    if (!projectile.selfRotate)
+                                    {
+                                        enemy.m_Active = false;
+                                        tutorial.m_bSequenceSuccessful = false;
+                                    }
+                                    else
+                                    {
+                                        enemy.m_Active = false;
+                                        tutorial.m_bSequenceSuccessful = true;
+                                    }
+                            }
+
+
+                            }
+                        }
+                        
+
+
+                    }
+                    else if (CheckCollisionWithPlayerShield(enemy))
+                    {
+                        enemy.m_Active = false;
+                        tutorial.m_bSpawnedSequence = false;
+                        tutorial.m_bSequenceSuccessful = false;
+    }
+                }
+                else
+                {
+                    //Forward to the next tutorial state
+                    currentTutorialTime = waitTime;
+                    tutorial.tutorialState = Tutorial.Action.Hide;
+
+                    if (tutorial.m_successCounter == 2 || tutorial.m_successCounter == 3)
+                    {
+                        tutorial.m_bPauseGame = false;
+                        constantLoop = false;
+                        currentTutorialTime = TimeSpan.Zero;
+                        waitTime = TimeSpan.FromSeconds(5);
+                        tutorial.m_bSpawnedSequence = false;
+
+                        //Return the projectile to the player
+                        projectile.m_bActive = false;
+                        recallDiscSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
+                        projectile.m_ProjectileColor = Color.Gray;
+                        projectile.m_Trail.SetAllTint(Color.Gray);
+                    }
+
+
+                    if (tutorial.m_bSequenceSuccessful)
+                    {
+                        tutorial.m_successCounter++;
+                        tutorial.m_bSequenceSuccessful = false;
+                    }
+
+                    enemy.Kill();
+                    lastKilledEnemy = enemiesList[i];
+                    enemiesList.RemoveAt(i);
+                    enemyDeath.Play();
+                }
+
+            }
+        }
+
+
+
+
+
         private bool CheckCollisionWithPlayerShield(EnemyBase enemy)
         {
             bool collision = false;
@@ -916,6 +1050,46 @@ namespace Thro_Bot
             }
         }
 
+        private void SpawnGreenEnemy(GameTime gameTime)
+        {
+            EnemyBase enemy = null;
+            enemy = new LinearTriangleEnemy();
+            enemy.Initialize(enemyTextures[0], new Vector2(WIDTH/2, 0));
+            if (null != enemy)
+            {
+                enemy.onDeath += new EnemyBase.EnemyEventHandler(ShowEnemyDeath);
+                enemiesList.Add(enemy);
+            }
+            tutorial.m_bSpawnedSequence = true;
+        }
+
+        private void SpawnTwoGreenEnemy(GameTime gameTime)
+        {
+
+
+
+            EnemyBase enemy1 = null;
+            EnemyBase enemy2 = null;
+            enemy1 = new LinearTriangleEnemy();
+            enemy2 = new LinearTriangleEnemy();
+            enemy1.Initialize(enemyTextures[0], new Vector2(WIDTH / 2, 0));
+            enemy2.Initialize(enemyTextures[0], new Vector2(WIDTH / 2, -200));
+            if (null != enemy1)
+            {
+                enemy1.onDeath += new EnemyBase.EnemyEventHandler(ShowEnemyDeath);
+                enemiesList.Add(enemy1);
+            }
+
+            if (null != enemy2)
+            {
+                enemy2.onDeath += new EnemyBase.EnemyEventHandler(ShowEnemyDeath);
+                enemiesList.Add(enemy2);
+            }
+
+            tutorial.m_bSpawnedSequence = true;
+        }
+
+
 
         private void SpawnPowerUps(GameTime gameTime)
         {
@@ -1044,10 +1218,182 @@ namespace Thro_Bot
             }
         }
 
+        private void UpdatePlayerTutorial(GameTime gameTime)
+        {
+            //Check the case where the space bar is pressed
+            if (previousKeyboardState.IsKeyUp(Keys.Space) && currentKeyboardState.IsKeyDown(Keys.Space))
+            {
+                //Launch the projectile
+                projectile.m_bInOrbitToPlayer = false;
+                throwDiscSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
+            }
+        }
+
+
 
         private void QuitGame() {
 
             Exit();
+        }
+
+        protected void UpdateTutorial(GameTime gameTime)
+        {
+
+            tutorial.Update(gameTime);
+
+            currentTutorialTime += gameTime.ElapsedGameTime;
+
+            if (currentTutorialTime < waitTime)
+            {
+                //Update the projectile
+                UpdateProjectile(gameTime);
+
+
+                //to change the stamina
+                if (tutorial.m_successCounter < 3)
+                {
+                    ui.m_staminaAmount = 0.0f;
+
+                }
+                else {
+                    ui.m_staminaAmount = 100.0f;
+                }
+
+                //UPdate the ui to change the stamina of the projectile
+                ui.Update(gameTime);
+
+                //The states to spawn enemies
+                if (tutorial.m_successCounter == 2 && !tutorial.m_bSpawnedSequence)
+                {
+                    
+                    SpawnGreenEnemy(gameTime);
+                }
+
+                else if (tutorial.m_successCounter == 3 && !tutorial.m_bSpawnedSequence)
+                {
+
+                    SpawnGreenEnemy(gameTime);
+                }
+
+                else if (tutorial.m_successCounter == 4 && !tutorial.m_bSpawnedSequence)
+                {
+
+                    SpawnTwoGreenEnemy(gameTime);
+                }
+
+                UpdateEnemiesTutorial(gameTime);
+
+            }
+
+            else {
+                //Went past the wait time
+                tutorial.m_bPauseGame = true;
+
+
+                //Teach the player to release the projectile
+                if (tutorial.m_successCounter == 0)
+                {
+                    tutorial.tutorialState = Tutorial.Action.ReleaseProjectile;
+
+                    if (previousKeyboardState.IsKeyUp(Keys.Space) && currentKeyboardState.IsKeyDown(Keys.Space))
+                    {
+                        tutorial.tutorialState = Tutorial.Action.Hide;
+                        tutorial.m_bPauseGame = false;
+                        currentTutorialTime = TimeSpan.Zero;
+
+                        //Launch the projectile
+                        projectile.m_bInOrbitToPlayer = false;
+                        throwDiscSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
+
+                        tutorial.m_successCounter++;
+                    }
+
+                }
+
+                //Teach the player to recall the projectile
+                else if (tutorial.m_successCounter == 1)
+                {
+                    tutorial.tutorialState = Tutorial.Action.Recall;
+
+                    if (currentKeyboardState.IsKeyDown(Keys.R))
+                    {
+                        tutorial.tutorialState = Tutorial.Action.Hide;
+                        tutorial.m_bPauseGame = false;
+                        currentTutorialTime = TimeSpan.Zero;
+                        tutorial.m_successCounter++;
+                        waitTime = TimeSpan.FromSeconds(5);
+                        
+
+                    }
+                }
+
+                //Teach the player to hit Enemies
+                else if (tutorial.m_successCounter == 2)
+                {
+                    tutorial.tutorialState = Tutorial.Action.HitEnemy;
+
+                    if (previousKeyboardState.IsKeyUp(Keys.Space) && currentKeyboardState.IsKeyDown(Keys.Space))
+                    {
+                        tutorial.tutorialState = Tutorial.Action.Hide;
+                        tutorial.m_bPauseGame = false;
+                        constantLoop = true;
+
+                        //Launch the projectile
+                        projectile.m_bInOrbitToPlayer = false;
+                        throwDiscSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
+                    }
+
+                    //Wait for the player to finish
+                    if(constantLoop)
+                    currentTutorialTime = TimeSpan.Zero;
+                }
+
+                //Teach the player to smash Enemies
+                else if (tutorial.m_successCounter == 3)
+                {
+                    tutorial.tutorialState = Tutorial.Action.SmashEnemy;
+
+                    if (previousKeyboardState.IsKeyUp(Keys.Space) && currentKeyboardState.IsKeyDown(Keys.Space))
+                    {
+                        tutorial.tutorialState = Tutorial.Action.Hide;
+                        tutorial.m_bPauseGame = false;
+                        constantLoop = true;
+
+                        //Launch the projectile
+                        projectile.m_bInOrbitToPlayer = false;
+                        throwDiscSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
+                    }
+
+                    //Wait for the player to finish
+                    if (constantLoop)
+                        currentTutorialTime = TimeSpan.Zero;
+                }
+
+                else if (tutorial.m_successCounter == 4)
+                {
+                    tutorial.tutorialState = Tutorial.Action.Combo;
+
+                    if (previousKeyboardState.IsKeyUp(Keys.Space) && currentKeyboardState.IsKeyDown(Keys.Space))
+                    {
+                        tutorial.tutorialState = Tutorial.Action.Hide;
+                        tutorial.m_bPauseGame = false;
+                        constantLoop = true;
+
+                        //Launch the projectile
+                        projectile.m_bInOrbitToPlayer = false;
+                        throwDiscSnd.Play(1f, random.RandomFloat(-0.1f, 0.1f), 0f);
+                    }
+
+                    //Wait for the player to finish
+                    if (constantLoop)
+                        currentTutorialTime = TimeSpan.Zero;
+                }
+
+
+
+            }
+
+
         }
 
 
@@ -1365,14 +1711,44 @@ namespace Thro_Bot
                     player.m_bComboActive = false;
 
                     //Turn of the boss laser if the game ends
-                    if(laserShootLoop != null)
-                    laserShootLoop.Pause();
-                   
+                    if (laserShootLoop != null)
+                        laserShootLoop.Pause();
+
                 }
 
             }//end of checking if playing
 
-            else {
+            else if (currentGameScene.CurrentGameState == GameScene.GameState.Tutorial)
+            {
+                //Draw the background
+                Rectangle sourceRectangle = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+                spriteBatch.Draw(backgroundTexture, sourceRectangle, Color.White);
+
+                // Draw ring line            
+                spriteBatch.Draw(ringLineTexture, ringLinePosition, ringLineRectangle, Color.White, 0f, ringLineOrigin, 0.5f, SpriteEffects.None, 0f);
+
+                // Draw edge
+                Rectangle edgeRectangle = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+                spriteBatch.Draw(edge, edgeRectangle, Color.White);
+
+                //Draw the Player
+                player.Draw(spriteBatch);
+
+                //Draw the projectile
+                projectile.Draw(spriteBatch);
+
+                //Draw the tutorial message
+                tutorial.Draw(spriteBatch, ui.gameOverFont);
+
+
+                //Draw enemies
+                DrawEnemies(spriteBatch);
+
+            }
+
+
+            else
+            {
                 currentGameScene.Draw(spriteBatch);
             }
 

@@ -229,30 +229,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/GameOver.spritefont
 
-#begin Sounds/EnemyDeath.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/EnemyDeath.wav
-
-#begin Sounds/player_death.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/player_death.wav
-
-#begin Sounds/SpinLoop.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/SpinLoop.wav
-
-#begin Sounds/WallBounce.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/WallBounce.wav
-
 #begin Graphics/DiscFinal_spin.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -264,36 +240,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/DiscFinal_spin.png
-
-#begin Sounds/DiscHitEnemy.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/DiscHitEnemy.wav
-
-#begin Sounds/DiscHitShield.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/DiscHitShield.wav
-
-#begin Sounds/PlayerHurt.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/PlayerHurt.wav
-
-#begin Sounds/RecallDisc.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/RecallDisc.wav
-
-#begin Sounds/ThrowDisc.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/ThrowDisc.wav
 
 #begin Graphics/Boss.png
 /importer:TextureImporter
@@ -355,12 +301,6 @@
 /processorParam:TextureFormat=Color
 /build:Graphics/SmallPiece.png
 
-#begin Sounds/PickupHealth.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/PickupHealth.wav
-
 #begin Graphics/HealthEffect.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -396,24 +336,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/BackgroundDark.png
-
-#begin Sounds/LaserShootLoop.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/LaserShootLoop.wav
-
-#begin Sounds/BossIdle.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/BossIdle.wav
-
-#begin Sounds/LaserCharge.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sounds/LaserCharge.wav
 
 #begin Graphics/Thro-BotTitle.png
 /importer:TextureImporter
@@ -474,4 +396,82 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Graphics/Play.png
+
+#begin Sounds/BossIdle.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/BossIdle.wav
+
+#begin Sounds/DiscHitEnemy.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/DiscHitEnemy.wav
+
+#begin Sounds/DiscHitShield.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/DiscHitShield.wav
+
+#begin Sounds/EnemyDeath.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/EnemyDeath.wav
+
+#begin Sounds/LaserCharge.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/LaserCharge.wav
+
+#begin Sounds/LaserShootLoop.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/LaserShootLoop.wav
+
+#begin Sounds/PickupHealth.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/PickupHealth.wav
+
+#begin Sounds/player_death.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/player_death.wav
+
+#begin Sounds/PlayerHurt.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/PlayerHurt.wav
+
+#begin Sounds/RecallDisc.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/RecallDisc.wav
+
+#begin Sounds/SpinLoop.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/SpinLoop.wav
+
+#begin Sounds/ThrowDisc.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/ThrowDisc.wav
+
+#begin Sounds/WallBounce.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/WallBounce.wav
 

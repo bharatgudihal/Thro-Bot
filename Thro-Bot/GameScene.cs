@@ -18,6 +18,7 @@ namespace Thro_Bot
             MainMenu,
             Credits,
             Playing,
+            Tutorial,
             Quit
         }
 
@@ -57,6 +58,9 @@ namespace Thro_Bot
 
         //The sprite font for the credits
         public SpriteFont m_CreditsFont;
+
+        //The tutorial button
+        public MenuButton m_TutorialButton;
 
         //The quit button
         public MenuButton m_QuitButton;
@@ -114,6 +118,7 @@ namespace Thro_Bot
         public void InitializeButtons() {
             m_PlayButton = new MenuButton();
             m_CreditsButton = new MenuButton();
+            m_TutorialButton = new MenuButton();
             m_QuitButton = new MenuButton();
             m_BackButton = new MenuButton();
 
@@ -144,12 +149,14 @@ namespace Thro_Bot
                 //Update the buttons
                 m_PlayButton.Update();
                 m_CreditsButton.Update();
+                m_TutorialButton.Update();
                 m_QuitButton.Update();
                 
 
                 //Check the state of the buttons
                 CheckButtonState(m_PlayButton);
                 CheckButtonState(m_CreditsButton);
+                CheckButtonState(m_TutorialButton);
                 CheckButtonState(m_QuitButton);
 
                 //Check if the play button has been pressed
@@ -162,6 +169,12 @@ namespace Thro_Bot
                 if (m_CreditsButton.currentButtonState == MenuButton.ButtonState.Clicked)
                 {
                     CurrentGameState = GameState.Credits;
+                }
+
+                //Check if the tutorial button is pressed
+                if (m_TutorialButton.currentButtonState == MenuButton.ButtonState.Clicked)
+                {
+                    CurrentGameState = GameState.Tutorial;
                 }
 
                 //Check if the quit button has been pressed
@@ -227,6 +240,7 @@ namespace Thro_Bot
                 //Draw the buttons
                 m_PlayButton.Draw(spriteBatch);
                 m_CreditsButton.Draw(spriteBatch);
+                m_TutorialButton.Draw(spriteBatch);
                 m_QuitButton.Draw(spriteBatch);
 
                 //Draw the mouse

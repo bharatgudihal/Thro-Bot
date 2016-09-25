@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SourceFile>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/Sounds/PickupHealth.wav</SourceFile>
-  <SourceTime>2016-09-05T16:53:59.4458295-06:00</SourceTime>
+  <SourceTime>2016-09-24T14:23:45.3759112-06:00</SourceTime>
   <DestFile>C:/Users/u1070819/Documents/GitHub/Thro-Bot/Thro-Bot/Content/bin/Windows/Sounds/PickupHealth.xnb</DestFile>
-  <DestTime>2016-09-06T14:39:49.9080389-06:00</DestTime>
+  <DestTime>2016-09-24T14:25:01.6625274-06:00</DestTime>
   <Importer>WavImporter</Importer>
-  <ImporterTime>2016-03-30T00:36:08-06:00</ImporterTime>
+  <ImporterTime>2016-09-20T09:48:50-06:00</ImporterTime>
   <Processor>SoundEffectProcessor</Processor>
-  <ProcessorTime>2016-03-30T00:36:08-06:00</ProcessorTime>
+  <ProcessorTime>2016-09-20T09:48:50-06:00</ProcessorTime>
   <Parameters>
     <Key>Quality</Key>
     <Value>Best</Value>
